@@ -1,0 +1,141 @@
+<chapter id="configuring" xreflabel="Configuring">
+
+
+<title>Configuring Nagios</title>
+
+<section id="configuring-add" xreflabel="Adding Contacts">
+
+<title>Adding Email Contacts for Notifications</title>
+
+<para>
+Nagios notifications can be sent to any number of email addresses.
+To view the current set of email addresses that will receive notifications
+when nodes crash and recover, execute:
+</para>
+
+<para>
+<screen>
+# rocks list nagios contact
+</screen>
+</para>
+
+<para>
+The default contact is
+<computeroutput>root@&lt;FQDN of frontend&gt;</computeroutput>.
+For example, on the host express.rocksclusters.org, the above command
+will output:
+</para>
+
+<para>
+<screen>
+# rocks list nagios contact
+root@express.rocksclusters.org
+</screen>
+</para>
+
+<para>
+To change the default contact, execute:
+</para>
+
+<para>
+<screen>
+# rocks add nagios contact newguy@your.org
+</screen>
+</para>
+
+<para>
+Then when you list the contacts, you'll see:
+</para>
+
+<para>
+<screen>
+# rocks list nagios contact
+newguy@your.org
+</screen>
+</para>
+
+<para>
+To add an additional email address to the list of notifications,
+execute another add:
+</para>
+
+<para>
+<screen>
+# rocks add nagios contact junior@your.org
+</screen>
+</para>
+
+<para>
+Now the list of contacts will look like:
+</para>
+
+<para>
+<screen>
+# rocks list nagios contact
+junior@your.org,newguy@your.org
+</screen>
+</para>
+
+</section>
+
+
+<section id="configuring-remove" xreflabel="Removing a Contact">
+
+<title>Removing a Contact</title>
+
+<para>
+Let's assume you have two contacts specified for notifications:
+<emphasis>junior@your.org</emphasis> and
+<emphasis>newguy@your.org</emphasis>:
+</para>
+
+<para>
+<screen>
+# rocks list nagios contact
+junior@your.org,newguy@your.org
+</screen>
+</para>
+
+<para>
+To remove the contact <emphasis>newguy@your.org</emphasis>, execute:
+</para>
+
+<para>
+<screen>
+# rocks remove nagios contact newguy@your.org
+</screen>
+</para>
+
+<para>
+Then the contact list will look like:
+</para>
+
+<para>
+<screen>
+# rocks list nagios contact
+newguy@your.org
+</screen>
+</para>
+
+</section>
+
+
+<section id="configuring-apply" xreflabel="Applying Contacts">
+
+<title>Applying Updated Contacts to the Running System</title>
+
+<para>
+After you change the contact list, to apply the new contact list to
+the Nagios configuration, execute:
+</para>
+
+<para>
+<screen>
+# insert-ethers --update
+</screen>
+</para>
+
+</section>
+
+
+</chapter>

@@ -1,0 +1,10 @@
+<?xml version="1.0" standalone="no"?>
+
+<graph>
+
+	<edge from="server">
+		<to>nagios-server</to>
+	</edge>
+
+</graph>
+
