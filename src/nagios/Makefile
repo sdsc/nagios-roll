@@ -55,6 +55,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/03/12 18:44:35  jhayes
+# Initial version working on triton.
+#
 # Revision 1.1  2009/02/05 18:36:05  bruno
 # added
 #
@@ -66,37 +69,29 @@ REDHAT.ROOT     = $(PWD)/../../
 -include $(ROCKSROOT)/etc/Rules.mk
 include Rules.mk
 
-#CONFIG_FILES	= cgi.cfg commands.cfg localhost.cfg nagios.cfg resource.cfg
 CONFIG_FILES	=
 
 
 build:
 	tar zxvf $(NAME)-$(VERSION).tar.gz
-	(								\
-		cd $(NAME)-$(VERSION);					\
-		./configure --prefix=$(PKGROOT) 			\
-			--with-nagios-user=nagios 			\
-			--with-nagios-group=apache;			\
-		make all;						\
+	(							\
+	  cd $(NAME)-$(VERSION);				\
+	  ./configure --prefix=$(PKGROOT) 			\
+	  	--with-nagios-user=nagios 			\
+	  	--with-nagios-group=apache;			\
+	  make all;						\
 	)
 
 
 install::
 	mkdir -p $(ROOT)/$(PKGROOT)
 	(								\
-		cd $(NAME)-$(VERSION);					\
-		make prefix=$(ROOT)/$(PKGROOT) install;			\
-		make prefix=$(ROOT)/$(PKGROOT) install-config;		\
-		mkdir -p $(ROOT)/etc/rc.d/init.d;			\
-		install -m755 daemon-init 				\
-			$(ROOT)/etc/rc.d/init.d/nagios;			\
+	  cd $(NAME)-$(VERSION);					\
+	  make prefix=$(ROOT)/$(PKGROOT) install;			\
+	  make prefix=$(ROOT)/$(PKGROOT) install-config;		\
+	  install -m755 daemon-init $(ROOT)/$(PKGROOT)/etc;		\
+	  install -m755 sample-config/httpd.conf $(ROOT)/$(PKGROOT)/etc	\
 	)
-
-	# grep -v "cfg_file=/opt/nagios/etc/localhost.cfg"		\
-		# $(ROOT)/$(PKGROOT)/etc/nagios.cfg-sample 		\
-		# > $(ROOT)/$(PKGROOT)/etc/nagios.cfg-sample.rocks
-	# mv $(ROOT)/$(PKGROOT)/etc/nagios.cfg-sample.rocks 		\
-		# $(ROOT)/$(PKGROOT)/etc/nagios.cfg-sample		
 
 	for i in $(CONFIG_FILES) ; do 					\
 		install -m744 $(ROOT)/$(PKGROOT)/etc/$$i-sample		\

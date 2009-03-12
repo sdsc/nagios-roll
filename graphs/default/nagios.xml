@@ -2,9 +2,20 @@
 
 <graph>
 
-	<edge from="server">
-		<to>nagios-server</to>
-	</edge>
+  <description>
+  Nagios System Monitor
+  </description>
+
+  <copyright>
+  Copyright (c) 2000 - 2008 The Regents of the University of California.
+  All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
+  </copyright>
+
+  <changelog>
+  </changelog>
+
+  <edge from="server">
+    <to>nagios-server</to>
+  </edge>
 
 </graph>
-
