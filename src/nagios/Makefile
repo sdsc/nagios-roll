@@ -2,44 +2,44 @@
 # $Id$
 #
 # @Copyright@
-# 
+#
 # 				Rocks(tm)
 # 		         www.rocksclusters.org
 # 		        version 4.3 (Mars Hill)
-# 
+#
 # Copyright (c) 2000 - 2007 The Regents of the University of California.
-# All rights reserved.	
-# 
+# All rights reserved.
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
 # met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright
 # notice, this list of conditions and the following disclaimer.
-# 
+#
 # 2. Redistributions in binary form must reproduce the above copyright
 # notice unmodified and in its entirety, this list of conditions and the
-# following disclaimer in the documentation and/or other materials provided 
+# following disclaimer in the documentation and/or other materials provided
 # with the distribution.
-# 
+#
 # 3. All advertising and press materials, printed or electronic, mentioning
-# features or use of this software must display the following acknowledgement: 
-# 
+# features or use of this software must display the following acknowledgement:
+#
 # 	"This product includes software developed by the Rocks(tm)
 # 	Cluster Group at the San Diego Supercomputer Center at the
 # 	University of California, San Diego and its contributors."
-# 
+#
 # 4. Except as permitted for the purposes of acknowledgment in paragraph 3,
 # neither the name or logo of this software nor the names of its
 # authors may be used to endorse or promote products derived from this
 # software without specific prior written permission.  The name of the
 # software includes the following terms, and any derivatives thereof:
-# "Rocks", "Rocks Clusters", and "Avalanche Installer".  For licensing of 
-# the associated name, interested parties should contact Technology 
-# Transfer & Intellectual Property Services, University of California, 
-# San Diego, 9500 Gilman Drive, Mail Code 0910, La Jolla, CA 92093-0910, 
+# "Rocks", "Rocks Clusters", and "Avalanche Installer".  For licensing of
+# the associated name, interested parties should contact Technology
+# Transfer & Intellectual Property Services, University of California,
+# San Diego, 9500 Gilman Drive, Mail Code 0910, La Jolla, CA 92093-0910,
 # Ph: (858) 534-5815, FAX: (858) 534-7345, E-MAIL:invent@ucsd.edu
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS''
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
 # THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
@@ -51,10 +51,13 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2009/03/13 19:07:55  jhayes
+# Clean up node XML and Makefile.
+#
 # Revision 1.2  2009/03/12 18:44:35  jhayes
 # Initial version working on triton.
 #
@@ -63,42 +66,32 @@
 #
 #
 
-PKGROOT		= /opt/nagios
-REDHAT.ROOT     = $(PWD)/../../
+PKGROOT = /opt/nagios
+REDHAT.ROOT = $(PWD)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
 include Rules.mk
 
-CONFIG_FILES	=
-
-
 build:
 	tar zxvf $(NAME)-$(VERSION).tar.gz
-	(							\
-	  cd $(NAME)-$(VERSION);				\
-	  ./configure --prefix=$(PKGROOT) 			\
-	  	--with-nagios-user=nagios 			\
-	  	--with-nagios-group=apache;			\
-	  make all;						\
+	( \
+	  cd $(NAME)-$(VERSION); \
+	  ./configure --prefix=$(PKGROOT) \
+	    --with-nagios-user=nagios \
+	    --with-nagios-group=apache; \
+	  make all \
 	)
-
 
 install::
 	mkdir -p $(ROOT)/$(PKGROOT)
-	(								\
-	  cd $(NAME)-$(VERSION);					\
-	  make prefix=$(ROOT)/$(PKGROOT) install;			\
-	  make prefix=$(ROOT)/$(PKGROOT) install-config;		\
-	  install -m755 daemon-init $(ROOT)/$(PKGROOT)/etc;		\
-	  install -m755 sample-config/httpd.conf $(ROOT)/$(PKGROOT)/etc	\
+	( \
+	  cd $(NAME)-$(VERSION); \
+	  make prefix=$(ROOT)/$(PKGROOT) install; \
+	  make prefix=$(ROOT)/$(PKGROOT) install-config; \
+	  install -m755 daemon-init $(ROOT)/$(PKGROOT)/etc; \
+	  install -m755 sample-config/httpd.conf $(ROOT)/$(PKGROOT)/etc; \
+	  /bin/cp -r sample-config $(ROOT)/$(PKGROOT)/etc/ \
 	)
-
-	for i in $(CONFIG_FILES) ; do 					\
-		install -m744 $(ROOT)/$(PKGROOT)/etc/$$i-sample		\
-			$(ROOT)/$(PKGROOT)/etc/$$i;			\
-	done
-
 
 clean::
 	rm -rf $(NAME)-$(VERSION)
-
