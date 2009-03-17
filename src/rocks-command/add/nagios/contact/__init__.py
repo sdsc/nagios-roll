@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/03/17 06:46:59  jhayes
+# Follow conventions from other commands.
+#
 # Revision 1.1  2009/02/05 18:36:05  bruno
 # added
 #
@@ -68,13 +71,15 @@ import rocks.ip
 import rocks.util
 
 class Command(rocks.commands.Command):
+	"""
+	Add a new nagios notification email.
 
-	def usage(self):
-		return ('<email address>',
-			'email address for Nagios notifications')
+	<arg type='string' name='email'>
+	The notification email address.
+	</arg>
+	"""
 
-
-	def run(self, args):
+	def run(self, params, args):
 		if len(args) != 1:
 			self.help()
 			sys.exit(-1)

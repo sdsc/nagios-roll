@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/03/17 06:46:59  jhayes
+# Follow conventions from other commands.
+#
 # Revision 1.1  2009/02/05 18:36:05  bruno
 # added
 #
@@ -68,12 +71,11 @@ import rocks.ip
 import rocks.util
 
 class Command(rocks.commands.Command):
+	"""
+	Show nagios notification email addresses.
+	"""
 
-	def usage(self):
-		return ('', 'lists email addresses for Nagios notifications')
-
-
-	def run(self, args):
+	def run(self, params, args):
 		self.db.execute('select Value from app_globals '
 			'where Service="Nagios" and Component="Contact"')
 

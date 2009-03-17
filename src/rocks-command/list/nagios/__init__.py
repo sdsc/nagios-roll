@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/03/17 06:46:59  jhayes
+# Follow conventions from other commands.
+#
 # Revision 1.1  2009/02/05 18:36:05  bruno
 # added
 #
@@ -184,10 +187,13 @@ define hostgroup {
 """
 
 class Command(rocks.commands.Command):
+	"""
+	Generate nagios object entries.
 
-	def usage(self):
-		return ('', 'prints the Nagios configuration file')
-
+	<example cmd='list nagios'>
+	List nagios objects for all known hosts.
+	</example>
+	"""
 
 	def hostlines(self, subnet, netmask):
 		import rocks.ip
@@ -308,7 +314,7 @@ class Command(rocks.commands.Command):
 		return
 
       
-	def run(self, args):
+	def run(self, params, args):
 		if len(args) == 0:
 			object = 'all'
 		elif len(args) == 1:
