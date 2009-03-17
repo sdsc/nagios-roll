@@ -16,6 +16,7 @@
 
   <package>nagios</package>
   <package>nagios-plugins</package>
+  <package>rocks-command-nagios</package>
 
   <post>
 
