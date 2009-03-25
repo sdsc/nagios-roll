@@ -12,27 +12,32 @@
   </copyright>
 
   <changelog>
+  $Log$
+  Revision 1.5  2009/03/25 18:39:47  jhayes
+  Prep work for adding object configuration.  A bug fix or two.
+
   </changelog>
 
   <package>nagios</package>
   <package>nagios-plugins</package>
+  <package>nagios-insert-ethers</package>
   <package>rocks-command-nagios</package>
 
   <post>
 
   <!--
-    JJH: see http://nagios.sourceforge.net/docs/3_0/quickstart-fedora.html
+    # JJH: see http://nagios.sourceforge.net/docs/3_0/quickstart-fedora.html
   -->
 
   <!--
-    JJH: replaced <= gbruno
+    # JJH: replaced <= gbruno
     # Create a new nagios user account and give it a password.
     /usr/sbin/useradd -m nagios
   -->
   /usr/sbin/useradd -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios
 
   <!--
-    JJH: Unneeded: use apache group directly instead
+    # JJH: Unneeded: use apache group directly instead
     # Create a new nagcmd group for allowing external commands to be submitted
     # through the web interface. Add both the nagios user and the apache user
     # to the group.
@@ -40,17 +45,17 @@
     /usr/sbin/usermod -a -G nagcmd apache
     /usr/sbin/usermod -a -G nagcmd nagios
 
-    JJH: Done by roll build; ==with-command-group defaults to nagios
+    # JJH: Done by roll build; ==with-command-group defaults to nagios
     # Run the Nagios configure script, passing the name of the group you
     # created earlier like so:
     ./configure ==with-command-group=nagcmd
     make all
     make install
 
-    JJH: Nothing to do; Makefile already created /opt/nagios/etc/sample-config
+    # JJH: Nothing to do; Makefile already created /opt/nagios/etc/sample-config
     make install-config
 
-    JJH: Must inline these, since Makefile unavailable during installation
+    # JJH: Must inline here, since Makefile unavailable during installation
   -->
   <!-- make install-init -->
   <file name="/etc/rc.d/init.d/nagios"
@@ -63,18 +68,18 @@
         expr="/bin/cat /opt/nagios/etc/httpd.conf" perms="0644"/>
 
   <!--
-    JJH: replaced
+    # JJH: replaced
     # Replace nagios@localhost w/the email specified at installation
     vi /opt/nagios/etc/objects/contacts.cfg
   -->
   /bin/sed -e 's/nagios@localhost/<var name="Info_ClusterContact"/>/' \
-    /opt/nagios/etc/objects/contacts.cfg > /tmp/contacts.cfg
+    /opt/nagios/etc/objects/contacts.cfg &gt; /tmp/contacts.cfg
   <file name="/opt/nagios/etc/objects/contacts.cfg"
         expr="/bin/cat /tmp/contacts.cfg"/>
   /bin/rm -f /tmp/contacts.cfg
   
   <!--
-    JJH: replaced <= gbruno; I used nagiosadmin (default) instead of nagios
+    # JJH: replaced <= gbruno; I used nagiosadmin (default) instead of nagios
     # Create a nagiosadmin account for logging into the Nagios web interface.
     # Remember the password you assign to this account - you'll need it later.
     htpasswd -c /usr/local/nagios/etc/htpasswd.users nagiosadmin
@@ -84,61 +89,47 @@ nagiosadmin:<var name="Kickstart_PrivateRootPassword"/>
   </file>
 
   <!--
-    JJH: not needed
+    # JJH: not needed
     # Restart Apache to make the new settings take effect.
     service httpd restart
 
-    JJH: Handled by Makefile; opts default to nagios
+    # JJH: Handled by Makefile; opts default to nagios
     # Compile and install the plugins.
     ./configure ==with-nagios-user=nagios ==with-nagios-group=nagios
     make
     make install
 
-    JJH: <= gbruno; use of nagiosadmin above moots this
-    <file name="/opt/nagios/etc/cgi.cfg" mode="append">
-
-##
-## ROCKS
-##
-authorized_for_system_information=nagios
-authorized_for_configuration_information=nagios
-authorized_for_system_commands=nagios
-authorized_for_all_services=nagios
-authorized_for_all_hosts=nagios
-authorized_for_all_service_commands=nagios
-authorized_for_all_host_commands=nagios
     </file>
   -->
 
   <!--
-    JJH: <= gbruno commented until I understand it
-    mkdir -p /opt/nagios/etc/hosts
+    # JJH: add Rocks-specific configuration
+  -->
+  <file name="/opt/nagios/etc/rocksconfig.cfg"
+        expr="/opt/rocks/bin/rocks list nagios"/>
 
-    <file name="/opt/nagios/etc/hosts/localnodes.cfg"
-          expr="/opt/rocks/bin/rocks list nagios"/>
-
-    <file name="/opt/nagios/etc/nagios.cfg" mode="append">
+  <file name="/opt/nagios/etc/nagios.cfg" mode="append">
 
 ##
 ## ROCKS
 ##
-cfg_file=/opt/nagios/etc/hosts/localnodes.cfg
-    </file>
-  -->
+cfg_file=/opt/nagios/etc/rocksconfig.cfg
+  </file>
 
   <!--
-    JJH: Not needed
+    # JJH: Not needed
     chkconfig ==add nagios
 
-    JJH: Initial nagios launch creates ssh key.  Short-term work-around below.
+    # JJH: create ssh key so nagios won't prompt for passphrase
   -->
-  mkdir -p /opt/nagios/.ssh/
-  touch /opt/nagios/.ssh/id_rsa.pub
+  mkdir -p /opt/nagios/.ssh
+  ssh-keygen -q -f /opt/nagios/.ssh/id_rsa -N ''
+
   chown -R nagios.apache /opt/nagios
   chkconfig nagios on
 
   <!--
-    JJH: not needed
+    # JJH: not needed
     # Verify the sample Nagios configuration files.
     /opt/nagios/bin/nagios -v /opt/nagios/etc/nagios.cfg
     # If there are no errors, start Nagios.
