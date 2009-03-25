@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2009/03/25 19:55:30  jhayes
+# Change default email to cluster contact.
+#
 # Revision 1.2  2009/03/17 06:46:59  jhayes
 # Follow conventions from other commands.
 #
@@ -85,10 +88,8 @@ class Command(rocks.commands.Command):
 			contacts.append(contact)
 
 		if contacts == []:
-			localhost = self.db.getGlobalVar('Kickstart',
-							'PublicHostname')
-
-			contacts = [ 'root@%s' % (localhost) ]
+			email = self.db.getGlobalVar('Info', 'ClusterContact')
+			contacts = [ email ]
 
 		self.addText('%s' % (string.join(contacts, ',')))
 
