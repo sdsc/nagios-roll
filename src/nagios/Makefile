@@ -55,6 +55,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.4  2009/03/26 21:26:50  jhayes
+# Begin working on using rocks command to manipulate nagios config.
+#
 # Revision 1.3  2009/03/13 19:07:55  jhayes
 # Clean up node XML and Makefile.
 #
@@ -87,7 +90,6 @@ install::
 	( \
 	  cd $(NAME)-$(VERSION); \
 	  make prefix=$(ROOT)/$(PKGROOT) install; \
-	  make prefix=$(ROOT)/$(PKGROOT) install-config; \
 	  install -m755 daemon-init $(ROOT)/$(PKGROOT)/etc; \
 	  install -m755 sample-config/httpd.conf $(ROOT)/$(PKGROOT)/etc; \
 	  /bin/cp -r sample-config $(ROOT)/$(PKGROOT)/etc/ \

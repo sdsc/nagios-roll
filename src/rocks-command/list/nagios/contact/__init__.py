@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.4  2009/03/26 21:26:50  jhayes
+# Begin working on using rocks command to manipulate nagios config.
+#
 # Revision 1.3  2009/03/25 19:55:30  jhayes
 # Change default email to cluster contact.
 #
@@ -63,35 +66,29 @@
 # Revision 1.1  2009/02/05 18:36:05  bruno
 # added
 #
-#
 
 import os
-import sys
+import re
 import string
 import rocks.commands
-import rocks.reports.base
-import rocks.ip
-import rocks.util
 
 class Command(rocks.commands.Command):
-	"""
-	Show nagios notification email addresses.
-	"""
+  """
+  Show nagios notification email addresses.
+  """
 
-	def run(self, params, args):
-		self.db.execute('select Value from app_globals '
-			'where Service="Nagios" and Component="Contact"')
+  def run(self, params, args):
 
-		contacts = []
+    contacts = []
 
-		for contact, in self.db.fetchall():
-			contacts.append(contact)
+    if os.path.exists('/opt/nagios/etc/rocks/contacts.cfg'):
+      f = open('/opt/nagios/etc/rocks/contacts.cfg')
+      for line in f.readlines():
+        found = re.search(r'^\s*email\s+([^;\s]+)', line)
+        if found:
+          contacts.append(found.group(1))
+      f.close()
 
-		if contacts == []:
-			email = self.db.getGlobalVar('Info', 'ClusterContact')
-			contacts = [ email ]
+    self.addText('%s' % (string.join(contacts, "\n")))
 
-		self.addText('%s' % (string.join(contacts, ',')))
-
-		return
-
+    return

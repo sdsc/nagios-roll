@@ -54,44 +54,67 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2009/03/26 21:26:50  jhayes
+# Begin working on using rocks command to manipulate nagios config.
+#
 # Revision 1.2  2009/03/17 06:46:59  jhayes
 # Follow conventions from other commands.
 #
 # Revision 1.1  2009/02/05 18:36:05  bruno
 # added
 #
-#
 
 import os
 import sys
 import string
 import rocks.commands
-import rocks.reports.base
-import rocks.ip
-import rocks.util
+
+contactTemplate = """
+
+define contact {
+  contact_name                    %s
+  alias                           %s admin
+  service_notification_period     24x7
+  host_notification_period        24x7
+  service_notification_options    w,u,c,r
+  host_notification_options       d,r
+  service_notification_commands   notify-by-email
+  host_notification_commands      host-notify-by-email
+  email                           %s
+}
+"""
+contactgroupTemplate = """
+define contactgroup {
+  contactgroup_name       admins
+  alias                   Nagios Administrators
+  members                 %s
+}
+"""
 
 class Command(rocks.commands.Command):
-	"""
-	Add a new nagios notification email.
+  """
+  Add a new nagios notification email.
 
-	<arg type='string' name='email'>
-	The notification email address.
-	</arg>
-	"""
+  <arg type='string' name='email'>
+  The notification email address.
+  </arg>
+  """
 
-	def run(self, params, args):
-		if len(args) != 1:
-			self.help()
-			sys.exit(-1)
+  def run(self, params, args):
+    if len(args) != 1:
+      self.abort('email required')
 
-		#
-		# insert the new contact
-		#
-		cmd = 'insert into app_globals ' + \
-			'(Service, Component, Value) ' + \
-			'values ("Nagios", "Contact", "%s")' % (args[0])
+    contacts = string.split(self.command('list.nagios.contact'), "\n")
+    if len(contacts) == 1 and contacts[0] == '':
+      contacts = []
+    for contact in contacts:
+      if contact == args[0]:
+        return
+    contacts.append(args[0])
+    f = open('/opt/nagios/etc/rocks/contacts.cfg', 'w')
+    for contact in contacts:
+      f.write(contactTemplate % (contact, contact, contact))
+    f.write(contactgroupTemplate % (string.join(contacts, ',')))
+    f.close()
 
-		self.db.execute(cmd)
-
-		return
-
+    return

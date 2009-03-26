@@ -13,6 +13,9 @@
 
   <changelog>
   $Log$
+  Revision 1.6  2009/03/26 21:26:49  jhayes
+  Begin working on using rocks command to manipulate nagios config.
+
   Revision 1.5  2009/03/25 18:39:47  jhayes
   Prep work for adding object configuration.  A bug fix or two.
 
@@ -20,7 +23,6 @@
 
   <package>nagios</package>
   <package>nagios-plugins</package>
-  <package>nagios-insert-ethers</package>
   <package>rocks-command-nagios</package>
 
   <post>
@@ -68,17 +70,10 @@
         expr="/bin/cat /opt/nagios/etc/httpd.conf" perms="0644"/>
 
   <!--
-    # JJH: replaced
+    # JJH: not needed
     # Replace nagios@localhost w/the email specified at installation
     vi /opt/nagios/etc/objects/contacts.cfg
-  -->
-  /bin/sed -e 's/nagios@localhost/<var name="Info_ClusterContact"/>/' \
-    /opt/nagios/etc/objects/contacts.cfg &gt; /tmp/contacts.cfg
-  <file name="/opt/nagios/etc/objects/contacts.cfg"
-        expr="/bin/cat /tmp/contacts.cfg"/>
-  /bin/rm -f /tmp/contacts.cfg
-  
-  <!--
+
     # JJH: replaced <= gbruno; I used nagiosadmin (default) instead of nagios
     # Create a nagiosadmin account for logging into the Nagios web interface.
     # Remember the password you assign to this account - you'll need it later.
@@ -103,18 +98,26 @@ nagiosadmin:<var name="Kickstart_PrivateRootPassword"/>
   -->
 
   <!--
-    # JJH: add Rocks-specific configuration
+    # JJH: add configuration
   -->
-  <file name="/opt/nagios/etc/rocksconfig.cfg"
-        expr="/opt/rocks/bin/rocks list nagios"/>
-
   <file name="/opt/nagios/etc/nagios.cfg" mode="append">
 
 ##
 ## ROCKS
 ##
-cfg_file=/opt/nagios/etc/rocksconfig.cfg
+
+# configuration packaged w/nagios
+cfg_file=/opt/nagios/etc/objects/timeperiods.cfg
+cfg_file=/opt/nagios/etc/objects/templates.cfg
+cfg_file=/opt/nagios/etc/objects/localhost.cfg
+
+# Rocks-generated configuration
+cfg_dir=/opt/nagios/etc/rocks
+
   </file>
+
+  /bin/mkdir -p /opt/nagios/etc/rocks
+  /opt/rocks/bin/rocks add nagios contact email='<var name="Info_ClusterContact"/>'
 
   <!--
     # JJH: Not needed

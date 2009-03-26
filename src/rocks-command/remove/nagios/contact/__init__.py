@@ -54,39 +54,40 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2009/03/26 21:26:50  jhayes
+# Begin working on using rocks command to manipulate nagios config.
+#
 # Revision 1.2  2009/03/17 06:47:00  jhayes
 # Follow conventions from other commands.
 #
 # Revision 1.1  2009/02/05 18:36:05  bruno
 # added
 #
-#
 
 import os
 import sys
 import string
 import rocks.commands
-import rocks.reports.base
-import rocks.ip
-import rocks.util
 
 class Command(rocks.commands.Command):
-	"""
-	Remove an existing nagios notification email.
+  """
+  Remove an existing nagios notification email.
 
-	<arg type='string' name='email'>
-	The notification email address.
-	</arg>
-	"""
+  <arg type='string' name='email'>
+  The notification email address.
+  </arg>
+  """
 
-	def run(self, params, args):
-		if len(args) != 1:
-			self.help()
-			sys.exit(-1)
+  def run(self, params, args):
+    if len(args) != 1:
+      self.abort('email required')
 
-		self.db.execute('delete from app_globals '
-			'where Service="Nagios" and Component="Contact" '
-			'and Value="%s"' % args[0])
-
-		return
-
+    contacts = string.split(self.command('list.nagios.contact'), "\n")
+    if len(contacts) == 1 and contacts[0] == '':
+      contacts = []
+    if os.path.exists('/opt/nagios/etc/rocks/contacts.cfg'):
+      os.remove('/opt/nagios/etc/rocks/contacts.cfg')
+    for contact in contacts:
+      if(contact != args[0]):
+        self.command('add.nagios.contact', [contact])
+    return
