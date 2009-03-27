@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.6  2009/03/27 22:58:29  jhayes
+# Debugging.
+#
 # Revision 1.5  2009/03/27 18:54:51  jhayes
 # Add nagios host commands.
 #
@@ -73,34 +76,58 @@
 import string
 import rocks.commands
 
-contactDefaults = """\
+timeperiodDefs = """\
+define timeperiod {
+  timeperiod_name 24x7    
+  alias           All day, every day
+  sunday          00:00-24:00
+  monday          00:00-24:00
+  tuesday         00:00-24:00
+  wednesday       00:00-24:00
+  thursday        00:00-24:00
+  friday          00:00-24:00
+  saturday        00:00-24:00
+}
+"""
+
+contactHeader = """\
+define command {
+  command_name email-re-host
+  command_line /usr/bin/printf "%b" "***** Nagios *****\\n\\nNotification Type: $NOTIFICATIONTYPE$\\nHost: $HOSTNAME$\\nState: $HOSTSTATE$\\nAddress: $HOSTADDRESS$\\nInfo: $HOSTOUTPUT$\\n\\nDate/Time: $LONGDATETIME$\\n" | @MAIL_PROG@ -s "** $NOTIFICATIONTYPE$ Host Alert: $HOSTNAME$ is $HOSTSTATE$ **" $CONTACTEMAIL$
+}
+
+define command {
+  command_name email-re-service
+  command_line /usr/bin/printf "%b" "***** Nagios *****\\n\\nNotification Type: $NOTIFICATIONTYPE$\\n\\nService: $SERVICEDESC$\\nHost: $HOSTALIAS$\\nAddress: $HOSTADDRESS$\\nState: $SERVICESTATE$\\n\\nDate/Time: $LONGDATETIME$\\n\\nAdditional Info:\\n\\n$SERVICEOUTPUT$" | @MAIL_PROG@ -s "** $NOTIFICATIONTYPE$ Service Alert: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **" $CONTACTEMAIL$
+}
+
 define contact {
-  contact_name                  contact-defaults
+  name                          contact-defaults
   host_notifications_enabled    1
   service_notifications_enabled 1
   host_notification_period      24x7
   service_notification_period   24x7
   host_notification_options     d,u,r,f,s
   service_notification_options  w,u,c,r,f,s
-  host_notification_commands    notify-host-by-email
-  service_notification_commands notify-service-by-email
+  host_notification_commands    email-re-host
+  service_notification_commands email-re-service
   register                      0
 }
 """
 
 contactFormat = """\
 define contact {
-  use                           contact-defaults
-  contact_name                  %s
-  email                         %s
+  use          contact-defaults
+  contact_name %s
+  email        %s
 }
 """
 
 contactgroupFormat = """\
 define contactgroup {
-  contactgroup_name             admins
-  alias                         Nagios Administrators
-  members                       %s
+  contactgroup_name admins
+  alias             Nagios Administrators
+  members           %s
 }
 """
 
@@ -126,8 +153,11 @@ class Command(rocks.commands.Command):
         return
     contacts.append(args[0])
 
+    f = open('/opt/nagios/etc/rocks/timeperiods.cfg', 'w')
+    f.write(timeperiodDefs)
+    f.close()
     f = open('/opt/nagios/etc/rocks/contacts.cfg', 'w')
-    f.write(contactDefaults)
+    f.write(contactHeader)
     for contact in contacts:
       f.write("\n")
       f.write(contactFormat % (contact, contact))

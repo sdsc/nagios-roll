@@ -55,6 +55,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.5  2009/03/27 22:58:28  jhayes
+# Debugging.
+#
 # Revision 1.4  2009/03/26 21:26:50  jhayes
 # Begin working on using rocks command to manipulate nagios config.
 #
@@ -87,6 +90,7 @@ build:
 
 install::
 	mkdir -p $(ROOT)/$(PKGROOT)
+	mkdir -p $(ROOT)/$(PKGROOT)/etc
 	( \
 	  cd $(NAME)-$(VERSION); \
 	  make prefix=$(ROOT)/$(PKGROOT) install; \

@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/03/27 22:58:29  jhayes
+# Debugging.
+#
 # Revision 1.1  2009/03/27 18:54:51  jhayes
 # Add nagios host commands.
 #
@@ -73,35 +76,54 @@
 import string
 import rocks.commands
 
-hostDefaults = """\
+timeperiodDefs = """\
+define timeperiod {
+  timeperiod_name 24x7    
+  alias           All day, every day
+  sunday          00:00-24:00
+  monday          00:00-24:00
+  tuesday         00:00-24:00
+  wednesday       00:00-24:00
+  thursday        00:00-24:00
+  friday          00:00-24:00
+  saturday        00:00-24:00
+}
+"""
+
+hostHeader = """\
+define command {
+  command_name host-ping
+  command_line $USER1$/check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 5
+}
+
 define host {
-  host_name                     host-defaults
+  name                          host-defaults
   alias                         Host Defaults
-  check_command                 check-host-alive ; aka ping
-  max_check_attempts            10               ; 10 failed pings == "down"
-  check_interval                5                ; check every 5 min
-  retry_interval                1                ; wait 1 min between retries
-  check_period                  24x7             ; check all day, every day
+  check_command                 host-ping
+  max_check_attempts            10            ; 10 failed pings == "down"
+  check_interval                5             ; check every 5 min
+  retry_interval                1             ; wait 1 min between retries
+  check_period                  24x7          ; check all day, every day
   event_handler_enabled         1
   flap_detection_enabled        1
   process_perf_data             1
   retain_status_information     1
   retain_nonstatus_information  1
   contact_groups                admins
-  notification_interval         240              ; resend after 4 hours
-  notification_period           24x7             ; send notification whenever
-  notification_options          d,u,r            ; down, up, recover
+  notification_interval         240           ; renotify after 4 hours
+  notification_period           24x7          ; send notification whenever
+  notification_options          d,u,r         ; down, up, recover
   notifications_enabled         1
   register                      0
 }
 """
 
 hostFormat = """\
-define contact {
-  use                           host-defaults
-  host_name                     %s
-  alias                         %s
-  address                       %s
+define host {
+  use       host-defaults
+  host_name %s
+  alias     %s
+  address   %s
 }
 """
 
@@ -132,8 +154,11 @@ class Command(rocks.commands.Command):
         return
     hosts.append(newHost)
 
+    f = open('/opt/nagios/etc/rocks/timeperiods.cfg', 'w')
+    f.write(timeperiodDefs)
+    f.close()
     f = open('/opt/nagios/etc/rocks/hosts.cfg', 'w')
-    f.write(hostDefaults)
+    f.write(hostHeader)
     for host in hosts:
       (name, ip) = string.split(host)
       f.write("\n")

@@ -13,6 +13,9 @@
 
   <changelog>
   $Log$
+  Revision 1.7  2009/03/27 22:58:28  jhayes
+  Debugging.
+
   Revision 1.6  2009/03/26 21:26:49  jhayes
   Begin working on using rocks command to manipulate nagios config.
 
@@ -54,11 +57,11 @@
     make all
     make install
 
-    # JJH: Nothing to do; Makefile already created /opt/nagios/etc/sample-config
-    make install-config
-
     # JJH: Must inline here, since Makefile unavailable during installation
   -->
+  <!-- make install-config -->
+  <file name="/opt/nagios/etc/cgi.cfg"
+        expr="/bin/cat /opt/nagios/etc/sample-config/cgi.cfg"/>
   <!-- make install-init -->
   <file name="/etc/rc.d/init.d/nagios"
         expr="/bin/cat /opt/nagios/etc/daemon-init" perms="0755"/>
@@ -100,24 +103,17 @@ nagiosadmin:<var name="Kickstart_PrivateRootPassword"/>
   <!--
     # JJH: add configuration
   -->
-  <file name="/opt/nagios/etc/nagios.cfg" mode="append">
-
+  <file name="/opt/nagios/etc/nagios.cfg" perms="0644">
 ##
 ## ROCKS
 ##
 
-# configuration packaged w/nagios
-cfg_file=/opt/nagios/etc/objects/timeperiods.cfg
-cfg_file=/opt/nagios/etc/objects/templates.cfg
-cfg_file=/opt/nagios/etc/objects/localhost.cfg
-
-# Rocks-generated configuration
 cfg_dir=/opt/nagios/etc/rocks
-
   </file>
 
   /bin/mkdir -p /opt/nagios/etc/rocks
-  /opt/rocks/bin/rocks add nagios contact email='<var name="Info_ClusterContact"/>'
+  /opt/rocks/bin/rocks add nagios contact '<var name="Info_ClusterContact"/>'
+  /opt/rocks/bin/rocks add nagios host localhost 127.0.0.1
 
   <!--
     # JJH: Not needed
