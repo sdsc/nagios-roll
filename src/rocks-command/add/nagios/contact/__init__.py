@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.4  2009/03/27 17:48:42  jhayes
+# Tidier implementation.
+#
 # Revision 1.3  2009/03/26 21:26:50  jhayes
 # Begin working on using rocks command to manipulate nagios config.
 #
@@ -64,30 +67,36 @@
 # added
 #
 
-import os
-import sys
 import string
 import rocks.commands
 
-contactTemplate = """
-
+contactDefaults = """
 define contact {
-  contact_name                    %s
-  alias                           %s admin
-  service_notification_period     24x7
-  host_notification_period        24x7
-  service_notification_options    w,u,c,r
-  host_notification_options       d,r
-  service_notification_commands   notify-by-email
-  host_notification_commands      host-notify-by-email
-  email                           %s
+  name                          contact-defaults
+  host_notifications_enabled    1
+  service_notifications_enabled 1
+  host_notification_period      24x7
+  service_notification_period   24x7
+  host_notification_options     d,u,r,f,s
+  service_notification_options  w,u,c,r,f,s
+  host_notification_commands    notify-host-by-email
+  service_notification_commands notify-service-by-email
+  register                      0
 }
 """
-contactgroupTemplate = """
+
+contactFormat = """
+define contact {
+  use                           contact-defaults
+  contact_name                  %s
+  email                         %s
+}
+"""
+contactgroupFormat = """
 define contactgroup {
-  contactgroup_name       admins
-  alias                   Nagios Administrators
-  members                 %s
+  contactgroup_name             admins
+  alias                         Nagios Administrators
+  members                       %s
 }
 """
 
@@ -101,6 +110,7 @@ class Command(rocks.commands.Command):
   """
 
   def run(self, params, args):
+
     if len(args) != 1:
       self.abort('email required')
 
@@ -111,10 +121,14 @@ class Command(rocks.commands.Command):
       if contact == args[0]:
         return
     contacts.append(args[0])
+
     f = open('/opt/nagios/etc/rocks/contacts.cfg', 'w')
+    f.write(contactDefaults)
     for contact in contacts:
-      f.write(contactTemplate % (contact, contact, contact))
-    f.write(contactgroupTemplate % (string.join(contacts, ',')))
+      f.write("\n")
+      f.write(contactFormat % (contact, contact))
+    f.write("\n")
+    f.write(contactgroupFormat % (string.join(contacts, ',')))
     f.close()
 
     return
