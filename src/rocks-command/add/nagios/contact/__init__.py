@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.5  2009/03/27 18:54:51  jhayes
+# Add nagios host commands.
+#
 # Revision 1.4  2009/03/27 17:48:42  jhayes
 # Tidier implementation.
 #
@@ -70,9 +73,9 @@
 import string
 import rocks.commands
 
-contactDefaults = """
+contactDefaults = """\
 define contact {
-  name                          contact-defaults
+  contact_name                  contact-defaults
   host_notifications_enabled    1
   service_notifications_enabled 1
   host_notification_period      24x7
@@ -85,14 +88,15 @@ define contact {
 }
 """
 
-contactFormat = """
+contactFormat = """\
 define contact {
   use                           contact-defaults
   contact_name                  %s
   email                         %s
 }
 """
-contactgroupFormat = """
+
+contactgroupFormat = """\
 define contactgroup {
   contactgroup_name             admins
   alias                         Nagios Administrators

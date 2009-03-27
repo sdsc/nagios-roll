@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.4  2009/03/27 18:54:52  jhayes
+# Add nagios host commands.
+#
 # Revision 1.3  2009/03/26 21:26:50  jhayes
 # Begin working on using rocks command to manipulate nagios config.
 #
@@ -65,7 +68,6 @@
 #
 
 import os
-import sys
 import string
 import rocks.commands
 

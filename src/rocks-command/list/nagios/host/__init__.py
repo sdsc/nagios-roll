@@ -54,7 +54,7 @@
 # @Copyright@
 #
 # $Log$
-# Revision 1.5  2009/03/27 18:54:52  jhayes
+# Revision 1.1  2009/03/27 18:54:52  jhayes
 # Add nagios host commands.
 #
 # Revision 1.4  2009/03/26 21:26:50  jhayes
@@ -72,26 +72,31 @@
 
 import os
 import re
-import string
 import rocks.commands
 
 class Command(rocks.commands.Command):
   """
-  Show nagios notification email addresses.
+  Show nagios hosts.
   """
 
   def run(self, params, args):
 
-    contacts = []
+    result = ''
 
-    if os.path.exists('/opt/nagios/etc/rocks/contacts.cfg'):
-      f = open('/opt/nagios/etc/rocks/contacts.cfg')
+    if os.path.exists('/opt/nagios/etc/rocks/hosts.cfg'):
+      f = open('/opt/nagios/etc/rocks/hosts.cfg')
       for line in f.readlines():
-        found = re.search(r'^\s*contact_name\s+([^;\s]+)', line)
-        if found and found.group(1) != 'contact-defaults':
-          contacts.append(found.group(1))
+        found = re.search(r'^\s*(host_name|address)\s+([^;\s]+)', line)
+        if found:
+          if found.group(1) == 'address':
+            result += " "
+          elif found.group(2) == 'host-defaults':
+            continue
+          elif result != '':
+            result += "\n"
+          result += found.group(2)
       f.close()
 
-    self.addText('%s' % (string.join(contacts, "\n")))
+    self.addText(result)
 
     return

@@ -54,16 +54,13 @@
 # @Copyright@
 #
 # $Log$
-# Revision 1.5  2009/03/27 18:54:52  jhayes
+# Revision 1.1  2009/03/27 18:54:52  jhayes
 # Add nagios host commands.
 #
-# Revision 1.4  2009/03/26 21:26:50  jhayes
+# Revision 1.3  2009/03/26 21:26:50  jhayes
 # Begin working on using rocks command to manipulate nagios config.
 #
-# Revision 1.3  2009/03/25 19:55:30  jhayes
-# Change default email to cluster contact.
-#
-# Revision 1.2  2009/03/17 06:46:59  jhayes
+# Revision 1.2  2009/03/17 06:47:00  jhayes
 # Follow conventions from other commands.
 #
 # Revision 1.1  2009/02/05 18:36:05  bruno
@@ -71,27 +68,30 @@
 #
 
 import os
-import re
 import string
 import rocks.commands
 
 class Command(rocks.commands.Command):
   """
-  Show nagios notification email addresses.
+  Remove an existing nagios host.
+
+  <arg type='string' name='name'>
+  The host name.
+  </arg>
   """
 
   def run(self, params, args):
 
-    contacts = []
+    if len(args) != 1:
+      self.abort('host name required')
 
-    if os.path.exists('/opt/nagios/etc/rocks/contacts.cfg'):
-      f = open('/opt/nagios/etc/rocks/contacts.cfg')
-      for line in f.readlines():
-        found = re.search(r'^\s*contact_name\s+([^;\s]+)', line)
-        if found and found.group(1) != 'contact-defaults':
-          contacts.append(found.group(1))
-      f.close()
-
-    self.addText('%s' % (string.join(contacts, "\n")))
-
+    hosts = string.split(self.command('list.nagios.host'), "\n")
+    if len(hosts) == 1 and hosts[0] == '':
+      hosts = []
+    if os.path.exists('/opt/nagios/etc/rocks/hosts.cfg'):
+      os.remove('/opt/nagios/etc/rocks/hosts.cfg')
+    for host in hosts:
+      pieces = string.split(host, ' ')
+      if(pieces[0] != args[0]):
+        self.command('add.nagios.host', pieces)
     return

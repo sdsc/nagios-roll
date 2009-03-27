@@ -54,14 +54,14 @@
 # @Copyright@
 #
 # $Log$
-# Revision 1.5  2009/03/27 18:54:52  jhayes
+# Revision 1.1  2009/03/27 18:54:51  jhayes
 # Add nagios host commands.
 #
-# Revision 1.4  2009/03/26 21:26:50  jhayes
-# Begin working on using rocks command to manipulate nagios config.
+# Revision 1.4  2009/03/27 17:48:42  jhayes
+# Tidier implementation.
 #
-# Revision 1.3  2009/03/25 19:55:30  jhayes
-# Change default email to cluster contact.
+# Revision 1.3  2009/03/26 21:26:50  jhayes
+# Begin working on using rocks command to manipulate nagios config.
 #
 # Revision 1.2  2009/03/17 06:46:59  jhayes
 # Follow conventions from other commands.
@@ -70,28 +70,74 @@
 # added
 #
 
-import os
-import re
 import string
 import rocks.commands
 
+hostDefaults = """\
+define host {
+  host_name                     host-defaults
+  alias                         Host Defaults
+  check_command                 check-host-alive ; aka ping
+  max_check_attempts            10               ; 10 failed pings == "down"
+  check_interval                5                ; check every 5 min
+  retry_interval                1                ; wait 1 min between retries
+  check_period                  24x7             ; check all day, every day
+  event_handler_enabled         1
+  flap_detection_enabled        1
+  process_perf_data             1
+  retain_status_information     1
+  retain_nonstatus_information  1
+  contact_groups                admins
+  notification_interval         240              ; resend after 4 hours
+  notification_period           24x7             ; send notification whenever
+  notification_options          d,u,r            ; down, up, recover
+  notifications_enabled         1
+  register                      0
+}
+"""
+
+hostFormat = """\
+define contact {
+  use                           host-defaults
+  host_name                     %s
+  alias                         %s
+  address                       %s
+}
+"""
+
 class Command(rocks.commands.Command):
   """
-  Show nagios notification email addresses.
+  Add a new nagios host.
+
+  <arg type='string' name='name'>
+  The host name.
+  </arg>
+
+  <arg type='string' name='ip'>
+  The host address.
+  </arg>
   """
 
   def run(self, params, args):
 
-    contacts = []
+    if len(args) != 2:
+      self.abort('name, ip required')
 
-    if os.path.exists('/opt/nagios/etc/rocks/contacts.cfg'):
-      f = open('/opt/nagios/etc/rocks/contacts.cfg')
-      for line in f.readlines():
-        found = re.search(r'^\s*contact_name\s+([^;\s]+)', line)
-        if found and found.group(1) != 'contact-defaults':
-          contacts.append(found.group(1))
-      f.close()
+    hosts = string.split(self.command('list.nagios.host'), "\n")
+    if len(hosts) == 1 and hosts[0] == '':
+      hosts = []
+    newHost = args[0] + " " + args[1]
+    for host in hosts:
+      if host == newHost:
+        return
+    hosts.append(newHost)
 
-    self.addText('%s' % (string.join(contacts, "\n")))
+    f = open('/opt/nagios/etc/rocks/hosts.cfg', 'w')
+    f.write(hostDefaults)
+    for host in hosts:
+      (name, ip) = string.split(host)
+      f.write("\n")
+      f.write(hostFormat % (name, name, ip))
+    f.close()
 
     return
