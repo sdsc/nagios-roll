@@ -13,6 +13,9 @@
 
   <changelog>
   $Log$
+  Revision 1.8  2009/03/28 00:40:39  jhayes
+  More debugging.
+
   Revision 1.7  2009/03/27 22:58:28  jhayes
   Debugging.
 
@@ -113,7 +116,9 @@ cfg_dir=/opt/nagios/etc/rocks
 
   /bin/mkdir -p /opt/nagios/etc/rocks
   /opt/rocks/bin/rocks add nagios contact '<var name="Info_ClusterContact"/>'
-  /opt/rocks/bin/rocks add nagios host localhost 127.0.0.1
+  /opt/rocks/bin/rocks add nagios host \
+    '<var name="Kickstart_PrivateHostname"/>' \
+    '<var name="Kickstart_PrivateAddress"/>'
 
   <!--
     # JJH: Not needed

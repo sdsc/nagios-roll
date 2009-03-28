@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2009/03/28 00:40:39  jhayes
+# More debugging.
+#
 # Revision 1.2  2009/03/27 22:58:29  jhayes
 # Debugging.
 #
@@ -109,7 +112,7 @@ define host {
   process_perf_data             1
   retain_status_information     1
   retain_nonstatus_information  1
-  contact_groups                admins
+  contact_groups                nagios-administrators
   notification_interval         240           ; renotify after 4 hours
   notification_period           24x7          ; send notification whenever
   notification_options          d,u,r         ; down, up, recover
@@ -124,6 +127,50 @@ define host {
   host_name %s
   alias     %s
   address   %s
+}
+"""
+
+hostgroupFormat = """\
+define hostgroup {
+  hostgroup_name  All Hosts
+  alias           All Hosts
+  members         %s
+}
+"""
+
+# TODO: Here for now, maybe separated later
+serviceHeader = """\
+define service {
+  name                         service-defaults
+  is_volatile                  0
+  max_check_attempts           4
+  check_interval               5
+  retry_interval               1
+  active_checks_enabled        1
+  passive_checks_enabled       1
+  check_period                 24x7
+  obsess_over_service          1
+  check_freshness              0
+  event_handler_enabled        1
+  flap_detection_enabled       1
+  process_perf_data            1
+  retain_status_information    1
+  retain_nonstatus_information 1
+  notification_interval        240
+  notification_period          24x7
+  notification_options         w,u,c,r
+  notifications_enabled        1
+  contact_groups               nagios-administrators
+  register                     0
+}
+"""
+
+serviceFormat = """\
+define service {
+  use                 service-defaults
+  hostgroup_name      %s
+  service_description %s
+  check_command       %s
 }
 """
 
@@ -157,12 +204,21 @@ class Command(rocks.commands.Command):
     f = open('/opt/nagios/etc/rocks/timeperiods.cfg', 'w')
     f.write(timeperiodDefs)
     f.close()
+
+    names = []
     f = open('/opt/nagios/etc/rocks/hosts.cfg', 'w')
     f.write(hostHeader)
     for host in hosts:
       (name, ip) = string.split(host)
       f.write("\n")
       f.write(hostFormat % (name, name, ip))
+      names.append(name)
+    f.write("\n")
+    f.write(hostgroupFormat % string.join(names, ','))
+    f.write("\n")
+    f.write(serviceHeader)
+    f.write("\n")
+    f.write(serviceFormat % ('All Hosts', 'PING', 'host-ping'))
     f.close()
 
     return

@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.7  2009/03/28 00:40:39  jhayes
+# More debugging.
+#
 # Revision 1.6  2009/03/27 22:58:29  jhayes
 # Debugging.
 #
@@ -125,7 +128,7 @@ define contact {
 
 contactgroupFormat = """\
 define contactgroup {
-  contactgroup_name admins
+  contactgroup_name nagios-administrators
   alias             Nagios Administrators
   members           %s
 }
