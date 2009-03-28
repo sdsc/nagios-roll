@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.6  2009/03/28 06:15:02  jhayes
+# Add ability to specify contact groups when adding contact.
+#
 # Revision 1.5  2009/03/27 18:54:52  jhayes
 # Add nagios host commands.
 #
@@ -86,10 +89,16 @@ class Command(rocks.commands.Command):
 
     if os.path.exists('/opt/nagios/etc/rocks/contacts.cfg'):
       f = open('/opt/nagios/etc/rocks/contacts.cfg')
+      contact = {}
       for line in f.readlines():
-        found = re.search(r'^\s*contact_name\s+([^;\s]+)', line)
-        if found and found.group(1) != 'contact-defaults':
-          contacts.append(found.group(1))
+        found = re.search(r'^\s*(contactgroups|email)\s+([^;]+)', line)
+        if not found:
+          continue
+        contact[found.group(1)] = found.group(2).strip()
+        if contact.has_key('contactgroups') and contact.has_key('email'):
+          contacts.append('%s groups="%s"' %
+                          (contact['email'], contact['contactgroups']))
+          contact = {}
       f.close()
 
     self.addText('%s' % (string.join(contacts, "\n")))
