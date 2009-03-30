@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2009/03/30 21:16:58  jhayes
+# Debugging.
+#
 # Revision 1.2  2009/03/30 19:29:43  jhayes
 # Split nagios service manipluation into separate commands.  Remove all add
 # arguments in favor of named params.  Lotsa code improvements.
@@ -97,12 +100,12 @@ class Command(rocks.commands.Command):
       os.remove('/opt/nagios/etc/rocks/hosts.cfg')
     for host in hosts:
       parse = re.match(
-        r'^name=[\'"](.*?)[\'"]\s+ip=[\'"](.*?)[\'"]\s+groups=[\'"](.*?)[\'"]\s*$', host
+        r'^name=[\'"](.*?)[\'"]\s+ip=[\'"](.*?)[\'"]\s+contacts=[\'"](.*?)[\'"]\s+groups=[\'"](.*?)[\'"]\s*$', host
       )
       if parse and parse.group(1) != args[0]:
         self.command(
           'add.nagios.host',
           ['name=' + parse.group(1), 'ip=' + parse.group(2),
-           'groups=' + parse.group(3)]
+           'contacts=' + parse.group(3), 'groups=' + parse.group(4)]
         )
     return

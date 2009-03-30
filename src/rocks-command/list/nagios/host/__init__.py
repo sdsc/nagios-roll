@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2009/03/30 21:16:58  jhayes
+# Debugging.
+#
 # Revision 1.2  2009/03/30 19:29:42  jhayes
 # Split nagios service manipluation into separate commands.  Remove all add
 # arguments in favor of named params.  Lotsa code improvements.
@@ -93,14 +96,17 @@ class Command(rocks.commands.Command):
       host = {}
       for line in f.readlines():
         found = re.search(
-          r'^\s*(host_name|address|hostgroups)\s+([^;]+)', line
+          r'^\s*(host_name|address|hostgroups|contact_groups)\s+([^;]+)', line
         )
         if not found:
           continue
         host[found.group(1)] = found.group(2).strip()
-        if len(host) == 3:
-          hosts.append('name="%s" ip="%s" groups="%s"' %
-                       (host['host_name'], host['address'], host['hostgroups']))
+        if len(host) == 4:
+          hosts.append(
+            'name="%s" ip="%s" contacts="%s" groups="%s"' %
+            (host['host_name'], host['address'], host['contact_groups'],
+             host['hostgroups'])
+          )
           host = {}
       f.close()
 

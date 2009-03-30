@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.5  2009/03/30 21:16:58  jhayes
+# Debugging.
+#
 # Revision 1.4  2009/03/30 19:29:42  jhayes
 # Split nagios service manipluation into separate commands.  Remove all add
 # arguments in favor of named params.  Lotsa code improvements.
@@ -100,14 +103,14 @@ define timeperiod {
 
 hostHeader = """\
 define command {
-  command_name host-ping
+  command_name ping-host
   command_line $USER1$/check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 5
 }
 
 define host {
   name                          host-defaults
   alias                         Host Defaults
-  check_command                 host-ping
+  check_command                 ping-host
   max_check_attempts            10            ; 10 failed pings == "down"
   check_interval                5             ; check every 5 min
   retry_interval                1             ; wait 1 min between retries
@@ -117,7 +120,6 @@ define host {
   process_perf_data             1
   retain_status_information     1
   retain_nonstatus_information  1
-  contact_groups                nagios-administrators
   notification_interval         240           ; renotify after 4 hours
   notification_period           24x7          ; send notification whenever
   notification_options          d,u,r         ; down, up, recover
@@ -128,11 +130,12 @@ define host {
 
 hostFormat = """\
 define host {
-  use        host-defaults
-  host_name  %s
-  alias      %s
-  address    %s
-  hostgroups %s
+  use            host-defaults
+  host_name      %s
+  alias          %s
+  address        %s
+  hostgroups     %s
+  contact_groups %s
 }
 """
 
@@ -160,6 +163,10 @@ class Command(rocks.commands.Command):
   Host groups that should include this host.
   </param>
 
+  <param type='string' name='contacts'>
+  Contact group to be notified of host status.
+  </param>
+
   <example cmd='add nagios host name=nas-0-0 ip=10.1.1.100'>
   </example>
 
@@ -169,10 +176,11 @@ class Command(rocks.commands.Command):
 
   def run(self, params, args):
 
-    if not ('name' in params and 'ip' in params):
-      self.abort('name, ip required')
+    if not ('name' in params and 'ip' in params and 'contacts' in params):
+      self.abort('name, ip, contacts required')
     newName = params['name']
     newIp = params['ip']
+    newContacts = params['contacts']
     if 'groups' in params:
       newGroups = params['groups']
     else:
@@ -180,17 +188,20 @@ class Command(rocks.commands.Command):
 
     ipsByName = {}
     groupsByName = {}
+    contactsByName = {}
     hosts = string.split(self.command('list.nagios.host'), "\n")
     if len(hosts) == 1 and hosts[0] == '':
       hosts = []
     for host in hosts:
       parse = re.match(
-        r'^name=[\'"](.*?)[\'"]\s+ip=[\'"](.*?)[\'"]\s+groups=[\'"](.*?)[\'"]\s*$', host
+        r'^name=[\'"](.*?)[\'"]\s+ip=[\'"](.*?)[\'"]\s+contacts=[\'"](.*?)[\'"]\s+groups=[\'"](.*?)[\'"]\s*$', host
       )
       if parse:
         ipsByName[parse.group(1)] = parse.group(2)
-        groupsByName[parse.group(1)] = parse.group(3)
+        contactsByName[parse.group(1)] = parse.group(3)
+        groupsByName[parse.group(1)] = parse.group(4)
     ipsByName[newName] = newIp
+    contactsByName[newName] = newContacts
     groupsByName[newName] = newGroups
 
     membersByGroup = {}
@@ -209,8 +220,10 @@ class Command(rocks.commands.Command):
     f.write(hostHeader)
     for name in groupsByName.keys():
       f.write("\n")
-      f.write(hostFormat %
-              (name, name, ipsByName[name], groupsByName[name]))
+      f.write(
+        hostFormat %
+        (name, name, ipsByName[name], groupsByName[name], contactsByName[name])
+      )
     for group in membersByGroup.keys():
       f.write("\n")
       f.write(hostgroupFormat % (group, group, membersByGroup[group]))
