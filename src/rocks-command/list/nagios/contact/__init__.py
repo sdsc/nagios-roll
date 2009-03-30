@@ -54,6 +54,10 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.7  2009/03/30 19:29:42  jhayes
+# Split nagios service manipluation into separate commands.  Remove all add
+# arguments in favor of named params.  Lotsa code improvements.
+#
 # Revision 1.6  2009/03/28 06:15:02  jhayes
 # Add ability to specify contact groups when adding contact.
 #
@@ -95,8 +99,8 @@ class Command(rocks.commands.Command):
         if not found:
           continue
         contact[found.group(1)] = found.group(2).strip()
-        if contact.has_key('contactgroups') and contact.has_key('email'):
-          contacts.append('%s groups="%s"' %
+        if len(contact) == 2:
+          contacts.append('email="%s" groups="%s"' %
                           (contact['email'], contact['contactgroups']))
           contact = {}
       f.close()

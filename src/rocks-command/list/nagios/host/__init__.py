@@ -54,6 +54,10 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/03/30 19:29:42  jhayes
+# Split nagios service manipluation into separate commands.  Remove all add
+# arguments in favor of named params.  Lotsa code improvements.
+#
 # Revision 1.1  2009/03/27 18:54:52  jhayes
 # Add nagios host commands.
 #
@@ -72,6 +76,7 @@
 
 import os
 import re
+import string
 import rocks.commands
 
 class Command(rocks.commands.Command):
@@ -81,22 +86,24 @@ class Command(rocks.commands.Command):
 
   def run(self, params, args):
 
-    result = ''
+    hosts = []
 
     if os.path.exists('/opt/nagios/etc/rocks/hosts.cfg'):
       f = open('/opt/nagios/etc/rocks/hosts.cfg')
+      host = {}
       for line in f.readlines():
-        found = re.search(r'^\s*(host_name|address)\s+([^;\s]+)', line)
-        if found:
-          if found.group(1) == 'address':
-            result += " "
-          elif found.group(2) == 'host-defaults':
-            continue
-          elif result != '':
-            result += "\n"
-          result += found.group(2)
+        found = re.search(
+          r'^\s*(host_name|address|hostgroups)\s+([^;]+)', line
+        )
+        if not found:
+          continue
+        host[found.group(1)] = found.group(2).strip()
+        if len(host) == 3:
+          hosts.append('name="%s" ip="%s" groups="%s"' %
+                       (host['host_name'], host['address'], host['hostgroups']))
+          host = {}
       f.close()
 
-    self.addText(result)
+    self.addText('%s' % (string.join(hosts, "\n")))
 
     return

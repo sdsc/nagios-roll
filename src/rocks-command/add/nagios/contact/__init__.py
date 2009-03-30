@@ -54,6 +54,10 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.9  2009/03/30 19:29:42  jhayes
+# Split nagios service manipluation into separate commands.  Remove all add
+# arguments in favor of named params.  Lotsa code improvements.
+#
 # Revision 1.8  2009/03/28 06:15:02  jhayes
 # Add ability to specify contact groups when adding contact.
 #
@@ -142,27 +146,27 @@ class Command(rocks.commands.Command):
   """
   Add a new nagios notification email.
 
-  <arg type='string' name='email'>
+  <param type='string' name='email'>
   The notification email address.
-  </arg>
+  </param>
 
   <param type='string' name='groups'>
   Contact groups that should include this contact.
   </param>
 
-  <example cmd='add nagios contact me@myhost.org'>
+  <example cmd='add nagios contact email=me@myhost.org'>
   </example>
 
-  <example cmd='add nagios contact me@myhost.org groups="Nagios Admin"'>
+  <example cmd='add nagios contact email=me@myhost.org groups="Nagios Admin"'>
   </example>
   """
 
   def run(self, params, args):
 
-    if len(args) != 1:
+    if not 'email' in params:
       self.abort('email required')
-    newEmail = args[0]
-    if params.has_key('groups'):
+    newEmail = params['email']
+    if 'groups' in params:
       newGroups = params['groups']
     else:
       newGroups = newEmail + ' group'
@@ -170,32 +174,35 @@ class Command(rocks.commands.Command):
     contacts = self.command('list.nagios.contact').split("\n")
     if len(contacts) == 1 and contacts[0] == '':
       contacts = []
-    membershipsByEmail = {}
+    groupsByEmail = {}
     for contact in contacts:
-      parse = re.match(r'^(\S+)\s+groups=[\'"](.*)[\'"]\s*$', contact)
+      parse = re.match(
+        r'^email=[\'"](.*?)[\'"]\s+groups=[\'"](.*?)[\'"]\s*$', contact
+      )
       if parse:
-        membershipsByEmail[parse.group(1)] = parse.group(2)
-    membershipsByEmail[newEmail] = newGroups
+        groupsByEmail[parse.group(1)] = parse.group(2)
+    groupsByEmail[newEmail] = newGroups
 
-    membershipsByGroup = {}
-    for email in membershipsByEmail.keys():
-      for group in membershipsByEmail[email].split(','):
-        if not membershipsByGroup.has_key(group):
-          membershipsByGroup[group] = email
+    membersByGroup = {}
+    for email in groupsByEmail.keys():
+      for group in groupsByEmail[email].split(','):
+        if not group in membersByGroup:
+          membersByGroup[group] = email
         else:
-          membershipsByGroup[group] += ',' + email
+          membersByGroup[group] += ',' + email
 
     f = open('/opt/nagios/etc/rocks/timeperiods.cfg', 'w')
     f.write(timeperiodDefs)
     f.close()
+
     f = open('/opt/nagios/etc/rocks/contacts.cfg', 'w')
     f.write(contactHeader)
-    for email in membershipsByEmail.keys():
+    for email in groupsByEmail.keys():
       f.write("\n")
-      f.write(contactFormat % (email, membershipsByEmail[email], email))
-    f.write("\n")
-    for group in membershipsByGroup.keys():
-      f.write(contactgroupFormat % (group, group, membershipsByGroup[group]))
+      f.write(contactFormat % (email, groupsByEmail[email], email))
+    for group in membersByGroup.keys():
+      f.write("\n")
+      f.write(contactgroupFormat % (group, group, membersByGroup[group]))
     f.close()
 
     return

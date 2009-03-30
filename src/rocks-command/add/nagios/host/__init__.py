@@ -54,6 +54,10 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.4  2009/03/30 19:29:42  jhayes
+# Split nagios service manipluation into separate commands.  Remove all add
+# arguments in favor of named params.  Lotsa code improvements.
+#
 # Revision 1.3  2009/03/28 00:40:39  jhayes
 # More debugging.
 #
@@ -76,6 +80,7 @@
 # added
 #
 
+import re
 import string
 import rocks.commands
 
@@ -123,54 +128,19 @@ define host {
 
 hostFormat = """\
 define host {
-  use       host-defaults
-  host_name %s
-  alias     %s
-  address   %s
+  use        host-defaults
+  host_name  %s
+  alias      %s
+  address    %s
+  hostgroups %s
 }
 """
 
 hostgroupFormat = """\
 define hostgroup {
-  hostgroup_name  All Hosts
-  alias           All Hosts
+  hostgroup_name  %s
+  alias           %s
   members         %s
-}
-"""
-
-# TODO: Here for now, maybe separated later
-serviceHeader = """\
-define service {
-  name                         service-defaults
-  is_volatile                  0
-  max_check_attempts           4
-  check_interval               5
-  retry_interval               1
-  active_checks_enabled        1
-  passive_checks_enabled       1
-  check_period                 24x7
-  obsess_over_service          1
-  check_freshness              0
-  event_handler_enabled        1
-  flap_detection_enabled       1
-  process_perf_data            1
-  retain_status_information    1
-  retain_nonstatus_information 1
-  notification_interval        240
-  notification_period          24x7
-  notification_options         w,u,c,r
-  notifications_enabled        1
-  contact_groups               nagios-administrators
-  register                     0
-}
-"""
-
-serviceFormat = """\
-define service {
-  use                 service-defaults
-  hostgroup_name      %s
-  service_description %s
-  check_command       %s
 }
 """
 
@@ -178,47 +148,72 @@ class Command(rocks.commands.Command):
   """
   Add a new nagios host.
 
-  <arg type='string' name='name'>
+  <param type='string' name='name'>
   The host name.
-  </arg>
+  </param>
 
-  <arg type='string' name='ip'>
+  <param type='string' name='ip'>
   The host address.
-  </arg>
+  </param>
+
+  <param type='string' name='groups'>
+  Host groups that should include this host.
+  </param>
+
+  <example cmd='add nagios host name=nas-0-0 ip=10.1.1.100'>
+  </example>
+
+  <example cmd='add nagios host name=compute-0-1 ip=10.1.1.101 groups="compute nodes"'>
+  </example>
   """
 
   def run(self, params, args):
 
-    if len(args) != 2:
+    if not ('name' in params and 'ip' in params):
       self.abort('name, ip required')
+    newName = params['name']
+    newIp = params['ip']
+    if 'groups' in params:
+      newGroups = params['groups']
+    else:
+      newGroups = newName + ' group'
 
+    ipsByName = {}
+    groupsByName = {}
     hosts = string.split(self.command('list.nagios.host'), "\n")
     if len(hosts) == 1 and hosts[0] == '':
       hosts = []
-    newHost = args[0] + " " + args[1]
     for host in hosts:
-      if host == newHost:
-        return
-    hosts.append(newHost)
+      parse = re.match(
+        r'^name=[\'"](.*?)[\'"]\s+ip=[\'"](.*?)[\'"]\s+groups=[\'"](.*?)[\'"]\s*$', host
+      )
+      if parse:
+        ipsByName[parse.group(1)] = parse.group(2)
+        groupsByName[parse.group(1)] = parse.group(3)
+    ipsByName[newName] = newIp
+    groupsByName[newName] = newGroups
+
+    membersByGroup = {}
+    for name in groupsByName.keys():
+      for group in groupsByName[name].split(','):
+        if not group in membersByGroup:
+          membersByGroup[group] = name
+        else:
+          membersByGroup[group] += ',' + name
 
     f = open('/opt/nagios/etc/rocks/timeperiods.cfg', 'w')
     f.write(timeperiodDefs)
     f.close()
 
-    names = []
     f = open('/opt/nagios/etc/rocks/hosts.cfg', 'w')
     f.write(hostHeader)
-    for host in hosts:
-      (name, ip) = string.split(host)
+    for name in groupsByName.keys():
       f.write("\n")
-      f.write(hostFormat % (name, name, ip))
-      names.append(name)
-    f.write("\n")
-    f.write(hostgroupFormat % string.join(names, ','))
-    f.write("\n")
-    f.write(serviceHeader)
-    f.write("\n")
-    f.write(serviceFormat % ('All Hosts', 'PING', 'host-ping'))
+      f.write(hostFormat %
+              (name, name, ipsByName[name], groupsByName[name]))
+    for group in membersByGroup.keys():
+      f.write("\n")
+      f.write(hostgroupFormat % (group, group, membersByGroup[group]))
     f.close()
 
     return

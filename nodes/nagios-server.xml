@@ -13,6 +13,10 @@
 
   <changelog>
   $Log$
+  Revision 1.9  2009/03/30 19:29:42  jhayes
+  Split nagios service manipluation into separate commands.  Remove all add
+  arguments in favor of named params.  Lotsa code improvements.
+
   Revision 1.8  2009/03/28 00:40:39  jhayes
   More debugging.
 
@@ -115,10 +119,15 @@ cfg_dir=/opt/nagios/etc/rocks
   </file>
 
   /bin/mkdir -p /opt/nagios/etc/rocks
-  /opt/rocks/bin/rocks add nagios contact '<var name="Info_ClusterContact"/>'
+  /opt/rocks/bin/rocks add nagios contact \
+    email='<var name="Info_ClusterContact"/>' groups='administrators'
   /opt/rocks/bin/rocks add nagios host \
-    '<var name="Kickstart_PrivateHostname"/>' \
-    '<var name="Kickstart_PrivateAddress"/>'
+    name='<var name="Kickstart_PrivateHostname"/>' \
+    ip='<var name="Kickstart_PrivateAddress"/>' \
+    groups='all-hosts'
+  /opt/rocks/bin/rocks add nagios service \
+    name='PING' hosts='all-hosts' \
+    command='check_ping!100.0,20%!500.0,60%' contacts='administrators'
 
   <!--
     # JJH: Not needed

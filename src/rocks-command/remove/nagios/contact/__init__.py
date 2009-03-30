@@ -54,6 +54,10 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.6  2009/03/30 19:29:42  jhayes
+# Split nagios service manipluation into separate commands.  Remove all add
+# arguments in favor of named params.  Lotsa code improvements.
+#
 # Revision 1.5  2009/03/28 06:15:02  jhayes
 # Add ability to specify contact groups when adding contact.
 #
@@ -84,17 +88,23 @@ class Command(rocks.commands.Command):
   """
 
   def run(self, params, args):
+
     if len(args) != 1:
       self.abort('email required')
 
     contacts = self.command('list.nagios.contact').split("\n")
     if len(contacts) == 1 and contacts[0] == '':
       contacts = []
+
     if os.path.exists('/opt/nagios/etc/rocks/contacts.cfg'):
       os.remove('/opt/nagios/etc/rocks/contacts.cfg')
     for contact in contacts:
-      parse = re.match(r'^(\S+)\s+groups=[\'"](.*)[\'"]\s*$', contact)
+      parse = re.match(
+        r'^email=[\'"](.*?)[\'"]\s+groups=[\'"](.*?)[\'"]\s*$', contact
+      )
       if parse and parse.group(1) != args[0]:
-        self.command('add.nagios.contact',
-                     [parse.group(1), 'groups=' + parse.group(2)])
+        self.command(
+          'add.nagios.contact',
+          ['email=' + parse.group(1), 'groups=' + parse.group(2)]
+        )
     return
