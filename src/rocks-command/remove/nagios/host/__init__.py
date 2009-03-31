@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.4  2009/03/31 21:52:31  jhayes
+# Restart nagios after adding/removing objects.
+#
 # Revision 1.3  2009/03/30 21:16:58  jhayes
 # Debugging.
 #
@@ -108,4 +111,6 @@ class Command(rocks.commands.Command):
           ['name=' + parse.group(1), 'ip=' + parse.group(2),
            'contacts=' + parse.group(3), 'groups=' + parse.group(4)]
         )
+
+    os.system('service nagios restart > /dev/null 2>&1')
     return

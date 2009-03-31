@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/03/31 21:52:31  jhayes
+# Restart nagios after adding/removing objects.
+#
 # Revision 1.1  2009/03/31 13:37:36  jhayes
 # Add service commands.
 #
@@ -79,6 +82,7 @@
 # added
 #
 
+import os
 import re
 import string
 import rocks.commands
@@ -189,4 +193,5 @@ class Command(rocks.commands.Command):
       )
     f.close()
 
+    os.system('service nagios restart > /dev/null 2>&1')
     return

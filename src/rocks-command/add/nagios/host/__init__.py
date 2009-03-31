@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.7  2009/03/31 21:52:31  jhayes
+# Restart nagios after adding/removing objects.
+#
 # Revision 1.6  2009/03/30 23:14:49  jhayes
 # Debugging.
 #
@@ -86,6 +89,7 @@
 # added
 #
 
+import os
 import re
 import string
 import rocks.commands
@@ -232,4 +236,5 @@ class Command(rocks.commands.Command):
       f.write(hostgroupFormat % (group, group, membersByGroup[group]))
     f.close()
 
+    os.system('service nagios restart > /dev/null 2>&1')
     return

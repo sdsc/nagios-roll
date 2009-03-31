@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.7  2009/03/31 21:52:31  jhayes
+# Restart nagios after adding/removing objects.
+#
 # Revision 1.6  2009/03/30 19:29:42  jhayes
 # Split nagios service manipluation into separate commands.  Remove all add
 # arguments in favor of named params.  Lotsa code improvements.
@@ -107,4 +110,6 @@ class Command(rocks.commands.Command):
           'add.nagios.contact',
           ['email=' + parse.group(1), 'groups=' + parse.group(2)]
         )
+
+    os.system('service nagios restart > /dev/null 2>&1')
     return
