@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.5  2009/04/01 19:09:02  jhayes
+# Allow batch add in prep for sync command.
+#
 # Revision 1.4  2009/03/31 21:52:31  jhayes
 # Restart nagios after adding/removing objects.
 #
@@ -79,6 +82,7 @@
 
 import os
 import re
+import tempfile
 import rocks.commands
 
 class Command(rocks.commands.Command):
@@ -95,22 +99,21 @@ class Command(rocks.commands.Command):
     if len(args) != 1:
       self.abort('host name required')
 
-    hosts = self.command('list.nagios.host').split("\n")
-    if len(hosts) == 1 and hosts[0] == '':
-      hosts = []
+    lines = self.command('list.nagios.host').split("\n")
+    if len(lines) == 1 and lines[0] == '':
+      lines = []
+
+    tempname = tempfile.mktemp('.txt')
+    f = open(tempname, 'w')
+    for line in lines:
+      if not re.search('name=[\'"]?' + args[0] + r'[\'"]?(\s|$)', line):
+        f.write(line + "\n")
+    f.close()
 
     if os.path.exists('/opt/nagios/etc/rocks/hosts.cfg'):
       os.remove('/opt/nagios/etc/rocks/hosts.cfg')
-    for host in hosts:
-      parse = re.match(
-        r'^name=[\'"](.*?)[\'"]\s+ip=[\'"](.*?)[\'"]\s+contacts=[\'"](.*?)[\'"]\s+groups=[\'"](.*?)[\'"]\s*$', host
-      )
-      if parse and parse.group(1) != args[0]:
-        self.command(
-          'add.nagios.host',
-          ['name=' + parse.group(1), 'ip=' + parse.group(2),
-           'contacts=' + parse.group(3), 'groups=' + parse.group(4)]
-        )
+    self.command('add.nagios.host', ['file=' + tempname])
 
+    os.remove(tempname)
     os.system('service nagios restart > /dev/null 2>&1')
     return
