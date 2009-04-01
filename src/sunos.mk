@@ -54,7 +54,7 @@
 # @Copyright@
 #
 # $Log$
-# Revision 1.2  2009/04/01 19:15:34  phil
+# Revision 1.1  2009/04/01 19:15:34  phil
 # Adjustments to build on Solaris
 #
 # Revision 1.1  2009/02/05 18:36:05  bruno
@@ -62,13 +62,6 @@
 #
 #
 
--include $(shell ${ROCKSROOT}/bin/arch).mk
--include $(shell ${ROCKSROOT}/bin/os).mk
-
-default:
-	@echo "copyright|rpm|pkg|clean"
-
-copyright rpm pkg clean::
-	for i in $(SRCDIRS) ; do \
-		(cd $$i; $(MAKE) $@) ; \
-	done
+SRCDIRS = `find * -prune -type d \
+	! -name CVS \
+	! -name .`
