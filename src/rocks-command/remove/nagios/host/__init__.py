@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.6  2009/04/02 17:14:44  jhayes
+# Remove redundant restarts.
+#
 # Revision 1.5  2009/04/01 19:09:02  jhayes
 # Allow batch add in prep for sync command.
 #
@@ -115,5 +118,4 @@ class Command(rocks.commands.Command):
     self.command('add.nagios.host', ['file=' + tempname])
 
     os.remove(tempname)
-    os.system('service nagios restart > /dev/null 2>&1')
     return

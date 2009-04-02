@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.8  2009/04/02 17:14:44  jhayes
+# Remove redundant restarts.
+#
 # Revision 1.7  2009/03/31 21:52:31  jhayes
 # Restart nagios after adding/removing objects.
 #
@@ -111,5 +114,4 @@ class Command(rocks.commands.Command):
           ['email=' + parse.group(1), 'groups=' + parse.group(2)]
         )
 
-    os.system('service nagios restart > /dev/null 2>&1')
     return
