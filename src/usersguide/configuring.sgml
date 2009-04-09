@@ -1,140 +1,109 @@
 <chapter id="configuring" xreflabel="Configuring">
-
-
 <title>Configuring Nagios</title>
 
-<section id="configuring-add" xreflabel="Adding Contacts">
-
-<title>Adding Email Contacts for Notifications</title>
 
 <para>
-Nagios notifications can be sent to any number of email addresses.
-To view the current set of email addresses that will receive notifications
-when nodes crash and recover, execute:
+Configuring nagios on your cluster involves specifying information for three
+kinds of nagios objects.  Nagios <emphasis>contacts</emphasis> specify email
+addresses to notify when the state of your cluster changes.  Nagios
+<emphasis>hosts</emphasis> describe the compute nodes or similar resources
+that are part of your cluster.  Nagios <emphasis>services</emphasis> are the
+host attributes or network services that nagios monitors.
+</para><para>
+Configuration for each of these nagios objects can be managed using the
+<command>rocks</command> command-line tool, as described below.
 </para>
 
+<section id="configuring-contacts" xreflabel="Configuring Contacts">
+<title>Configuring Nagios Contacts</title>
 <para>
+You can use the <command>rocks add nagios contact</command> command to specify
+additional emails to notify in the event of cluster status changes, the
+<command>rocks remove nagios contact</command> command to delete emails, and the
+<command>rocks list nagios contact</command> command to show the emails you've
+entered.  The <command>rocks add nagios host</command> command has this format:
 <screen>
+# rocks add nagios contact email=<emphasis>login@host</emphasis> [groups=<emphasis>group</emphasis>[,<emphasis>group ...</emphasis>]]
+</screen>
+The <command>groups</command> parameter allows you to specify one or more
+<emphasis>contact groups</emphasis> that should include the new contact.  These
+groups are used later when you specify which contacts should receive
+notification about host and service state changes.  If you specify no
+<command>groups</command> parameter, the <command>rocks</command> command
+generates a group from the email.
+</para><para>
+Here is an example of using several <command>rocks</command> commands to add,
+remove, and list nagios contacts:
+<screen>
+# rocks add nagios contact email=alf@ufo.edu
 # rocks list nagios contact
-</screen>
-</para>
-
-<para>
-The default contact is
-<computeroutput>root@&lt;FQDN of frontend&gt;</computeroutput>.
-For example, on the host express.rocksclusters.org, the above command
-will output:
-</para>
-
-<para>
-<screen>
+email="alf@ufo.edu" groups="alf@ufo.edu group"
+# rocks add nagios contact email=r2d2@ufo.edu groups=administrators
 # rocks list nagios contact
-root@express.rocksclusters.org
-</screen>
-</para>
-
-<para>
-To change the default contact, execute:
-</para>
-
-<para>
-<screen>
-# rocks add nagios contact newguy@your.org
-</screen>
-</para>
-
-<para>
-Then when you list the contacts, you'll see:
-</para>
-
-<para>
-<screen>
+email="alf@ufo.edu" groups="alf@ufo.edu group"
+email="r2d2@ufo.edu" groups="administrators"
+# rocks remove nagios contact alf@ufo.edu
 # rocks list nagios contact
-newguy@your.org
+email="r2d2@ufo.edu" groups="administrators"
 </screen>
 </para>
-
-<para>
-To add an additional email address to the list of notifications,
-execute another add:
-</para>
-
-<para>
-<screen>
-# rocks add nagios contact junior@your.org
-</screen>
-</para>
-
-<para>
-Now the list of contacts will look like:
-</para>
-
-<para>
-<screen>
-# rocks list nagios contact
-junior@your.org,newguy@your.org
-</screen>
-</para>
-
 </section>
 
-
-<section id="configuring-remove" xreflabel="Removing a Contact">
-
-<title>Removing a Contact</title>
-
+<section id="configuring-hosts" xreflabel="Configuring Hosts">
+<title>Configuring Nagios Hosts</title>
 <para>
-Let's assume you have two contacts specified for notifications:
-<emphasis>junior@your.org</emphasis> and
-<emphasis>newguy@your.org</emphasis>:
-</para>
-
-<para>
+You can use the <command>rocks add nagios host</command> command to tell nagios
+about resources in your cluster, the <command>rocks remove nagios host</command>
+command to delete hosts, and the <command>rocks list nagios host</command>
+command to show the hosts you've entered.  The <command>rocks add nagios
+host</command> command has this format:
 <screen>
-# rocks list nagios contact
-junior@your.org,newguy@your.org
+# rocks add nagios host name=<emphasis>string</emphasis> ip=<emphasis>address</emphasis> contacts=<emphasis>group</emphasis>[,<emphasis>group ...</emphasis>] \
+  [groups=<emphasis>group</emphasis>[,<emphasis>group ...</emphasis>]]
+</screen>
+The <command>contacts</command> parameter specifies one or more contact groups
+(defined in the <command>rocks add nagios contact</command> command) that
+should receive email when the state of this host changes.  The
+<command>groups</command> parameter allows you to specify one or more
+<emphasis>host groups</emphasis> that should include the new host.  These
+groups are used later when you specify which hosts provide specific services.
+If you specify no <command>groups</command> parameter, the
+<command>rocks</command> command generates a group from the host name.
+</para><para>
+Here is an example of using several <command>rocks</command> commands to add,
+remove, and list nagios hosts:
+<screen>
+# rocks add nagios host name=c1 ip=10.1.255.250 contacts=administrators
+# rocks add nagios host name=c2 ip=10.1.255.249 contacts=administrators groups=bignodes
+# rocks list nagios host
+name="c2" ip="10.1.255.249" contacts="administrators" groups="bignodes"
+name="c1" ip="10.1.255.250" contacts="administrators" groups="c1 group"
+# rocks remove nagios host c1
+# rocks list nagios host
+name="c2" ip="10.1.255.249" contacts="administrators" groups="bignodes"
+</screen>
+You may never need to use the <command>rocks add nagios host</command>
+directly.  The <command>rocks sync nagios</command> command automatically adds
+all the hosts in your cluster to nagios, placing each in a group named after its
+appliance type.  Here is an example of its use:
+<screen>
+# rocks list nagios host
+# rocks sync nagios contacts=administrators
+# rocks list nagios host
+name="compute-0-0-appliance" ip="10.1.255.254" contacts="administrators" groups="Compute-group"
+name="compute-0-1-appliance" ip="10.1.255.253" contacts="administrators" groups="Compute-group"
+name="compute-0-2-appliance" ip="10.1.255.252" contacts="administrators" groups="Compute-group"
+name="compute-0-3-appliance" ip="10.1.255.251" contacts="administrators" groups="Compute-group"
+&lt;etc.&gt;
+name="blue-appliance" ip="10.1.1.1" contacts="administrators" groups="Frontend-group"
 </screen>
 </para>
-
-<para>
-To remove the contact <emphasis>newguy@your.org</emphasis>, execute:
-</para>
-
-<para>
-<screen>
-# rocks remove nagios contact newguy@your.org
-</screen>
-</para>
-
-<para>
-Then the contact list will look like:
-</para>
-
-<para>
-<screen>
-# rocks list nagios contact
-newguy@your.org
-</screen>
-</para>
-
 </section>
 
-
-<section id="configuring-apply" xreflabel="Applying Contacts">
-
-<title>Applying Updated Contacts to the Running System</title>
-
+<section id="configuring-services" xreflabel="Configuring Services">
+<title>Configuring Nagios Services</title>
 <para>
-After you change the contact list, to apply the new contact list to
-the Nagios configuration, execute:
 </para>
-
-<para>
-<screen>
-# insert-ethers --update
-</screen>
-</para>
-
 </section>
 
 
