@@ -18,7 +18,7 @@ Configuration for each of these nagios objects can be managed using the
 <title>Configuring Nagios Contacts</title>
 <para>
 You can use the <command>rocks add nagios contact</command> command to specify
-additional emails to notify in the event of cluster status changes, the
+emails to notify in the event of cluster status changes, the
 <command>rocks remove nagios contact</command> command to delete emails, and the
 <command>rocks list nagios contact</command> command to show the emails you've
 entered.  The <command>rocks add nagios host</command> command has this format:
@@ -103,8 +103,69 @@ name="blue-appliance" ip="10.1.1.1" contacts="administrators" groups="Frontend-g
 <section id="configuring-services" xreflabel="Configuring Services">
 <title>Configuring Nagios Services</title>
 <para>
+You can use the <command>rocks add nagios service</command> command to specify
+additional host metrics or services for nagios to monitor, the
+<command>rocks remove nagios service</command> command to end monitoring of
+specific metrics or services, and the <command>rocks list nagios
+service</command> command to show the metrics and services nagios is
+monitoring.  The <command>rocks add nagios service</command> command has this
+format:
+<screen>
+# rocks add nagios service name=<emphasis>string</emphasis> hosts=<emphasis>group</emphasis>[,<emphasis>group</emphasis> ...] command=<emphasis>string</emphasis> \
+    contacts=<emphasis>group</emphasis>[,<emphasis>group</emphasis> ...]
+</screen>
+The <command>name</command> parameter identifies the service; you can use any
+name that you find meaningful.  The <command>hosts</command> parameter
+specifies one or more host groups to monitor; these host groups are defined by
+the <command>rocks add nagios host</command> command.  The
+<command>contacts</command> parameter specifies one or more contact groups that
+nagios should notify when the status of this service changes; these contact
+groups are defined by the <command>rocks add nagios contact</command> command.
+</para><para>
+The <command>command</command> parameter specifies the shell execution line
+to be used for testing the service.  Typically, this execution line will
+specify one of the plug-in programs packaged with nagios along with any
+necessary command-line options to be passed to the program.  The nagios
+installation includes dozens of these programs; they can be found in
+/opt/nagios/libexec.  Running any of these with a --help option will print a
+description of the program and its options.  Online documentation for nagios
+plug-ins can be found at http://nagiosplugins.org/man.
+</para><para>
+Nagios provides many <emphasis>macros</emphasis> that can be used to
+incorporate host-specific informtation (e.g., IP address) in command
+definitions.  See http://nagios.sourceforge.net/docs/3_0/macrolist.html for a
+list of the macros that nagios supports.
+</para><para>
+Here is an example of using several <command>rocks</command> commands to add,
+remove, and list nagios services:
+<screen>
+TODO
+</screen>
 </para>
 </section>
 
+<section id="initial-configuration" xreflabel="Initial Configuration">
+<title>Initial Nagios Configuration</title>
+<para>
+During installation, the Rocks nagios roll automatically adds the cluster
+contact email entered on the Rocks cluster information screen as a nagios
+contact.  This contact is included in the nagios contact group "administrators".
+This contact group receives information about the nagios host group
+"all-hosts", a group the roll automatically defines with the cluster frontend
+as its initial member.  The Rocks nagios roll creates a nagios service to
+periodically perform a ping test to this host group.
+</para><para>
+This set of <command>rocks</command> commands shows the initial nagios
+configuration:
+<screen>
+# rocks list nagios contact
+email="alf@ufo.edu" groups="administrators"
+# rocks list nagios host
+name="blue" ip="10.1.1.1" contacts="administrators" groups="all-hosts"
+# rocks list nagios service
+name="PING" hosts="all-hosts" command="check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 5" contacts="administrators"
+</screen>
+</para>
+</section>
 
 </chapter>

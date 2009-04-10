@@ -1,30 +1,19 @@
 <chapter id="using" xreflabel="Using">
-
-<title>Using Nagios</title>
-
+<title>Examining Nagios Results</title>
 
 <para>
-To use Nagios, point your web browser to the URL:
-</para>
-
-<para>
+To examine the monitoring data collected by nagios, point your web browser to
+the URL:
 <screen>
 http://localhost/nagios/
 </screen>
-</para>
-
-<para>
 A window will popup asking for a username and password.
-Enter <computeroutput>nagios</computeroutput> for the username and
+Enter <computeroutput>nagiosadmin</computeroutput> for the username and
 the root user's password for the password.
-</para>
-
-<para>
+</para><para>
 Then you'll see the Nagios web page.
 Click on <computeroutput>Host Detail</computeroutput> to see the status
 of all the monitored nodes.
 </para>
 
-
 </chapter>
-
