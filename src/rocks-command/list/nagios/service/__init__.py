@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/04/10 21:36:37  jhayes
+# Allow definition of service frequency and retry period.
+#
 # Revision 1.1  2009/03/31 13:37:36  jhayes
 # Add service commands.
 #
@@ -92,19 +95,20 @@ class Command(rocks.commands.Command):
       service = {}
       for line in f.readlines():
         found = re.search(
-          r'^\s*(hostgroup_name|service_description|command_line|contact_groups)\s+([^;]+)', line
+          r'^\s*(check_interval|hostgroup_name|service_description|command_line|contact_groups|retry_interval)\s+([^;]+)', line
         )
         if not found:
           continue
         service[found.group(1)] = found.group(2).strip()
-        if len(service) == 4:
+        if len(service) == 6:
           found = re.search(r'^\S*/(.*)$', service['command_line'])
           if found:
             service['command_line'] = found.group(1)
           services.append(
-            'name="%s" hosts="%s" command="%s" contacts="%s"' %
+            'name="%s" hosts="%s" command="%s" contacts="%s" frequency="%s" retry="%s"' %
             (service['service_description'], service['hostgroup_name'],
-             service['command_line'], service['contact_groups'])
+             service['command_line'], service['contact_groups'],
+             service['check_interval'], service['retry_interval'])
           )
           service = {}
       f.close()

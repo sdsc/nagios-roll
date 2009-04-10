@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.4  2009/04/10 21:36:37  jhayes
+# Allow definition of service frequency and retry period.
+#
 # Revision 1.3  2009/04/01 19:12:50  jhayes
 # Add warning header to configuration files.
 #
@@ -99,8 +102,6 @@ define service {
   name                         service-defaults
   is_volatile                  0
   max_check_attempts           4
-  check_interval               5
-  retry_interval               1
   active_checks_enabled        1
   passive_checks_enabled       1
   check_period                 24x7
@@ -132,6 +133,8 @@ define service {
   hostgroup_name      %s
   service_description %s
   check_command       %s
+  check_interval      %s
+  retry_interval      %s
   contact_groups      %s
 }
 """
@@ -155,6 +158,14 @@ class Command(rocks.commands.Command):
   <param type='string' name='contacts'>
   The contract group to notify about service state.
   </param>
+
+  <param type='integer' name='frequency'>
+  How often to check the service.
+  </param>
+
+  <param type='integer' name='retry'>
+  How often to retry the service when it fails initially.
+  </param>
   """
 
   def run(self, params, args):
@@ -166,24 +177,36 @@ class Command(rocks.commands.Command):
     newHosts = params['hosts']
     newCommand = params['command']
     newContacts = params['contacts']
+    newFrequency = 5
+    newRetry = 1
+    if 'frequency' in params:
+      newFrequency = params['frequency']
+    if 'retry' in params:
+      newFrequency = params['retry']
 
     hostsByName = {}
     commandsByName = {}
     contactsByName = {}
+    frequencyByName = {}
+    retryByName = {}
     services = string.split(self.command('list.nagios.service'), "\n")
     if len(services) == 1 and services[0] == '':
       services = []
     for service in services:
       parse = re.match(
-        r'^name=[\'"](.*?)[\'"]\s+hosts=[\'"](.*?)[\'"]\s+command=[\'"](.*?)[\'"]\s+contacts=[\'"](.*?)[\'"]\s*$', service
+        r'^name=[\'"](.*?)[\'"]\s+hosts=[\'"](.*?)[\'"]\s+command=[\'"](.*?)[\'"]\s+contacts=[\'"](.*?)[\'"]\s+frequency=[\'"](.*?)[\'"]\s+retry=[\'"](.*?)[\'"]\s*$', service
       )
       if parse:
         hostsByName[parse.group(1)] = parse.group(2)
         commandsByName[parse.group(1)] = parse.group(3)
         contactsByName[parse.group(1)] = parse.group(4)
+        frequencyByName[parse.group(1)] = parse.group(5)
+        retryByName[parse.group(1)] = parse.group(6)
     hostsByName[newName] = newHosts
     commandsByName[newName] = newCommand
     contactsByName[newName] = newContacts
+    frequencyByName[newName] = newFrequency
+    retryByName[newName] = newRetry
 
     f = open('/opt/nagios/etc/rocks/services.cfg', 'w')
     f.write(serviceHeader)
@@ -196,7 +219,8 @@ class Command(rocks.commands.Command):
       f.write("\n")
       f.write(
         serviceFormat %
-        (hostsByName[name], name, name + '-command', contactsByName[name])
+        (hostsByName[name], name, name + '-command', frequencyByName[name],
+         retryByName[name], contactsByName[name])
       )
     f.close()
 

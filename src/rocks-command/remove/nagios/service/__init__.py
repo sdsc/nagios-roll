@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.4  2009/04/10 21:36:37  jhayes
+# Allow definition of service frequency and retry period.
+#
 # Revision 1.3  2009/04/02 17:14:45  jhayes
 # Remove redundant restarts.
 #
@@ -105,13 +108,14 @@ class Command(rocks.commands.Command):
       os.remove('/opt/nagios/etc/rocks/services.cfg')
     for service in services:
       parse = re.match(
-        r'^name=[\'"](.*?)[\'"]\s+hosts=[\'"](.*?)[\'"]\s+command=[\'"](.*?)[\'"]\s+contacts=[\'"](.*?)[\'"]\s*$', service
+        r'^name=[\'"](.*?)[\'"]\s+hosts=[\'"](.*?)[\'"]\s+command=[\'"](.*?)[\'"]\s+contacts=[\'"](.*?)[\'"]\s+frequency=[\'"](.*?)[\'"]\s+retry=[\'"](.*?)[\'"]\s*$', service
       )
       if parse and parse.group(1) != args[0]:
         self.command(
           'add.nagios.service',
           ['name=' + parse.group(1), 'hosts=' + parse.group(2),
-           'command=' + parse.group(3), 'contacts=' + parse.group(4)]
+           'command=' + parse.group(3), 'contacts=' + parse.group(4),
+           'frequency=' + parse.group(5), 'retry=' + parse.group(6)]
         )
 
     return
