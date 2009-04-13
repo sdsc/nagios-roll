@@ -1,5 +1,5 @@
 # $Id$
-# 
+#
 # @Copyright@
 # 
 # 				Rocks(tm)
@@ -54,8 +54,89 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/04/13 23:19:10  jhayes
+# Code cleaning.
+#
+# Revision 1.11  2009/04/01 19:12:50  jhayes
+# Add warning header to configuration files.
+#
+# Revision 1.10  2009/03/31 21:52:30  jhayes
+# Restart nagios after adding/removing objects.
+#
+# Revision 1.9  2009/03/30 19:29:42  jhayes
+# Split nagios service manipluation into separate commands.  Remove all add
+# arguments in favor of named params.  Lotsa code improvements.
+#
+# Revision 1.8  2009/03/28 06:15:02  jhayes
+# Add ability to specify contact groups when adding contact.
+#
+# Revision 1.7  2009/03/28 00:40:39  jhayes
+# More debugging.
+#
+# Revision 1.6  2009/03/27 22:58:29  jhayes
+# Debugging.
+#
+# Revision 1.5  2009/03/27 18:54:51  jhayes
+# Add nagios host commands.
+#
+# Revision 1.4  2009/03/27 17:48:42  jhayes
+# Tidier implementation.
+#
+# Revision 1.3  2009/03/26 21:26:50  jhayes
+# Begin working on using rocks command to manipulate nagios config.
+#
+# Revision 1.2  2009/03/17 06:46:59  jhayes
+# Follow conventions from other commands.
+#
 # Revision 1.1  2009/02/05 18:36:05  bruno
 # added
 #
-#
 
+import re
+import rocks.commands
+
+class Command(rocks.commands.Command):
+  """
+  Add a new nagios notification email.
+  """
+
+  def parse_attributes(self, lines):
+    """
+    Converts a list of lines with the format attr=value [attr=value ...] to a
+    list of dictionaries.
+    """
+    result = []
+    for line in lines:
+      object = {}
+      s = line
+      parse = re.match(r'\s*(\w+)=(\'[^\']*\'|"[^"]*"|[^\'"\s]+)', s)
+      while parse:
+        object[parse.group(1)] = parse.group(2).strip('\'"')
+        s = s[len(parse.group(0)):]
+        parse = re.match(r'\s*(\w+)=(\'[^\']*\'|"[^"]*"|[^\'\s"]+)', s)
+      result.append(object)
+    return result
+
+  def parse_file(self, path):
+    """
+    Converts a file containing lines of the format attr=value [attr=value ...]
+    to a list of dictionaries.
+    """
+    f = open(path)
+    lines = []
+    for line in f:
+      line = line.strip()
+      if line != '' and not line.startswith('#'):
+        lines.append(line)
+    f.close()
+    return self.parse_attributes(lines)
+
+  def parse_list_nagios_output(self, args):
+    """
+    Converts the output of the "rocks list nagios" command to a list of
+    dictionaries.
+    """
+    lines = self.command('list.nagios', args).split("\n")
+    if len(lines) == 1 and lines[0] == '':
+      return []
+    return self.parse_attributes(lines)

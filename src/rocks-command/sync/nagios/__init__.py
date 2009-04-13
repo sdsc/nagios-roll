@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/04/13 23:19:10  jhayes
+# Code cleaning.
+#
 # Revision 1.1  2009/04/02 17:33:54  jhayes
 # Add rocks nagios sync command to create appliance-based host groups.
 #
@@ -111,7 +114,7 @@ class Command(rocks.commands.Command):
     f = open(tempname, 'w')
     for name, appliance, ip in self.db.fetchall():
       f.write(
-        'name="%s-appliance" ip=%s contacts="%s" groups="%s-group"' %
+        'name="%s-appliance" ip=%s contacts="%s" groups="%s-group,allhosts"' %
         (name, ip, params['contacts'], appliance)
       )
     f.close()

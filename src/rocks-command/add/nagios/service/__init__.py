@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.5  2009/04/13 23:19:10  jhayes
+# Code cleaning.
+#
 # Revision 1.4  2009/04/10 21:36:37  jhayes
 # Allow definition of service frequency and retry period.
 #
@@ -89,8 +92,6 @@
 #
 
 import os
-import re
-import string
 import rocks.commands
 
 serviceHeader = """\
@@ -139,7 +140,9 @@ define service {
 }
 """
 
-class Command(rocks.commands.Command):
+servicesPath = '/opt/nagios/etc/rocks/services.cfg'
+
+class Command(rocks.commands.add.nagios.Command):
   """
   Add a new nagios service.
 
@@ -173,56 +176,51 @@ class Command(rocks.commands.Command):
     if not ('name' in params and 'hosts' in params and \
             'command' in params and 'contacts' in params):
       self.abort('Must provide name, hosts, command, and contacts')
-    newName = params['name']
-    newHosts = params['hosts']
-    newCommand = params['command']
-    newContacts = params['contacts']
-    newFrequency = 5
-    newRetry = 1
+
+    objects = self.parse_list_nagios_output(['file=' + servicesPath])
+    commandLinesByCommandName = {}
+    for object in objects:
+      if 'command_line' in object:
+        commandLinesByCommandName[object['command_name']]=object['command_line']
+    checkCommandsByName = {}
+    checkIntervalsByName = {}
+    contactGroupsByName = {}
+    hostGroupsByName = {}
+    retryIntervalsByName = {}
+    for object in objects:
+      if 'service_description' in object:
+        name = object['service_description']
+        hostGroupsByName[name] = object['hostgroup_name']
+        checkCommandsByName[name] = \
+          commandLinesByCommandName[object['check_command']]
+        contactGroupsByName[name] = object['contact_groups']
+        checkIntervalsByName[name] = object['check_interval']
+        retryIntervalsByName[name] = object['retry_interval']
+    name = params['name']
+    hostGroupsByName[name] = params['hosts']
+    checkCommandsByName[name] = '/opt/nagios/libexec/' + params['command']
+    contactGroupsByName[params['name']] = params['contacts']
     if 'frequency' in params:
-      newFrequency = params['frequency']
+      checkIntervalsByName[name] = params['frequency']
+    else:
+      checkIntervalsByName[name] = 5
     if 'retry' in params:
-      newFrequency = params['retry']
+      retryIntervalsByName[name] = params['retry']
+    else:
+      retryIntervalsByName[name] = 1
 
-    hostsByName = {}
-    commandsByName = {}
-    contactsByName = {}
-    frequencyByName = {}
-    retryByName = {}
-    services = string.split(self.command('list.nagios.service'), "\n")
-    if len(services) == 1 and services[0] == '':
-      services = []
-    for service in services:
-      parse = re.match(
-        r'^name=[\'"](.*?)[\'"]\s+hosts=[\'"](.*?)[\'"]\s+command=[\'"](.*?)[\'"]\s+contacts=[\'"](.*?)[\'"]\s+frequency=[\'"](.*?)[\'"]\s+retry=[\'"](.*?)[\'"]\s*$', service
-      )
-      if parse:
-        hostsByName[parse.group(1)] = parse.group(2)
-        commandsByName[parse.group(1)] = parse.group(3)
-        contactsByName[parse.group(1)] = parse.group(4)
-        frequencyByName[parse.group(1)] = parse.group(5)
-        retryByName[parse.group(1)] = parse.group(6)
-    hostsByName[newName] = newHosts
-    commandsByName[newName] = newCommand
-    contactsByName[newName] = newContacts
-    frequencyByName[newName] = newFrequency
-    retryByName[newName] = newRetry
-
-    f = open('/opt/nagios/etc/rocks/services.cfg', 'w')
+    f = open(servicesPath, 'w')
     f.write(serviceHeader)
-    for name in hostsByName.keys():
+    for name in hostGroupsByName.keys():
       f.write("\n")
-      f.write(
-        commandFormat %
-        (name + '-command', '/opt/nagios/libexec/' + commandsByName[name])
-      )
+      f.write(commandFormat % (name + '-command', checkCommandsByName[name]))
       f.write("\n")
       f.write(
         serviceFormat %
-        (hostsByName[name], name, name + '-command', frequencyByName[name],
-         retryByName[name], contactsByName[name])
+        (hostGroupsByName[name], name, name + '-command',
+         checkIntervalsByName[name], retryIntervalsByName[name],
+         contactGroupsByName[name])
       )
     f.close()
 
     os.system('service nagios restart > /dev/null 2>&1')
-    return

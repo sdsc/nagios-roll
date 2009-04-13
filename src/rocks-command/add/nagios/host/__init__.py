@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.9  2009/04/13 23:19:10  jhayes
+# Code cleaning.
+#
 # Revision 1.8  2009/04/01 19:09:02  jhayes
 # Allow batch add in prep for sync command.
 #
@@ -93,7 +96,6 @@
 #
 
 import os
-import re
 import rocks.commands
 
 timeperiodDefs = """\
@@ -164,7 +166,10 @@ define hostgroup {
 }
 """
 
-class Command(rocks.commands.Command):
+hostsPath = '/opt/nagios/etc/rocks/hosts.cfg'
+timeperiodsPath = '/opt/nagios/etc/rocks/timeperiods.cfg'
+
+class Command(rocks.commands.add.nagios.Command):
   """
   Add a new nagios host.
 
@@ -197,71 +202,57 @@ class Command(rocks.commands.Command):
 
   def run(self, params, args):
 
-    lines = self.command('list.nagios.host').split("\n")
-    if len(lines) == 1 and lines[0] == '':
-      lines = []
+    objects = self.parse_list_nagios_output(['file=' + hostsPath, 'type=host'])
 
     if 'file' in params:
-      f = open(params['file'])
-      for line in f:
-        line = line.strip()
-        if line != '' and not line.startswith('#'):
-          lines.append(line)
-      f.close()
-    elif not ('name' in params and 'ip' in params and 'contacts' in params):
-      self.abort('name, ip, contacts required')
+      extension = self.parse_file(params['file'])
     else:
-      if not 'groups' in params:
-        params['groups'] = params['name'] + ' group'
-      lines.append(
-        'name="%s" ip="%s" contacts="%s" groups="%s"' %
-        (params['name'], params['ip'], params['contacts'], params['groups'])
-      )
+      extension = [params]
 
-    ipsByName = {}
-    groupsByName = {}
-    contactsByName = {}
-    for line in lines:
-      host = {}
-      s = line
-      parse = re.match(r'\s*([^=]+)=(\'[^\']*\'|"[^"]*"|[^\'"]\S*)', s)
-      while parse:
-        host[parse.group(1)] = parse.group(2).strip('\'"')
-        s = s[len(parse.group(0)):]
-        parse = re.match(r'\s*([^=]+)=(\'[^\']*\'|"[^"]*"|[^\'"]\S*)', s)
-      if not ('name' in host and 'ip' in host and 'contacts' in host):
-        self.abort('name, ip, contacts required in "%s"' % line)
-      name = host['name']
-      if not 'groups' in host:
-        host['groups'] = name + ' group'
-      ipsByName[name] = host['ip']
-      contactsByName[name] = host['contacts']
-      groupsByName[name] = host['groups']
-
+    addressesByName = {}
+    hostGroupsByName = {}
+    contactGroupsByName = {}
+    for object in objects:
+      if not 'host_name' in object:
+        continue
+      name = object['host_name']
+      addressesByName[name] = object['address']
+      contactGroupsByName[name] = object['contact_groups']
+      hostGroupsByName[name] = object['hostgroups']
+    for object in extension:
+      if not ('name' in object and 'ip' in object and 'contacts' in object):
+        self.abort('name, ip, contacts required')
+      name = object['name']
+      addressesByName[name] = object['ip']
+      contactGroupsByName[name] = object['contacts']
+      if 'groups' in object:
+        hostGroupsByName[name] = object['groups']
+      else:
+        hostGroupsByName[name] = name + ' group'
     membersByGroup = {}
-    for name in groupsByName.keys():
-      for group in groupsByName[name].split(','):
+    for name in hostGroupsByName:
+      for group in hostGroupsByName[name].split(','):
         if not group in membersByGroup:
           membersByGroup[group] = name
         else:
           membersByGroup[group] += ',' + name
 
-    f = open('/opt/nagios/etc/rocks/timeperiods.cfg', 'w')
+    f = open(timeperiodsPath, 'w')
     f.write(timeperiodDefs)
     f.close()
 
-    f = open('/opt/nagios/etc/rocks/hosts.cfg', 'w')
+    f = open(hostsPath, 'w')
     f.write(hostHeader)
-    for name in groupsByName.keys():
+    for name in addressesByName:
       f.write("\n")
       f.write(
         hostFormat %
-        (name, name, ipsByName[name], groupsByName[name], contactsByName[name])
+        (name, name, addressesByName[name], hostGroupsByName[name],
+         contactGroupsByName[name])
       )
-    for group in membersByGroup.keys():
+    for group in membersByGroup:
       f.write("\n")
       f.write(hostgroupFormat % (group, group, membersByGroup[group]))
     f.close()
 
     os.system('service nagios restart > /dev/null 2>&1')
-    return

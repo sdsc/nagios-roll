@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.4  2009/04/13 23:19:10  jhayes
+# Code cleaning.
+#
 # Revision 1.3  2009/04/13 19:10:10  jhayes
 # Concentrate nagios config file parsing in parent nagios list command class.
 #
@@ -118,7 +121,7 @@ class Command(rocks.commands.Command):
     for object in objects:
       if 'type' in params and params['type'] != object['type']:
         continue
-      text = '- '
+      text = ''
       for attribute in object:
         text += ' %s="%s"' % (attribute, object[attribute])
       result.append(text)

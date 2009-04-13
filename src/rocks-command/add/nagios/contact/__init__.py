@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.12  2009/04/13 23:19:10  jhayes
+# Code cleaning.
+#
 # Revision 1.11  2009/04/01 19:12:50  jhayes
 # Add warning header to configuration files.
 #
@@ -90,7 +93,6 @@
 #
 
 import os
-import re
 import rocks.commands
 
 timeperiodDefs = """\
@@ -157,7 +159,10 @@ define contactgroup {
 }
 """
 
-class Command(rocks.commands.Command):
+contactsPath = '/opt/nagios/etc/rocks/contacts.cfg'
+timeperiodsPath = '/opt/nagios/etc/rocks/timeperiods.cfg'
+
+class Command(rocks.commands.add.nagios.Command):
   """
   Add a new nagios notification email.
 
@@ -172,7 +177,7 @@ class Command(rocks.commands.Command):
   <example cmd='add nagios contact email=me@myhost.org'>
   </example>
 
-  <example cmd='add nagios contact email=me@myhost.org groups="Nagios Admin"'>
+  <example cmd='add nagios contact email=me@myhost.org groups=administrators'>
   </example>
   """
 
@@ -180,45 +185,36 @@ class Command(rocks.commands.Command):
 
     if not 'email' in params:
       self.abort('email required')
-    newEmail = params['email']
+
+    objects = self.parse_list_nagios_output(['file=' + contactsPath])
+    contactGroupsByEmail = {}
+    for object in objects:
+      if 'email' in object and 'contactgroups' in object:
+        contactGroupsByEmail[object['email']] = object['contactgroups']
     if 'groups' in params:
-      newGroups = params['groups']
+      contactGroupsByEmail[params['email']] = params['groups']
     else:
-      newGroups = newEmail + ' group'
-
-    contacts = self.command('list.nagios.contact').split("\n")
-    if len(contacts) == 1 and contacts[0] == '':
-      contacts = []
-    groupsByEmail = {}
-    for contact in contacts:
-      parse = re.match(
-        r'^email=[\'"](.*?)[\'"]\s+groups=[\'"](.*?)[\'"]\s*$', contact
-      )
-      if parse:
-        groupsByEmail[parse.group(1)] = parse.group(2)
-    groupsByEmail[newEmail] = newGroups
-
+      contactGroupsByEmail[params['email']] = params['email'] + ' group'
     membersByGroup = {}
-    for email in groupsByEmail.keys():
-      for group in groupsByEmail[email].split(','):
+    for email in contactGroupsByEmail:
+      for group in contactGroupsByEmail[email].split(','):
         if not group in membersByGroup:
           membersByGroup[group] = email
         else:
           membersByGroup[group] += ',' + email
 
-    f = open('/opt/nagios/etc/rocks/timeperiods.cfg', 'w')
+    f = open(timeperiodsPath, 'w')
     f.write(timeperiodDefs)
     f.close()
 
-    f = open('/opt/nagios/etc/rocks/contacts.cfg', 'w')
+    f = open(contactsPath, 'w')
     f.write(contactHeader)
-    for email in groupsByEmail.keys():
+    for email in contactGroupsByEmail:
       f.write("\n")
-      f.write(contactFormat % (email, groupsByEmail[email], email))
-    for group in membersByGroup.keys():
+      f.write(contactFormat % (email, contactGroupsByEmail[email], email))
+    for group in membersByGroup:
       f.write("\n")
       f.write(contactgroupFormat % (group, group, membersByGroup[group]))
     f.close()
 
     os.system('service nagios restart > /dev/null 2>&1')
-    return

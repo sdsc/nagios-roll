@@ -151,7 +151,7 @@ During installation, the Rocks nagios roll automatically adds the cluster
 contact email entered on the Rocks cluster information screen as a nagios
 contact.  This contact is included in the nagios contact group "administrators".
 This contact group receives information about the nagios host group
-"all-hosts", a group the roll automatically defines with the cluster frontend
+"allhosts", a group the roll automatically defines with the cluster frontend
 as its initial member.  The Rocks nagios roll creates a nagios service to
 periodically perform a ping test to this host group.
 </para><para>
@@ -161,9 +161,9 @@ configuration:
 # rocks list nagios contact
 email="alf@ufo.edu" groups="administrators"
 # rocks list nagios host
-name="blue" ip="10.1.1.1" contacts="administrators" groups="all-hosts"
+name="blue" ip="10.1.1.1" contacts="administrators" groups="allhosts"
 # rocks list nagios service
-name="PING" hosts="all-hosts" command="check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 5" contacts="administrators"
+name="PING" hosts="allhosts" command="check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 5" contacts="administrators"
 </screen>
 </para>
 </section>

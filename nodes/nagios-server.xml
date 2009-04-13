@@ -13,6 +13,9 @@
 
   <changelog>
   $Log$
+  Revision 1.12  2009/04/13 23:19:09  jhayes
+  Code cleaning.
+
   Revision 1.11  2009/03/30 23:14:49  jhayes
   Debugging.
 
@@ -132,9 +135,9 @@ cfg_dir=/opt/nagios/etc/rocks
     name='<var name="Kickstart_PrivateHostname"/>' \
     ip='<var name="Kickstart_PrivateAddress"/>' \
     contacts='administrators' \
-    groups='all-hosts'
+    groups='allhosts'
   /opt/rocks/bin/rocks add nagios service \
-    name='PING' hosts='all-hosts' \
+    name='PING' hosts='allhosts' \
     command='check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 5' \
     contacts='administrators'
 
