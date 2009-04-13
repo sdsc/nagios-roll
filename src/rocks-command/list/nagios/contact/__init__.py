@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.8  2009/04/13 19:10:10  jhayes
+# Concentrate nagios config file parsing in parent nagios list command class.
+#
 # Revision 1.7  2009/03/30 19:29:42  jhayes
 # Split nagios service manipluation into separate commands.  Remove all add
 # arguments in favor of named params.  Lotsa code improvements.
@@ -77,34 +80,18 @@
 # added
 #
 
-import os
-import re
-import string
 import rocks.commands
 
-class Command(rocks.commands.Command):
+class Command(rocks.commands.list.nagios.Command):
   """
   Show nagios notification email addresses.
   """
 
   def run(self, params, args):
-
+    objects = self.parse_nagios_file('/opt/nagios/etc/rocks/contacts.cfg')
     contacts = []
-
-    if os.path.exists('/opt/nagios/etc/rocks/contacts.cfg'):
-      f = open('/opt/nagios/etc/rocks/contacts.cfg')
-      contact = {}
-      for line in f.readlines():
-        found = re.search(r'^\s*(contactgroups|email)\s+([^;]+)', line)
-        if not found:
-          continue
-        contact[found.group(1)] = found.group(2).strip()
-        if len(contact) == 2:
-          contacts.append('email="%s" groups="%s"' %
-                          (contact['email'], contact['contactgroups']))
-          contact = {}
-      f.close()
-
-    self.addText('%s' % (string.join(contacts, "\n")))
-
-    return
+    for object in objects:
+      if 'email' in object:
+        contacts.append('email="%s" groups="%s"' %
+                        (object['email'], object['contactgroups']))
+    self.addText("\n".join(contacts))

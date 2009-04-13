@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.4  2009/04/13 19:10:10  jhayes
+# Concentrate nagios config file parsing in parent nagios list command class.
+#
 # Revision 1.3  2009/03/30 21:16:58  jhayes
 # Debugging.
 #
@@ -77,39 +80,21 @@
 # added
 #
 
-import os
-import re
-import string
 import rocks.commands
 
-class Command(rocks.commands.Command):
+class Command(rocks.commands.list.nagios.Command):
   """
   Show nagios hosts.
   """
 
   def run(self, params, args):
-
+    objects = self.parse_nagios_file('/opt/nagios/etc/rocks/hosts.cfg')
     hosts = []
-
-    if os.path.exists('/opt/nagios/etc/rocks/hosts.cfg'):
-      f = open('/opt/nagios/etc/rocks/hosts.cfg')
-      host = {}
-      for line in f.readlines():
-        found = re.search(
-          r'^\s*(host_name|address|hostgroups|contact_groups)\s+([^;]+)', line
+    for object in objects:
+      if 'host_name' in object:
+        hosts.append(
+          'name="%s" ip="%s" contacts="%s" groups="%s"' %
+          (object['host_name'], object['address'], object['contact_groups'],
+           object['hostgroups'])
         )
-        if not found:
-          continue
-        host[found.group(1)] = found.group(2).strip()
-        if len(host) == 4:
-          hosts.append(
-            'name="%s" ip="%s" contacts="%s" groups="%s"' %
-            (host['host_name'], host['address'], host['contact_groups'],
-             host['hostgroups'])
-          )
-          host = {}
-      f.close()
-
-    self.addText('%s' % (string.join(hosts, "\n")))
-
-    return
+    self.addText("\n".join(hosts))

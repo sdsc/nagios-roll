@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2009/04/13 19:10:10  jhayes
+# Concentrate nagios config file parsing in parent nagios list command class.
+#
 # Revision 1.2  2009/04/10 21:36:37  jhayes
 # Allow definition of service frequency and retry period.
 #
@@ -76,43 +79,29 @@
 # added
 #
 
-import os
 import re
-import string
 import rocks.commands
 
-class Command(rocks.commands.Command):
+class Command(rocks.commands.list.nagios.Command):
   """
   Show nagios services.
   """
 
   def run(self, params, args):
-
+    objects = self.parse_nagios_file('/opt/nagios/etc/rocks/services.cfg')
     services = []
-
-    if os.path.exists('/opt/nagios/etc/rocks/services.cfg'):
-      f = open('/opt/nagios/etc/rocks/services.cfg')
-      service = {}
-      for line in f.readlines():
-        found = re.search(
-          r'^\s*(check_interval|hostgroup_name|service_description|command_line|contact_groups|retry_interval)\s+([^;]+)', line
+    commands = {}
+    for object in objects:
+      if 'command_name' in object:
+        found = re.search(r'^(.*/)?([^/]+)$', object['command_line'])
+        if found:
+          commands[object['command_name']] = found.group(2)
+    for object in objects:
+      if 'service_description' in object:
+        services.append(
+          'name="%s" hosts="%s" command="%s" contacts="%s" frequency="%s" retry="%s"' %
+          (object['service_description'], object['hostgroup_name'],
+           commands[object['check_command']], object['contact_groups'],
+           object['check_interval'], object['retry_interval'])
         )
-        if not found:
-          continue
-        service[found.group(1)] = found.group(2).strip()
-        if len(service) == 6:
-          found = re.search(r'^\S*/(.*)$', service['command_line'])
-          if found:
-            service['command_line'] = found.group(1)
-          services.append(
-            'name="%s" hosts="%s" command="%s" contacts="%s" frequency="%s" retry="%s"' %
-            (service['service_description'], service['hostgroup_name'],
-             service['command_line'], service['contact_groups'],
-             service['check_interval'], service['retry_interval'])
-          )
-          service = {}
-      f.close()
-
-    self.addText('%s' % (string.join(services, "\n")))
-
-    return
+    self.addText("\n".join(services))
