@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.9  2009/04/14 20:50:08  jhayes
+# More code cleaning.
+#
 # Revision 1.8  2009/04/02 17:14:44  jhayes
 # Remove redundant restarts.
 #
@@ -82,7 +85,10 @@
 
 import os
 import re
+import tempfile
 import rocks.commands
+
+contactsPath = '/opt/nagios/etc/rocks/contacts.cfg'
 
 class Command(rocks.commands.Command):
   """
@@ -98,20 +104,21 @@ class Command(rocks.commands.Command):
     if len(args) != 1:
       self.abort('email required')
 
-    contacts = self.command('list.nagios.contact').split("\n")
-    if len(contacts) == 1 and contacts[0] == '':
-      contacts = []
+    lines = self.command('list.nagios', ['file=' + contactsPath]).split("\n")
+    if len(lines) == 1 and lines[0] == '':
+      lines = []
 
-    if os.path.exists('/opt/nagios/etc/rocks/contacts.cfg'):
-      os.remove('/opt/nagios/etc/rocks/contacts.cfg')
-    for contact in contacts:
-      parse = re.match(
-        r'^email=[\'"](.*?)[\'"]\s+groups=[\'"](.*?)[\'"]\s*$', contact
-      )
-      if parse and parse.group(1) != args[0]:
-        self.command(
-          'add.nagios.contact',
-          ['email=' + parse.group(1), 'groups=' + parse.group(2)]
-        )
+    tempname = tempfile.mktemp('.txt')
+    f = open(tempname, 'w')
+    for line in lines:
+      if line.find('email=') < 0:
+        continue
+      if not re.search('email=[\'"]?' + args[0] + r'[\'"]?(\s|$)', line):
+        f.write(line + "\n")
+    f.close()
 
-    return
+    if os.path.exists(contactsPath):
+      os.remove(contactsPath)
+    self.command('add.nagios.contact', ['file=' + tempname])
+
+    os.remove(tempname)

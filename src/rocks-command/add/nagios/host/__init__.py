@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.10  2009/04/14 20:50:07  jhayes
+# More code cleaning.
+#
 # Revision 1.9  2009/04/13 23:19:10  jhayes
 # Code cleaning.
 #
@@ -202,36 +205,48 @@ class Command(rocks.commands.add.nagios.Command):
 
   def run(self, params, args):
 
-    objects = self.parse_list_nagios_output(['file=' + hostsPath, 'type=host'])
-
+    # Get list of existing hosts
+    objects = self.parse_list_nagios_output(['file=' + hostsPath])
+    # Allow batch input from file
     if 'file' in params:
       extension = self.parse_file(params['file'])
     else:
       extension = [params]
+    # Allow Nagios names as alternative to param names--makes implementation of
+    # remove cleaner
+    for object in extension:
+      if 'name' in object:
+        object['host_name'] = object['name']
+      elif not 'host_name' in object:
+        self.abort('name required')
+      if 'ip' in object:
+        object['address'] = object['ip']
+      elif not 'address' in object:
+        self.abort('ip required')
+      if 'contacts' in object:
+        object['contact_groups'] = object['contacts']
+      elif not 'contact_groups' in object:
+        self.abort('contacts required')
+      if 'groups' in object:
+        object['hostgroups'] = object['groups']
+      elif not 'hostgroups' in object:
+        object['hostgroups'] = object['host_name'] + ' group'
+    objects.extend(extension)
 
+    # Dictionaries ensure that user's values override any previous definition
     addressesByName = {}
-    hostGroupsByName = {}
     contactGroupsByName = {}
+    hostGroupsByName = {}
+    membersByGroup = {}
     for object in objects:
-      if not 'host_name' in object:
+      if not ('host_name' in object and 'address' in object and
+              'contact_groups' in object and 'hostgroups' in object):
         continue
       name = object['host_name']
       addressesByName[name] = object['address']
       contactGroupsByName[name] = object['contact_groups']
       hostGroupsByName[name] = object['hostgroups']
-    for object in extension:
-      if not ('name' in object and 'ip' in object and 'contacts' in object):
-        self.abort('name, ip, contacts required')
-      name = object['name']
-      addressesByName[name] = object['ip']
-      contactGroupsByName[name] = object['contacts']
-      if 'groups' in object:
-        hostGroupsByName[name] = object['groups']
-      else:
-        hostGroupsByName[name] = name + ' group'
-    membersByGroup = {}
-    for name in hostGroupsByName:
-      for group in hostGroupsByName[name].split(','):
+      for group in object['hostgroups'].split(','):
         if not group in membersByGroup:
           membersByGroup[group] = name
         else:
@@ -250,6 +265,7 @@ class Command(rocks.commands.add.nagios.Command):
         (name, name, addressesByName[name], hostGroupsByName[name],
          contactGroupsByName[name])
       )
+
     for group in membersByGroup:
       f.write("\n")
       f.write(hostgroupFormat % (group, group, membersByGroup[group]))

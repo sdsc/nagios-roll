@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.6  2009/04/14 20:50:07  jhayes
+# More code cleaning.
+#
 # Revision 1.5  2009/04/13 23:19:10  jhayes
 # Code cleaning.
 #
@@ -173,53 +176,81 @@ class Command(rocks.commands.add.nagios.Command):
 
   def run(self, params, args):
 
-    if not ('name' in params and 'hosts' in params and \
-            'command' in params and 'contacts' in params):
-      self.abort('Must provide name, hosts, command, and contacts')
-
+    # Get list of existing services
     objects = self.parse_list_nagios_output(['file=' + servicesPath])
+    # Pull out existing command definitions
     commandLinesByCommandName = {}
     for object in objects:
-      if 'command_line' in object:
+      if 'command_name' in object and 'command_line' in object:
         commandLinesByCommandName[object['command_name']]=object['command_line']
+    # Allow batch input from file
+    if 'file' in params:
+      extension = self.parse_file(params['file'])
+    else:
+      extension = [params]
+    # Allow Nagios names as alternative to param names--makes implementation of
+    # remove cleaner
+    for object in extension:
+      if 'name' in object:
+        object['service_description'] = object['name']
+      elif not 'service_description' in object:
+        self.abort('name required')
+      if 'hosts' in object:
+        object['hostgroup_name'] = object['hosts']
+      elif not 'hostgroup_name' in object:
+        self.abort('hosts required')
+      if 'command' in object:
+        commandName = object['service_description'] + '-command'
+        object['check_command'] = commandName
+        commandLinesByCommandName[commandName] = \
+          '/opt/nagios/libexec/' + object['command']
+      elif not 'check_command' in object:
+        self.abort('command required')
+      if 'contacts' in object:
+        object['contact_groups'] = object['contacts']
+      elif not 'contact_groups' in object:
+        self.abort('contacts required')
+      if 'frequency' in object:
+        object['check_interval'] = object['frequency']
+      elif not 'check_interval' in object:
+        object['check_interval'] = 5
+      if 'retry' in object:
+        object['retry_interval'] = object['retry']
+      elif not 'retry_interval' in object:
+        object['retry_interval'] = 1
+    objects.extend(extension)
+
+    # Dictionaries ensure that user's values override any previous definition
     checkCommandsByName = {}
     checkIntervalsByName = {}
     contactGroupsByName = {}
     hostGroupsByName = {}
     retryIntervalsByName = {}
     for object in objects:
-      if 'service_description' in object:
-        name = object['service_description']
-        hostGroupsByName[name] = object['hostgroup_name']
-        checkCommandsByName[name] = \
-          commandLinesByCommandName[object['check_command']]
-        contactGroupsByName[name] = object['contact_groups']
-        checkIntervalsByName[name] = object['check_interval']
-        retryIntervalsByName[name] = object['retry_interval']
-    name = params['name']
-    hostGroupsByName[name] = params['hosts']
-    checkCommandsByName[name] = '/opt/nagios/libexec/' + params['command']
-    contactGroupsByName[params['name']] = params['contacts']
-    if 'frequency' in params:
-      checkIntervalsByName[name] = params['frequency']
-    else:
-      checkIntervalsByName[name] = 5
-    if 'retry' in params:
-      retryIntervalsByName[name] = params['retry']
-    else:
-      retryIntervalsByName[name] = 1
+      if not ('service_description' in object and 'check_command' in object and
+              'check_interval' in object and 'contact_groups' in object and
+              'hostgroup_name' in object and 'retry_interval' in object):
+        continue
+      name = object['service_description']
+      checkCommandsByName[name] = object['check_command']
+      checkIntervalsByName[name] = object['check_interval']
+      contactGroupsByName[name] = object['contact_groups']
+      hostGroupsByName[name] = object['hostgroup_name']
+      retryIntervalsByName[name] = object['retry_interval']
 
     f = open(servicesPath, 'w')
     f.write(serviceHeader)
-    for name in hostGroupsByName.keys():
+    for name in checkCommandsByName:
       f.write("\n")
-      f.write(commandFormat % (name + '-command', checkCommandsByName[name]))
+      commandName = checkCommandsByName[name]
+      f.write(
+        commandFormat % (commandName, commandLinesByCommandName[commandName])
+      )
       f.write("\n")
       f.write(
         serviceFormat %
-        (hostGroupsByName[name], name, name + '-command',
-         checkIntervalsByName[name], retryIntervalsByName[name],
-         contactGroupsByName[name])
+        (hostGroupsByName[name], name, commandName, checkIntervalsByName[name],
+         retryIntervalsByName[name], contactGroupsByName[name])
       )
     f.close()
 

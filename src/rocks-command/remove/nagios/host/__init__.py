@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.7  2009/04/14 20:50:08  jhayes
+# More code cleaning.
+#
 # Revision 1.6  2009/04/02 17:14:44  jhayes
 # Remove redundant restarts.
 #
@@ -88,6 +91,8 @@ import re
 import tempfile
 import rocks.commands
 
+hostsPath = '/opt/nagios/etc/rocks/hosts.cfg'
+
 class Command(rocks.commands.Command):
   """
   Remove an existing nagios host.
@@ -102,20 +107,21 @@ class Command(rocks.commands.Command):
     if len(args) != 1:
       self.abort('host name required')
 
-    lines = self.command('list.nagios.host').split("\n")
+    lines = self.command('list.nagios', ['file=' + hostsPath]).split("\n")
     if len(lines) == 1 and lines[0] == '':
       lines = []
 
     tempname = tempfile.mktemp('.txt')
     f = open(tempname, 'w')
     for line in lines:
-      if not re.search('name=[\'"]?' + args[0] + r'[\'"]?(\s|$)', line):
+      if line.find('host_name=') < 0:
+        continue
+      if not re.search('host_name=[\'"]?' + args[0] + r'[\'"]?(\s|$)', line):
         f.write(line + "\n")
     f.close()
 
-    if os.path.exists('/opt/nagios/etc/rocks/hosts.cfg'):
-      os.remove('/opt/nagios/etc/rocks/hosts.cfg')
+    if os.path.exists(hostsPath):
+      os.remove(hostsPath)
     self.command('add.nagios.host', ['file=' + tempname])
 
     os.remove(tempname)
-    return

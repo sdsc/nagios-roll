@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.5  2009/04/14 20:50:08  jhayes
+# More code cleaning.
+#
 # Revision 1.4  2009/04/10 21:36:37  jhayes
 # Allow definition of service frequency and retry period.
 #
@@ -84,7 +87,10 @@
 
 import os
 import re
+import tempfile
 import rocks.commands
+
+servicesPath = '/opt/nagios/etc/rocks/services.cfg'
 
 class Command(rocks.commands.Command):
   """
@@ -100,22 +106,21 @@ class Command(rocks.commands.Command):
     if len(args) != 1:
       self.abort('service name required')
 
-    services = self.command('list.nagios.service').split("\n")
-    if len(services) == 1 and services[0] == '':
-      services = []
+    lines = self.command('list.nagios', ['file=' + servicesPath]).split("\n")
+    if len(lines) == 1 and lines[0] == '':
+      lines = []
 
-    if os.path.exists('/opt/nagios/etc/rocks/services.cfg'):
-      os.remove('/opt/nagios/etc/rocks/services.cfg')
-    for service in services:
-      parse = re.match(
-        r'^name=[\'"](.*?)[\'"]\s+hosts=[\'"](.*?)[\'"]\s+command=[\'"](.*?)[\'"]\s+contacts=[\'"](.*?)[\'"]\s+frequency=[\'"](.*?)[\'"]\s+retry=[\'"](.*?)[\'"]\s*$', service
-      )
-      if parse and parse.group(1) != args[0]:
-        self.command(
-          'add.nagios.service',
-          ['name=' + parse.group(1), 'hosts=' + parse.group(2),
-           'command=' + parse.group(3), 'contacts=' + parse.group(4),
-           'frequency=' + parse.group(5), 'retry=' + parse.group(6)]
-        )
+    tempname = tempfile.mktemp('.txt')
+    f = open(tempname, 'w')
+    for line in lines:
+      if line.find('service_description=') < 0:
+        continue
+      if not re.search( 'service_description=[\'"]?' + args[0] + r'[\'"]?(\s|$)', line
+        f.write(line + "\n")
+    f.close()
 
-    return
+    if os.path.exists(servicesPath):
+      os.remove(servicesPath)
+    self.command('add.nagios.service', ['file=' + tempname])
+
+    os.remove(tempname)

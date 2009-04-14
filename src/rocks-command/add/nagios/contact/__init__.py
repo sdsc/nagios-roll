@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.13  2009/04/14 20:50:07  jhayes
+# More code cleaning.
+#
 # Revision 1.12  2009/04/13 23:19:10  jhayes
 # Code cleaning.
 #
@@ -183,21 +186,33 @@ class Command(rocks.commands.add.nagios.Command):
 
   def run(self, params, args):
 
-    if not 'email' in params:
-      self.abort('email required')
-
+    # Get list of existing contacts
     objects = self.parse_list_nagios_output(['file=' + contactsPath])
-    contactGroupsByEmail = {}
-    for object in objects:
-      if 'email' in object and 'contactgroups' in object:
-        contactGroupsByEmail[object['email']] = object['contactgroups']
-    if 'groups' in params:
-      contactGroupsByEmail[params['email']] = params['groups']
+    # Allow batch input from file
+    if 'file' in params:
+      extension = self.parse_file(params['file'])
     else:
-      contactGroupsByEmail[params['email']] = params['email'] + ' group'
+      extension = [params]
+    # Allow Nagios names as alternative to param names--makes implementation of
+    # remove cleaner
+    for object in extension:
+      if not 'email' in object:
+        self.abort('email required')
+      if 'groups' in object:
+        object['contactgroups'] = object['groups']
+      elif not 'contactgroups' in object:
+        object['contactgroups'] = object['email'] + ' group'
+    objects.extend(extension)
+
+    # Dictionaries ensure that user's values override any previous definition
+    contactGroupsByEmail = {}
     membersByGroup = {}
-    for email in contactGroupsByEmail:
-      for group in contactGroupsByEmail[email].split(','):
+    for object in objects:
+      if not ('email' in object and 'contactgroups' in object):
+        continue
+      email = object['email']
+      contactGroupsByEmail[email] = object['contactgroups']
+      for group in object['contactgroups'].split(','):
         if not group in membersByGroup:
           membersByGroup[group] = email
         else:
@@ -212,6 +227,7 @@ class Command(rocks.commands.add.nagios.Command):
     for email in contactGroupsByEmail:
       f.write("\n")
       f.write(contactFormat % (email, contactGroupsByEmail[email], email))
+
     for group in membersByGroup:
       f.write("\n")
       f.write(contactgroupFormat % (group, group, membersByGroup[group]))
