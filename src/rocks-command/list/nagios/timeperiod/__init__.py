@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/04/15 18:26:29  jhayes
+# Add shorthand for specifying timeperiods.
+#
 # Revision 1.1  2009/04/15 01:39:41  jhayes
 # Add separate commands for manipulating timeperiod definitions.
 #
@@ -91,15 +94,15 @@ class Command(rocks.commands.list.nagios.Command):
   """
 
   def run(self, params, args):
+    days = ('sunday', 'monday', 'tuesday', 'wednesday', 'thursday',
+            'friday', 'saturday')
     objects = self.parse_nagios_file('/opt/nagios/etc/rocks/timeperiods.cfg')
     timeperiods = []
     for object in objects:
       if 'timeperiod_name' in object:
-        timeperiods.append(
-          ('name="%s" sunday="%s" monday="%s" tuesday="%s" wednesday="%s" ' +
-           'thursday="%s" friday="%s" saturday="%s"') %
-          (object['timeperiod_name'], object['sunday'], object['monday'],
-           object['tuesday'], object['wednesday'], object['thursday'],
-           object['friday'], object['saturday'])
-        )
+        s = 'name="%s"' % object['timeperiod_name']
+        for day in days:
+          if day in object:
+            s += ' %s="%s"' % (day, object[day])
+        timeperiods.append(s)
     self.addText("\n".join(timeperiods))

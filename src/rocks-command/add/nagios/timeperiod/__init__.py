@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/04/15 18:26:29  jhayes
+# Add shorthand for specifying timeperiods.
+#
 # Revision 1.1  2009/04/15 01:39:41  jhayes
 # Add separate commands for manipulating timeperiod definitions.
 #
@@ -111,15 +114,9 @@ timeperiodFormat = """\
 define timeperiod {
   timeperiod_name %s
   alias           %s
-  sunday          %s
-  monday          %s
-  tuesday         %s
-  wednesday       %s
-  thursday        %s
-  friday          %s
-  saturday        %s
-}
+%s}
 """
+dayperiodFormat = "  %-16s%s\n"
 
 timeperiodsPath = '/opt/nagios/etc/rocks/timeperiods.cfg'
 
@@ -179,45 +176,26 @@ class Command(rocks.commands.add.nagios.Command):
         object['timeperiod_name'] = object['name']
       elif not 'timeperiod_name' in object:
         self.abort('name required')
-      for day in days:
-        if not day in object:
-          object[day] = '00:00-24:00'
     objects.extend(extension)
 
     # Dictionaries ensure that user's values override any previous definition
-    sundaysByName = {}
-    mondaysByName = {}
-    tuesdaysByName = {}
-    wednesdaysByName = {}
-    thursdaysByName = {}
-    fridaysByName = {}
-    saturdaysByName = {}
+    dayperiodsByName = {}
     for object in objects:
-      if not ('timeperiod_name' in object and 'sunday' in object and
-              'monday' in object and 'tuesday' in object and
-              'wednesday' in object and 'thursday' in object and
-              'friday' in object and 'saturday' in object):
-        continue
-      name = object['timeperiod_name']
-      sundaysByName[name] = object['sunday']
-      mondaysByName[name] = object['monday']
-      tuesdaysByName[name] = object['tuesday']
-      wednesdaysByName[name] = object['wednesday']
-      thursdaysByName[name] = object['thursday']
-      fridaysByName[name] = object['friday']
-      saturdaysByName[name] = object['saturday']
+      if 'timeperiod_name' in object:
+        dayperiodsByName[object['timeperiod_name']] = object
 
     f = open(timeperiodsPath, 'w')
     f.write(timeperiodsHeader)
-    for name in sundaysByName:
+    for name in dayperiodsByName:
+      dayperiods = ''
+      for day in days:
+        if day in dayperiodsByName[name]:
+          period = dayperiodsByName[name][day]
+          if period == '*':
+            period = '00:00-24:00'
+          dayperiods += dayperiodFormat % (day, period)
       f.write("\n")
-      f.write(
-        timeperiodFormat %
-        (name, name, sundaysByName[name], mondaysByName[name],
-         tuesdaysByName[name], wednesdaysByName[name], thursdaysByName[name],
-         fridaysByName[name], saturdaysByName[name])
-      )
-          
+      f.write(timeperiodFormat % (name, name, dayperiods))
     f.close()
 
     os.system('service nagios restart > /dev/null 2>&1')

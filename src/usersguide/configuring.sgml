@@ -32,23 +32,23 @@ this format:
 Each of the weekday arguments allows you to specify a time range, in the format
 HH:MM-HH:MM, during which monitoring should take place.  For example, the range
 "00:00-12:00" specifies the morning hours, and "09:00-17:00" specifies a
-typical workday.  You can disable monitoring on a specific day by specifying
-"00:00-00:00".  For days not specified on the command line, the default is to
-enable monitoring for the whole day ("00:00-24:00").
+typical workday.  You can use "*" as a shorthand for the entire day,
+"00:00-24:00".  Monitoring is disabled on any day not included on the command
+line.
 </para><para>
 Here is an example of using several <command>rocks</command> commands to add,
 remove, and list nagios timeperiods:
 <screen>
-# rocks add nagios timeperiod name=weekdays sunday="00:00-00:00" saturday="00:00-00:00"
-# rocks list nagios contact
-email="alf@ufo.edu" groups="alf@ufo.edu group"
-# rocks add nagios contact email=r2d2@ufo.edu groups=administrators
-# rocks list nagios contact
-email="alf@ufo.edu" groups="alf@ufo.edu group"
-email="r2d2@ufo.edu" groups="administrators"
-# rocks remove nagios contact alf@ufo.edu
-# rocks list nagios contact
-email="r2d2@ufo.edu" groups="administrators"
+# rocks add nagios timeperiod name=weekdays monday="*" tuesday="*" wednesday="*" thursday="*" friday="*"
+# rocks list nagios timeperiod
+name="weekdays" monday="00:00-24:00" tuesday="00:00-24:00" wednesday="00:00-24:00" thursday="00:00-24:00" friday="00:00-24:00"
+# rocks add nagios timeperiod name=mwf monday="09:00-17:00" wednesday="09:00-17:00" friday="09:00-17:00"
+# rocks list nagios timeperiod
+name="weekdays" monday="00:00-24:00" tuesday="00:00-24:00" wednesday="00:00-24:00" thursday="00:00-24:00" friday="00:00-24:00"
+name="mwf" monday="09:00-17:00" wednesday="09:00-17:00" friday="09:00-17:00"
+# rocks remove nagios timeperiod weekdays
+# rocks list nagios timeperiod
+name="mwf" monday="09:00-17:00" wednesday="09:00-17:00" friday="09:00-17:00"
 </screen>
 </para>
 </section>

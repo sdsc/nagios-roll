@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.16  2009/04/15 18:26:29  jhayes
+# Add shorthand for specifying timeperiods.
+#
 # Revision 1.15  2009/04/15 16:50:26  jhayes
 # Allow specification of per-service monitoring timeperiod.  Remove copying of
 # sample configuration to target.
@@ -206,7 +209,11 @@ class Command(rocks.commands.add.nagios.Command):
         else:
           membersByGroup[group] += ',' + email
 
-    self.command('add.nagios.timeperiod', ['name=always'])
+    self.command(
+      'add.nagios.timeperiod',
+      ['name=always', 'sunday=*', 'monday=*', 'tuesday=*', 'wednesday=*',
+       'thursday=*', 'friday=*', 'saturday=*']
+    )
     f = open(contactsPath, 'w')
     f.write(contactHeader)
     for email in contactGroupsByEmail:
