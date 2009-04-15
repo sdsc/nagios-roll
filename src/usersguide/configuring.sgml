@@ -3,25 +3,25 @@
 
 
 <para>
-Configuring nagios on your cluster involves specifying information for four
-kinds of nagios objects.  Nagios <emphasis>timeperiods</emphasis> specify
+Configuring Nagios on your cluster involves specifying information for four
+kinds of Nagios objects.  Nagios <emphasis>timeperiods</emphasis> specify
 blocks of time during which monitoring should take place.  Nagios
 <emphasis>contacts</emphasis> specify email addresses to notify when the state
 of your cluster changes.  Nagios <emphasis>hosts</emphasis> describe the
 compute nodes or similar resources that are part of your cluster.  Nagios
 <emphasis>services</emphasis> are the host attributes or network services that
-nagios monitors.
+Nagios monitors.
 </para><para>
-Configuration for each of these nagios objects can be managed using the
+Configuration for each of these Nagios objects can be managed using the
 <command>rocks</command> command-line tool, as described below.
 </para>
 
 <section id="configuring-timeperiods" xreflabel="Configuring Timeperiods">
-<title>Configuring Nagios Contacts</title>
+<title>Configuring Nagios Timeperiods</title>
 <para>
 You can use the <command>rocks add nagios timeperiod</command> command to
-specify blocks of time when monitoring should take place, <command>rocks remove
-nagios timeperiod</command> command to delete timeperiods, and the
+specify blocks of time when monitoring should take place, the <command>rocks
+remove nagios timeperiod</command> command to delete timeperiods, and the
 <command>rocks list nagios timeperoid</command> command to show the timeperiods
 you've entered.  The <command>rocks add nagios timeperiod</command> command has
 this format:
@@ -37,14 +37,18 @@ typical workday.  You can use "*" as a shorthand for the entire day,
 line.
 </para><para>
 Here is an example of using several <command>rocks</command> commands to add,
-remove, and list nagios timeperiods:
+remove, and list Nagios timeperiods:
 <screen>
-# rocks add nagios timeperiod name=weekdays monday="*" tuesday="*" wednesday="*" thursday="*" friday="*"
+# rocks add nagios timeperiod name=weekdays monday="*" tuesday="*" wednesday="*" \
+  thursday="*" friday="*"
 # rocks list nagios timeperiod
-name="weekdays" monday="00:00-24:00" tuesday="00:00-24:00" wednesday="00:00-24:00" thursday="00:00-24:00" friday="00:00-24:00"
-# rocks add nagios timeperiod name=mwf monday="09:00-17:00" wednesday="09:00-17:00" friday="09:00-17:00"
+name="weekdays" monday="00:00-24:00" tuesday="00:00-24:00" wednesday="00:00-24:00"
+thursday="00:00-24:00" friday="00:00-24:00"
+# rocks add nagios timeperiod name=mwf monday="09:00-17:00" wednesday="09:00-17:00" \
+  friday="09:00-17:00"
 # rocks list nagios timeperiod
-name="weekdays" monday="00:00-24:00" tuesday="00:00-24:00" wednesday="00:00-24:00" thursday="00:00-24:00" friday="00:00-24:00"
+name="weekdays" monday="00:00-24:00" tuesday="00:00-24:00" wednesday="00:00-24:00"
+thursday="00:00-24:00" friday="00:00-24:00"
 name="mwf" monday="09:00-17:00" wednesday="09:00-17:00" friday="09:00-17:00"
 # rocks remove nagios timeperiod weekdays
 # rocks list nagios timeperiod
@@ -73,7 +77,7 @@ notification about host and service state changes.  If you specify no
 generates a group from the email.
 </para><para>
 Here is an example of using several <command>rocks</command> commands to add,
-remove, and list nagios contacts:
+remove, and list Nagios contacts:
 <screen>
 # rocks add nagios contact email=alf@ufo.edu
 # rocks list nagios contact
@@ -92,7 +96,7 @@ email="r2d2@ufo.edu" groups="administrators"
 <section id="configuring-hosts" xreflabel="Configuring Hosts">
 <title>Configuring Nagios Hosts</title>
 <para>
-You can use the <command>rocks add nagios host</command> command to tell nagios
+You can use the <command>rocks add nagios host</command> command to tell Nagios
 about resources in your cluster, the <command>rocks remove nagios host</command>
 command to delete hosts, and the <command>rocks list nagios host</command>
 command to show the hosts you've entered.  The <command>rocks add nagios
@@ -111,7 +115,7 @@ If you specify no <command>groups</command> parameter, the
 <command>rocks</command> command generates a group from the host name.
 </para><para>
 Here is an example of using several <command>rocks</command> commands to add,
-remove, and list nagios hosts:
+remove, and list Nagios hosts:
 <screen>
 # rocks add nagios host name=c1 ip=10.1.255.250 contacts=administrators
 # rocks add nagios host name=c2 ip=10.1.255.249 contacts=administrators groups=bignodes
@@ -124,18 +128,22 @@ name="c2" ip="10.1.255.249" contacts="administrators" groups="bignodes"
 </screen>
 You may never need to use the <command>rocks add nagios host</command>
 directly.  The <command>rocks sync nagios</command> command automatically adds
-all the hosts in your cluster to nagios, placing each in a group named after its
-appliance type.  Here is an example of its use:
+all the hosts in your cluster to Nagios, placing each in a group named after its
+appliance type, as well as an "allhosts" group.  Here is an example of its use:
 <screen>
 # rocks list nagios host
 # rocks sync nagios contacts=administrators
 # rocks list nagios host
-name="compute-0-0-appliance" ip="10.1.255.254" contacts="administrators" groups="Compute-group"
-name="compute-0-1-appliance" ip="10.1.255.253" contacts="administrators" groups="Compute-group"
-name="compute-0-2-appliance" ip="10.1.255.252" contacts="administrators" groups="Compute-group"
-name="compute-0-3-appliance" ip="10.1.255.251" contacts="administrators" groups="Compute-group"
+name="compute-0-0-appliance" ip="10.1.255.254" contacts="administrators"
+groups="Compute-group,allhosts"
+name="compute-0-1-appliance" ip="10.1.255.253" contacts="administrators"
+groups="Compute-group,allhosts"
+name="compute-0-2-appliance" ip="10.1.255.252" contacts="administrators"
+groups="Compute-group,allhosts"
+name="compute-0-3-appliance" ip="10.1.255.251" contacts="administrators"
+groups="Compute-group,allhosts"
 &lt;etc.&gt;
-name="blue-appliance" ip="10.1.1.1" contacts="administrators" groups="Frontend-group"
+name="blue-appliance" ip="10.1.1.1" contacts="administrators" groups="Frontend-group,allhosts"
 </screen>
 </para>
 </section>
@@ -144,42 +152,66 @@ name="blue-appliance" ip="10.1.1.1" contacts="administrators" groups="Frontend-g
 <title>Configuring Nagios Services</title>
 <para>
 You can use the <command>rocks add nagios service</command> command to specify
-additional host metrics or services for nagios to monitor, the
+additional host metrics or services for Nagios to monitor, the
 <command>rocks remove nagios service</command> command to end monitoring of
 specific metrics or services, and the <command>rocks list nagios
-service</command> command to show the metrics and services nagios is
+service</command> command to show the metrics and services Nagios is
 monitoring.  The <command>rocks add nagios service</command> command has this
 format:
 <screen>
 # rocks add nagios service name=<emphasis>string</emphasis> hosts=<emphasis>group</emphasis>[,<emphasis>group</emphasis> ...] command=<emphasis>string</emphasis> \
-    contacts=<emphasis>group</emphasis>[,<emphasis>group</emphasis> ...]
+    contacts=<emphasis>group</emphasis>[,<emphasis>group</emphasis> ...] [timeperiod=<emphasis>string</emphasis>] [frequency=<emphasis>int</emphasis>] [retry=<emphasis>int</emphasis>]
 </screen>
 The <command>name</command> parameter identifies the service; you can use any
 name that you find meaningful.  The <command>hosts</command> parameter
 specifies one or more host groups to monitor; these host groups are defined by
 the <command>rocks add nagios host</command> command.  The
 <command>contacts</command> parameter specifies one or more contact groups that
-nagios should notify when the status of this service changes; these contact
+Nagios should notify when the status of this service changes; these contact
 groups are defined by the <command>rocks add nagios contact</command> command.
+</para><para>
+The optional <command>timeperiod</command> parameter specifies a timeperiod,
+defined by the <command>rocks add nagios timeperiod</command> command, that
+indicates when the service should be monitored.  If you specify no timeperiod,
+Nagios will monitor the service continuously.  The optional
+<command>frequency</command> and <command>retry</command> parameters specify
+how often (in minutes) the service should be tested and how many minutes Nagios
+should wait before retesting a failed service.  The default is to test every
+five minutes and wait one minute before retesting.
 </para><para>
 The <command>command</command> parameter specifies the shell execution line
 to be used for testing the service.  Typically, this execution line will
-specify one of the plug-in programs packaged with nagios along with any
-necessary command-line options to be passed to the program.  The nagios
+invoke one of the plug-in programs packaged with Nagios along with any
+necessary command-line options to be passed to the program.  The Nagios
 installation includes dozens of these programs; they can be found in
 /opt/nagios/libexec.  Running any of these with a --help option will print a
-description of the program and its options.  Online documentation for nagios
+description of the program and its options.  Online documentation for Nagios
 plug-ins can be found at http://nagiosplugins.org/man.
 </para><para>
 Nagios provides many <emphasis>macros</emphasis> that can be used to
 incorporate host-specific informtation (e.g., IP address) in command
 definitions.  See http://nagios.sourceforge.net/docs/3_0/macrolist.html for a
-list of the macros that nagios supports.
+list of the macros that Nagios supports.
 </para><para>
 Here is an example of using several <command>rocks</command> commands to add,
-remove, and list nagios services:
+remove, and list Nagios services:
 <screen>
-TODO
+rocks add nagios service name='Load Average' hosts=allhosts \
+  command='check_load -w 3,3,3 -c 5,5,5' contacts=administrators
+rocks list nagios service
+name="Load Average" hosts="allhosts" command="check_load -w 3,3,3 -c 5,5,5" 
+contacts="administrators" frequency="5" retry="1" timeperiod="always"
+rocks add nagios service name='Free Disk' hosts=allhosts command='check_disk -W 10% -C 1%' \
+  contacts=administrators frequency=60
+rocks list nagios service
+name="Load Average" hosts="allhosts" command="check_load -w 3,3,3 -c 5,5,5"
+contacts="administrators" frequency="5" retry="1" timeperiod="always"
+name="Free Disk" hosts="allhosts" command="check_disk -W 10% -C 1%" contacts="administrators"
+frequency="60" retry="1" timeperiod="always"
+rocks remove nagios service 'Load Average'
+rocks list nagios service
+name="Free Disk" hosts="allhosts" command="check_disk -W 10% -C 1%" contacts="administrators"
+frequency="60" retry="1" timeperiod="always"
 </screen>
 </para>
 </section>
@@ -187,15 +219,15 @@ TODO
 <section id="initial-configuration" xreflabel="Initial Configuration">
 <title>Initial Nagios Configuration</title>
 <para>
-During installation, the Rocks nagios roll automatically adds the cluster
-contact email entered on the Rocks cluster information screen as a nagios
-contact.  This contact is included in the nagios contact group "administrators".
-This contact group receives information about the nagios host group
+During installation, the Rocks Nagios roll automatically adds the cluster
+contact email entered on the Rocks cluster information screen as a Nagios
+contact.  This contact is included in the Nagios contact group "administrators".
+This contact group receives information about the Nagios host group
 "allhosts", a group the roll automatically defines with the cluster frontend
-as its initial member.  The Rocks nagios roll creates a nagios service to
+as its initial member.  The Rocks Nagios roll creates a Nagios service to
 periodically perform a ping test to this host group.
 </para><para>
-This set of <command>rocks</command> commands shows the initial nagios
+This set of <command>rocks</command> commands shows the initial Nagios
 configuration:
 <screen>
 # rocks list nagios contact
@@ -203,7 +235,8 @@ email="alf@ufo.edu" groups="administrators"
 # rocks list nagios host
 name="blue" ip="10.1.1.1" contacts="administrators" groups="allhosts"
 # rocks list nagios service
-name="PING" hosts="allhosts" command="check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 5" contacts="administrators"
+name="PING" hosts="allhosts" contacts="administrators" timeperiod="always"
+command="check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 5"
 </screen>
 </para>
 </section>
