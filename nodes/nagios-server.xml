@@ -13,6 +13,9 @@
 
   <changelog>
   $Log$
+  Revision 1.13  2009/04/15 17:47:18  jhayes
+  Add line to config file to avoid nagios warning message.
+
   Revision 1.12  2009/04/13 23:19:09  jhayes
   Code cleaning.
 
@@ -125,6 +128,7 @@ nagiosadmin:<var name="Kickstart_PrivateRootPassword"/>
 ##
 
 cfg_dir=/opt/nagios/etc/rocks
+illegal_macro_output_chars=`~$^&amp;"|'&lt;&gt;
   </file>
 
   /bin/mkdir -p /opt/nagios/etc/rocks
