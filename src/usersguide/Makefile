@@ -55,6 +55,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/04/15 21:18:25  jhayes
+# Update image.
+#
 # Revision 1.1  2009/02/05 18:36:05  bruno
 # added
 #
@@ -67,9 +70,11 @@ include Rules.mk
 default: $(NAME).spec ../$(NAME)-$(VERSION).tar.gz
 
 html: predoc
+	cp images/select-nagios.png images/roll-select-rolls.png
 	jw --backend html --dsl $(PWD)/rocks.dsl#html index.sgml
 
 pdf: predoc
+	cp images/select-nagios.png images/roll-select-rolls.png
 	jw --backend pdf --dsl $(PWD)/rocks.dsl#print index.sgml
 
 build: html pdf
