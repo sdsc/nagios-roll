@@ -22,12 +22,12 @@ Configuration for each of these Nagios objects can be managed using the
 You can use the <command>rocks add nagios timeperiod</command> command to
 specify blocks of time when monitoring should take place, the <command>rocks
 remove nagios timeperiod</command> command to delete timeperiods, and the
-<command>rocks list nagios timeperoid</command> command to show the timeperiods
+<command>rocks list nagios timeperiod</command> command to show the timeperiods
 you've entered.  The <command>rocks add nagios timeperiod</command> command has
 this format:
 <screen>
 # rocks add nagios timeperiod name=<emphasis>string</emphasis> [sunday=<emphasis>range</emphasis>] [monday=<emphasis>range</emphasis>] [tuesday=<emphasis>range</emphasis>] \
-   [wednesday=<emphasis>range</emphasis>] [thursday=<emphasis>range</emphasis>] [friday=<emphasis>range</emphasis>] [satday=<emphasis>range</emphasis>]
+  [wednesday=<emphasis>range</emphasis>] [thursday=<emphasis>range</emphasis>] [friday=<emphasis>range</emphasis>] [saturday=<emphasis>range</emphasis>]
 </screen>
 Each of the weekday arguments allows you to specify a time range, in the format
 HH:MM-HH:MM, during which monitoring should take place.  For example, the range
@@ -160,7 +160,7 @@ monitoring.  The <command>rocks add nagios service</command> command has this
 format:
 <screen>
 # rocks add nagios service name=<emphasis>string</emphasis> hosts=<emphasis>group</emphasis>[,<emphasis>group</emphasis> ...] command=<emphasis>string</emphasis> \
-    contacts=<emphasis>group</emphasis>[,<emphasis>group</emphasis> ...] [timeperiod=<emphasis>string</emphasis>] [frequency=<emphasis>int</emphasis>] [retry=<emphasis>int</emphasis>]
+  contacts=<emphasis>group</emphasis>[,<emphasis>group</emphasis> ...] [timeperiod=<emphasis>string</emphasis>] [frequency=<emphasis>int</emphasis>] [retry=<emphasis>int</emphasis>]
 </screen>
 The <command>name</command> parameter identifies the service; you can use any
 name that you find meaningful.  The <command>hosts</command> parameter
@@ -189,27 +189,27 @@ description of the program and its options.  Online documentation for Nagios
 plug-ins can be found at http://nagiosplugins.org/man.
 </para><para>
 Nagios provides many <emphasis>macros</emphasis> that can be used to
-incorporate host-specific informtation (e.g., IP address) in command
+incorporate host-specific information (e.g., IP address) in command
 definitions.  See http://nagios.sourceforge.net/docs/3_0/macrolist.html for a
 list of the macros that Nagios supports.
 </para><para>
 Here is an example of using several <command>rocks</command> commands to add,
 remove, and list Nagios services:
 <screen>
-rocks add nagios service name='Load Average' hosts=allhosts \
+# rocks add nagios service name='Load Average' hosts=allhosts \
   command='check_load -w 3,3,3 -c 5,5,5' contacts=administrators
-rocks list nagios service
+# rocks list nagios service
 name="Load Average" hosts="allhosts" command="check_load -w 3,3,3 -c 5,5,5" 
 contacts="administrators" frequency="5" retry="1" timeperiod="always"
-rocks add nagios service name='Free Disk' hosts=allhosts command='check_disk -W 10% -C 1%' \
+# rocks add nagios service name='Free Disk' hosts=allhosts command='check_disk -W 10% -C 1%' \
   contacts=administrators frequency=60
-rocks list nagios service
+# rocks list nagios service
 name="Load Average" hosts="allhosts" command="check_load -w 3,3,3 -c 5,5,5"
 contacts="administrators" frequency="5" retry="1" timeperiod="always"
 name="Free Disk" hosts="allhosts" command="check_disk -W 10% -C 1%" contacts="administrators"
 frequency="60" retry="1" timeperiod="always"
-rocks remove nagios service 'Load Average'
-rocks list nagios service
+# rocks remove nagios service 'Load Average'
+# rocks list nagios service
 name="Free Disk" hosts="allhosts" command="check_disk -W 10% -C 1%" contacts="administrators"
 frequency="60" retry="1" timeperiod="always"
 </screen>
