@@ -54,6 +54,10 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.15  2009/04/15 16:50:26  jhayes
+# Allow specification of per-service monitoring timeperiod.  Remove copying of
+# sample configuration to target.
+#
 # Revision 1.14  2009/04/15 01:39:40  jhayes
 # Add separate commands for manipulating timeperiod definitions.
 #
@@ -120,8 +124,8 @@ define contact {
   name                          contact-defaults
   host_notifications_enabled    1
   service_notifications_enabled 1
-  host_notification_period      24x7
-  service_notification_period   24x7
+  host_notification_period      always
+  service_notification_period   always
   host_notification_options     d,u,r,f,s
   service_notification_options  w,u,c,r,f,s
   host_notification_commands    email-re-host
@@ -202,7 +206,7 @@ class Command(rocks.commands.add.nagios.Command):
         else:
           membersByGroup[group] += ',' + email
 
-    self.command('add.nagios.timeperiod', ['name=24x7'])
+    self.command('add.nagios.timeperiod', ['name=always'])
     f = open(contactsPath, 'w')
     f.write(contactHeader)
     for email in contactGroupsByEmail:

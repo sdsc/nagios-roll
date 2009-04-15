@@ -3,16 +3,55 @@
 
 
 <para>
-Configuring nagios on your cluster involves specifying information for three
-kinds of nagios objects.  Nagios <emphasis>contacts</emphasis> specify email
-addresses to notify when the state of your cluster changes.  Nagios
-<emphasis>hosts</emphasis> describe the compute nodes or similar resources
-that are part of your cluster.  Nagios <emphasis>services</emphasis> are the
-host attributes or network services that nagios monitors.
+Configuring nagios on your cluster involves specifying information for four
+kinds of nagios objects.  Nagios <emphasis>timeperiods</emphasis> specify
+blocks of time during which monitoring should take place.  Nagios
+<emphasis>contacts</emphasis> specify email addresses to notify when the state
+of your cluster changes.  Nagios <emphasis>hosts</emphasis> describe the
+compute nodes or similar resources that are part of your cluster.  Nagios
+<emphasis>services</emphasis> are the host attributes or network services that
+nagios monitors.
 </para><para>
 Configuration for each of these nagios objects can be managed using the
 <command>rocks</command> command-line tool, as described below.
 </para>
+
+<section id="configuring-timeperiods" xreflabel="Configuring Timeperiods">
+<title>Configuring Nagios Contacts</title>
+<para>
+You can use the <command>rocks add nagios timeperiod</command> command to
+specify blocks of time when monitoring should take place, <command>rocks remove
+nagios timeperiod</command> command to delete timeperiods, and the
+<command>rocks list nagios timeperoid</command> command to show the timeperiods
+you've entered.  The <command>rocks add nagios timeperiod</command> command has
+this format:
+<screen>
+# rocks add nagios timeperiod name=<emphasis>string</emphasis> [sunday=<emphasis>range</emphasis>] [monday=<emphasis>range</emphasis>] [tuesday=<emphasis>range</emphasis>] \
+   [wednesday=<emphasis>range</emphasis>] [thursday=<emphasis>range</emphasis>] [friday=<emphasis>range</emphasis>] [satday=<emphasis>range</emphasis>]
+</screen>
+Each of the weekday arguments allows you to specify a time range, in the format
+HH:MM-HH:MM, during which monitoring should take place.  For example, the range
+"00:00-12:00" specifies the morning hours, and "09:00-17:00" specifies a
+typical workday.  You can disable monitoring on a specific day by specifying
+"00:00-00:00".  For days not specified on the command line, the default is to
+enable monitoring for the whole day ("00:00-24:00").
+</para><para>
+Here is an example of using several <command>rocks</command> commands to add,
+remove, and list nagios timeperiods:
+<screen>
+# rocks add nagios timeperiod name=weekdays sunday="00:00-00:00" saturday="00:00-00:00"
+# rocks list nagios contact
+email="alf@ufo.edu" groups="alf@ufo.edu group"
+# rocks add nagios contact email=r2d2@ufo.edu groups=administrators
+# rocks list nagios contact
+email="alf@ufo.edu" groups="alf@ufo.edu group"
+email="r2d2@ufo.edu" groups="administrators"
+# rocks remove nagios contact alf@ufo.edu
+# rocks list nagios contact
+email="r2d2@ufo.edu" groups="administrators"
+</screen>
+</para>
+</section>
 
 <section id="configuring-contacts" xreflabel="Configuring Contacts">
 <title>Configuring Nagios Contacts</title>
@@ -21,7 +60,8 @@ You can use the <command>rocks add nagios contact</command> command to specify
 emails to notify in the event of cluster status changes, the
 <command>rocks remove nagios contact</command> command to delete emails, and the
 <command>rocks list nagios contact</command> command to show the emails you've
-entered.  The <command>rocks add nagios host</command> command has this format:
+entered.  The <command>rocks add nagios contact</command> command has this
+format:
 <screen>
 # rocks add nagios contact email=<emphasis>login@host</emphasis> [groups=<emphasis>group</emphasis>[,<emphasis>group ...</emphasis>]]
 </screen>

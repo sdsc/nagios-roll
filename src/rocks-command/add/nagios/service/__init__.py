@@ -54,6 +54,10 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.8  2009/04/15 16:50:26  jhayes
+# Allow specification of per-service monitoring timeperiod.  Remove copying of
+# sample configuration to target.
+#
 # Revision 1.7  2009/04/15 16:18:03  jhayes
 # Fix bug in service remove.
 #
@@ -111,7 +115,6 @@ define service {
   max_check_attempts           4
   active_checks_enabled        1
   passive_checks_enabled       1
-  check_period                 24x7
   obsess_over_service          1
   check_freshness              0
   event_handler_enabled        1
@@ -120,7 +123,7 @@ define service {
   retain_status_information    1
   retain_nonstatus_information 1
   notification_interval        240
-  notification_period          24x7
+  notification_period          always
   notification_options         w,u,c,r
   notifications_enabled        1
   register                     0
@@ -142,6 +145,7 @@ define service {
   check_command       %s
   check_interval      %s
   retry_interval      %s
+  check_period        %s
   contact_groups      %s
 }
 """
@@ -174,6 +178,10 @@ class Command(rocks.commands.add.nagios.Command):
 
   <param type='integer' name='retry'>
   How often to retry the service when it fails initially.
+  </param>
+
+  <param type='string' name='timeperiod'>
+  The times to monitor the service; defaults to always.
   </param>
   """
 
@@ -225,26 +233,34 @@ class Command(rocks.commands.add.nagios.Command):
         object['retry_interval'] = object['retry']
       elif not 'retry_interval' in object:
         object['retry_interval'] = 1
+      if 'timeperiod' in object:
+        object['check_period'] = object['timeperiod']
+      elif not 'check_period' in object:
+        object['check_period'] = 'always'
     objects.extend(extension)
 
     # Dictionaries ensure that user's values override any previous definition
     checkCommandsByName = {}
     checkIntervalsByName = {}
+    checkPeriodsByName = {}
     contactGroupsByName = {}
     hostGroupsByName = {}
     retryIntervalsByName = {}
     for object in objects:
       if not ('service_description' in object and 'check_command' in object and
               'check_interval' in object and 'contact_groups' in object and
-              'hostgroup_name' in object and 'retry_interval' in object):
+              'hostgroup_name' in object and 'retry_interval' in object and
+              'check_period' in object):
         continue
       name = object['service_description']
       checkCommandsByName[name] = object['check_command']
       checkIntervalsByName[name] = object['check_interval']
+      checkPeriodsByName[name] = object['check_period']
       contactGroupsByName[name] = object['contact_groups']
       hostGroupsByName[name] = object['hostgroup_name']
       retryIntervalsByName[name] = object['retry_interval']
 
+    self.command('add.nagios.timeperiod', ['name=always'])
     f = open(servicesPath, 'w')
     f.write(serviceHeader)
     for name in checkCommandsByName:
@@ -257,7 +273,8 @@ class Command(rocks.commands.add.nagios.Command):
       f.write(
         serviceFormat %
         (hostGroupsByName[name], name, commandName, checkIntervalsByName[name],
-         retryIntervalsByName[name], contactGroupsByName[name])
+         retryIntervalsByName[name], checkPeriodsByName[name],
+         contactGroupsByName[name])
       )
     f.close()
 

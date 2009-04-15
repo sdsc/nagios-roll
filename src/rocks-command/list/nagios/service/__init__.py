@@ -54,6 +54,10 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.4  2009/04/15 16:50:26  jhayes
+# Allow specification of per-service monitoring timeperiod.  Remove copying of
+# sample configuration to target.
+#
 # Revision 1.3  2009/04/13 19:10:10  jhayes
 # Concentrate nagios config file parsing in parent nagios list command class.
 #
@@ -99,9 +103,10 @@ class Command(rocks.commands.list.nagios.Command):
     for object in objects:
       if 'service_description' in object:
         services.append(
-          'name="%s" hosts="%s" command="%s" contacts="%s" frequency="%s" retry="%s"' %
+          'name="%s" hosts="%s" command="%s" contacts="%s" frequency="%s" retry="%s" timeperiod="%s"' %
           (object['service_description'], object['hostgroup_name'],
            commands[object['check_command']], object['contact_groups'],
-           object['check_interval'], object['retry_interval'])
+           object['check_interval'], object['retry_interval'],
+           object['check_period'])
         )
     self.addText("\n".join(services))

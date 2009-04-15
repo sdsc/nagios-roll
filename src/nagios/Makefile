@@ -55,6 +55,10 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.6  2009/04/15 16:50:26  jhayes
+# Allow specification of per-service monitoring timeperiod.  Remove copying of
+# sample configuration to target.
+#
 # Revision 1.5  2009/03/27 22:58:28  jhayes
 # Debugging.
 #
@@ -95,8 +99,7 @@ install::
 	  cd $(NAME)-$(VERSION); \
 	  make prefix=$(ROOT)/$(PKGROOT) install; \
 	  install -m755 daemon-init $(ROOT)/$(PKGROOT)/etc; \
-	  install -m755 sample-config/httpd.conf $(ROOT)/$(PKGROOT)/etc; \
-	  /bin/cp -r sample-config $(ROOT)/$(PKGROOT)/etc/ \
+	  install -m755 sample-config/httpd.conf $(ROOT)/$(PKGROOT)/etc \
 	)
 
 clean::

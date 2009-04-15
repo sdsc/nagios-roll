@@ -54,6 +54,10 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.12  2009/04/15 16:50:26  jhayes
+# Allow specification of per-service monitoring timeperiod.  Remove copying of
+# sample configuration to target.
+#
 # Revision 1.11  2009/04/15 01:39:40  jhayes
 # Add separate commands for manipulating timeperiod definitions.
 #
@@ -121,14 +125,14 @@ define host {
   max_check_attempts            10            ; 10 failed pings == "down"
   check_interval                5             ; check every 5 min
   retry_interval                1             ; wait 1 min between retries
-  check_period                  24x7          ; check all day, every day
+  check_period                  always        ; check all day, every day
   event_handler_enabled         1
   flap_detection_enabled        1
   process_perf_data             1
   retain_status_information     1
   retain_nonstatus_information  1
   notification_interval         240           ; renotify after 4 hours
-  notification_period           24x7          ; send notification whenever
+  notification_period           always        ; send notification whenever
   notification_options          d,u,r         ; down, up, recover
   notifications_enabled         1
   register                      0
@@ -236,7 +240,7 @@ class Command(rocks.commands.add.nagios.Command):
         else:
           membersByGroup[group] += ',' + name
 
-    self.command('add.nagios.timeperiod', ['name=24x7'])
+    self.command('add.nagios.timeperiod', ['name=always'])
     f = open(hostsPath, 'w')
     f.write(hostHeader)
     for name in addressesByName:
