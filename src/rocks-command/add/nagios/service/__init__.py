@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.7  2009/04/15 16:18:03  jhayes
+# Fix bug in service remove.
+#
 # Revision 1.6  2009/04/14 20:50:07  jhayes
 # More code cleaning.
 #
@@ -191,6 +194,10 @@ class Command(rocks.commands.add.nagios.Command):
     # Allow Nagios names as alternative to param names--makes implementation of
     # remove cleaner
     for object in extension:
+      # Allow interspersed command+service defs: again, makes remove cleaner
+      if 'command_name' in object and 'command_line' in object:
+        commandLinesByCommandName[object['command_name']]=object['command_line']
+        continue
       if 'name' in object:
         object['service_description'] = object['name']
       elif not 'service_description' in object:

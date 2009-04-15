@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.6  2009/04/15 16:18:03  jhayes
+# Fix bug in service remove.
+#
 # Revision 1.5  2009/04/14 20:50:08  jhayes
 # More code cleaning.
 #
@@ -113,9 +116,12 @@ class Command(rocks.commands.Command):
     tempname = tempfile.mktemp('.txt')
     f = open(tempname, 'w')
     for line in lines:
-      if line.find('service_description=') < 0:
+      # "rocks add nagios service" allows us to intersperse command + service,
+      # so we don't have to merge them here
+      if line.find('service_description=')<0 and line.find('command_line=')<0:
         continue
-      if not re.search( 'service_description=[\'"]?' + args[0] + r'[\'"]?(\s|$)', line
+      if not re.search('service_description=[\'"]?' + args[0] + r'[\'"]?(\s|$)',
+                       line):
         f.write(line + "\n")
     f.close()
 
