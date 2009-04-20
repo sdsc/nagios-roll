@@ -55,13 +55,15 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/04/20 18:52:12  jhayes
+# Tweaks.
+#
 # Revision 1.1  2009/02/05 18:36:05  bruno
 # added
 #
 #
 
 -include $(ROLLSROOT)/etc/Rolls.mk
-include Rolls.mk
 
 default:	roll
 
