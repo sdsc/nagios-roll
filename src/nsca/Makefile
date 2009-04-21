@@ -55,6 +55,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/04/21 20:50:52  jhayes
+# Add NSCA configuration files.
+#
 # Revision 1.1  2009/04/21 17:59:01  jhayes
 # Initial additions for NSCA plug-in.
 #
@@ -94,10 +97,10 @@ build:
 
 install::
 	mkdir -p $(ROOT)/$(PKGROOT)
-	mkdir -p $(ROOT)/$(PKGROOT)/sbin
+	mkdir -p $(ROOT)/$(PKGROOT)/bin
 	( \
 	  cd $(NAME)-$(VERSION); \
-	  /bin/cp src/nsca src/send_nsca $(ROOT)/$(PKGROOT)/sbin \
+	  /bin/cp src/nsca src/send_nsca $(ROOT)/$(PKGROOT)/bin/ \
 	)
 
 clean::

@@ -13,13 +13,27 @@
 
   <changelog>
   $Log$
+  Revision 1.2  2009/04/21 20:50:52  jhayes
+  Add NSCA configuration files.
+
   Revision 1.1  2009/04/21 17:59:01  jhayes
   Initial additions for NSCA plug-in.
 
   </changelog>
 
   <post>
-  # TBD
+
+
+  <!-- adapted from nsca-2.7.2/sample_config/send_nsca.cfg -->
+  <file name="/opt/nagios/etc/send_nsca.cfg" perms="0644">
+##
+## ROCKS
+##
+# We're restricting to local network; password would be overkill
+#password=
+encryption_method=1
+  </file>
+
   </post>
 
 </kickstart>
