@@ -1,0 +1,25 @@
+<?xml version="1.0" standalone="no"?>
+
+<kickstart>
+
+  <description>
+  NSCA Nagios plug-in for Nagios server
+  </description>
+
+  <copyright>
+  Copyright (c) 2000 - 2008 The Regents of the University of California.
+  All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
+  </copyright>
+
+  <changelog>
+  $Log$
+  Revision 1.1  2009/04/21 17:59:01  jhayes
+  Initial additions for NSCA plug-in.
+
+  </changelog>
+
+  <post>
+  # TBD
+  </post>
+
+</kickstart>
