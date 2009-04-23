@@ -13,6 +13,9 @@
 
   <changelog>
   $Log$
+  Revision 1.14  2009/04/23 20:10:31  jhayes
+  Portability tweaks.  Remove libmcrypt, since we're not using it.
+
   Revision 1.13  2009/04/15 17:47:18  jhayes
   Add line to config file to avoid nagios warning message.
 
@@ -58,7 +61,12 @@
     # Create a new nagios user account and give it a password.
     /usr/sbin/useradd -m nagios
   -->
-  /usr/sbin/useradd -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios
+  if test -f /usr/sbin/useradd.real; then
+    USERADD=/usr/sbin/useradd.real
+  else
+    USERADD=/usr/sbin/useradd
+  fi
+  $USERADD -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios -G apache
 
   <!--
     # JJH: Unneeded: use apache group directly instead
@@ -151,11 +159,11 @@ illegal_macro_output_chars=`~$^&amp;"|'&lt;&gt;
 
     # JJH: create ssh key so nagios won't prompt for passphrase
   -->
-  mkdir -p /opt/nagios/.ssh
-  ssh-keygen -q -f /opt/nagios/.ssh/id_rsa -N ''
+  /bin/mkdir -p /opt/nagios/.ssh
+  /usr/bin/ssh-keygen -q -f /opt/nagios/.ssh/id_rsa -N ''
 
-  chown -R nagios.apache /opt/nagios
-  chkconfig nagios on
+  /bin/chown -R nagios.apache /opt/nagios
+  /sbin/chkconfig nagios on
 
   <!--
     # JJH: not needed

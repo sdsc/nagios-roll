@@ -13,6 +13,9 @@
 
   <changelog>
   $Log$
+  Revision 1.6  2009/04/23 20:10:31  jhayes
+  Portability tweaks.  Remove libmcrypt, since we're not using it.
+
   Revision 1.5  2009/04/23 17:48:10  jhayes
   Build send_nsca on target for portability.
 
@@ -34,14 +37,6 @@
 
   <edge from="client">
     <to>nsca-client</to>
-  </edge>
-
-  <edge from="nsca-server">
-    <to>nsca-common</to>
-  </edge>
-
-  <edge from="nsca-client">
-    <to>nsca-common</to>
   </edge>
 
 </graph>
