@@ -13,6 +13,9 @@
 
   <changelog>
   $Log$
+  Revision 1.5  2009/04/23 20:39:03  jhayes
+  Work around nsca weirdness.
+
   Revision 1.4  2009/04/23 20:10:31  jhayes
   Portability tweaks.  Remove libmcrypt, since we're not using it.
 
@@ -56,7 +59,7 @@
 # We're restricting to local network; password would be overkill
 #password=
 encryption_method=1
-  </file>
+</file> <!-- NOTE: send_nsca pukes if we indent this closing tag! -->
 
   /bin/chown -R nagios.nagios /opt/nagios
 

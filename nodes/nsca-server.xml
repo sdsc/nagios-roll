@@ -13,6 +13,9 @@
 
   <changelog>
   $Log$
+  Revision 1.5  2009/04/23 20:39:03  jhayes
+  Work around nsca weirdness.
+
   Revision 1.4  2009/04/23 20:10:31  jhayes
   Portability tweaks.  Remove libmcrypt, since we're not using it.
 
@@ -42,7 +45,7 @@ server_address=<var name="Kickstart_PrivateAddress"/>
 nsca_user=nagios
 nsca_group=apache
 nsca_chroot=/opt/nagios/var/rw
-debug=0
+debug=1
 command_file=/opt/nagios/var/rw/nagios.cmd
 alternate_dump_file=/opt/nagios/var/rw/nsca.dump
 aggregate_writes=0
@@ -51,7 +54,7 @@ max_packet_age=30
 # We're restricting to local network; password would be overkill
 #password=
 decryption_method=1
-  </file>
+</file> <!-- NOTE: nsca pukes if we indent this closing tag! -->
 
   <file name="/etc/services" mode="append">
 nsca            5667/tcp                        # NSCA Nagios add-on
