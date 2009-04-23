@@ -13,14 +13,15 @@
 
   <changelog>
   $Log$
+  Revision 1.2  2009/04/23 17:48:11  jhayes
+  Build send_nsca on target for portability.
+
   Revision 1.1  2009/04/21 17:59:01  jhayes
   Initial additions for NSCA plug-in.
 
   </changelog>
 
   <package>libmcrypt</package>
-  <package>nsca</package>
-  <package></package>
 
   <post>
   </post>

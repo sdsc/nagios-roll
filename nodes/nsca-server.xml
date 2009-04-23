@@ -13,6 +13,9 @@
 
   <changelog>
   $Log$
+  Revision 1.3  2009/04/23 17:48:11  jhayes
+  Build send_nsca on target for portability.
+
   Revision 1.2  2009/04/21 20:50:52  jhayes
   Add NSCA configuration files.
 
@@ -20,6 +23,8 @@
   Initial additions for NSCA plug-in.
 
   </changelog>
+
+  <package>nsca</package>
 
   <post>
 
