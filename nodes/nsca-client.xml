@@ -13,6 +13,10 @@
 
   <changelog>
   $Log$
+  Revision 1.6  2009/04/24 23:49:33  anoop
+  Enable sunos build for nsca. Added libmcrypt back to enable optional
+  encryption. Removed send-nsca, so that we build from the same codebase
+
   Revision 1.5  2009/04/23 20:39:03  jhayes
   Work around nsca weirdness.
 
@@ -30,29 +34,19 @@
 
   </changelog>
 
-  <package>send-nsca</package>
+  <package os="linux">nsca</package>
+  <package os="sunos">ROCKSnsca</package>
+  <package os="sunos">ROCKSlibmcrypt</package>
 
   <post>
 
-  if test -f /usr/sbin/useradd.real; then
-    USERADD=/usr/sbin/useradd.real
-  else
-    USERADD=/usr/sbin/useradd
-  fi
-  $USERADD -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios
+/usr/sbin/groupadd -g 413 nagios
+/usr/sbin/useradd  -u 413 -g nagios -c "Nagios Monitoring" -d /opt/nagios nagios
 
-  /bin/mkdir -p /opt/nagios/bin
-  /bin/mkdir -p /opt/nagios/etc
-
-  cd /opt/nagios/tar
-  /bin/tar zxvf send-nsca.tar.gz
-  cd nsca*
-  ./configure
-  make
-  /bin/cp src/send_nsca /opt/nagios/bin/
-
-  <!-- adapted from nsca-2.7.2/sample_config/send_nsca.cfg -->
-  <file name="/opt/nagios/etc/send_nsca.cfg" perms="0644">
+<!-- adapted from nsca-2.7.2/sample_config/send_nsca.cfg -->
+mkdir -p /opt/nagios/etc
+chown -R nagios:nagios /opt/nagios/etc
+<file name="/opt/nagios/etc/send_nsca.cfg" owner="nagios:nagios" perms="0644">
 ##
 ## ROCKS
 ##
@@ -61,8 +55,6 @@
 encryption_method=1
 </file> <!-- NOTE: send_nsca pukes if we indent this closing tag! -->
 
-  /bin/chown -R nagios.nagios /opt/nagios
-
-  </post>
+</post>
 
 </kickstart>

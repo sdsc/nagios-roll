@@ -55,21 +55,31 @@
 # @Copyright@
 #
 # $Log$
-# Revision 1.1  2009/04/23 17:48:11  jhayes
-# Build send_nsca on target for portability.
+# Revision 1.3  2009/04/24 23:49:33  anoop
+# Enable sunos build for nsca. Added libmcrypt back to enable optional
+# encryption. Removed send-nsca, so that we build from the same codebase
 #
 #
 
-PKGROOT = /opt/nagios
-REDHAT.ROOT = $(PWD)/../../
+PKGROOT = /opt/rocks
+REDHAT.ROOT = $(CURDIR)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
+include Rules.mk
 
 build:
+	gunzip -c $(NAME)-$(VERSION).tar.gz | $(TAR) -xf -
+	( \
+	  cd $(NAME)-$(VERSION);		\
+	  ./configure --prefix=$(PKGROOT);	\
+	  $(MAKE);				\
+	)
 
 install::
-	/bin/mkdir -p $(ROOT)/$(PKGROOT)
-	/bin/mkdir -p $(ROOT)/$(PKGROOT)/tar
-	/bin/cp *.tar.gz $(ROOT)/$(PKGROOT)/tar/send-nsca.tar.gz
+	( \
+	  cd $(NAME)-$(VERSION); \
+	  $(MAKE) install DESTDIR=$(ROOT); \
+	)
 
 clean::
+	rm -rf $(NAME)-$(VERSION)

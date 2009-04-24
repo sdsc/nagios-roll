@@ -55,6 +55,10 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2009/04/24 23:49:33  anoop
+# Enable sunos build for nsca. Added libmcrypt back to enable optional
+# encryption. Removed send-nsca, so that we build from the same codebase
+#
 # Revision 1.2  2009/04/21 20:50:52  jhayes
 # Add NSCA configuration files.
 #
@@ -83,24 +87,26 @@
 #
 
 PKGROOT = /opt/nagios
-REDHAT.ROOT = $(PWD)/../../
+REDHAT.ROOT = $(CURDIR)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
+include Rules.mk
 
 build:
-	tar zxvf $(NAME)-$(VERSION).tar.gz
+	gunzip -c $(NAME)-$(VERSION).tar.gz | $(TAR) -xf -
 	( \
-	  cd $(NAME)-$(VERSION); \
-	  ./configure --prefix=$(PKGROOT); \
-	  make \
+	  cd $(NAME)-$(VERSION);		\
+	  ./configure --prefix=$(PKGROOT);	\
+	  $(MAKE)				\
 	)
 
 install::
 	mkdir -p $(ROOT)/$(PKGROOT)
 	mkdir -p $(ROOT)/$(PKGROOT)/bin
-	( \
-	  cd $(NAME)-$(VERSION); \
-	  /bin/cp src/nsca src/send_nsca $(ROOT)/$(PKGROOT)/bin/ \
+	(								\
+		cd $(NAME)-$(VERSION);					\
+		$(INSTALL) -m0755 src/nsca $(ROOT)/$(PKGROOT)/bin/nsca;	\
+		$(INSTALL) -m0755 src/send_nsca	$(ROOT)/$(PKGROOT)/bin/send_nsca;\
 	)
 
 clean::

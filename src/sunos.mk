@@ -54,14 +54,12 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/04/24 23:49:33  anoop
+# Enable sunos build for nsca. Added libmcrypt back to enable optional
+# encryption. Removed send-nsca, so that we build from the same codebase
+#
 # Revision 1.1  2009/04/01 19:15:34  phil
 # Adjustments to build on Solaris
 #
-# Revision 1.1  2009/02/05 18:36:05  bruno
-# added
-#
-#
 
-SRCDIRS = `find * -prune -type d \
-	! -name CVS \
-	! -name .`
+SRCDIRS = libmcrypt nsca
