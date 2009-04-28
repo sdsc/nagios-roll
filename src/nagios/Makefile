@@ -55,6 +55,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.7  2009/04/28 18:23:47  jhayes
+# Remove disused include.
+#
 # Revision 1.6  2009/04/15 16:50:26  jhayes
 # Allow specification of per-service monitoring timeperiod.  Remove copying of
 # sample configuration to target.
@@ -80,7 +83,6 @@ PKGROOT = /opt/nagios
 REDHAT.ROOT = $(PWD)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
-include Rules.mk
 
 build:
 	tar zxvf $(NAME)-$(VERSION).tar.gz
