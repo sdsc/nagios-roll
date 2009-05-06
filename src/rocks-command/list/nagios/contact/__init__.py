@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.9  2009/05/06 18:50:09  jhayes
+# Clean up implementation using new dump command.
+#
 # Revision 1.8  2009/04/13 19:10:10  jhayes
 # Concentrate nagios config file parsing in parent nagios list command class.
 #
@@ -82,16 +85,17 @@
 
 import rocks.commands
 
-class Command(rocks.commands.list.nagios.Command):
+contactsPath = '/opt/nagios/etc/rocks/contacts.cfg'
+
+class Command(rocks.commands.Command):
   """
   Show nagios notification email addresses.
   """
 
   def run(self, params, args):
-    objects = self.parse_nagios_file('/opt/nagios/etc/rocks/contacts.cfg')
-    contacts = []
-    for object in objects:
-      if 'email' in object:
-        contacts.append('email="%s" groups="%s"' %
-                        (object['email'], object['contactgroups']))
-    self.addText("\n".join(contacts))
+    lines = self.command('dump.nagios', [contactsPath]).split("\n")
+    result = []
+    for line in lines:
+      if line.startswith('rocks add nagios contact '):
+        result.append(line[len('rocks add nagios contact '):])
+    self.addText("\n".join(result))

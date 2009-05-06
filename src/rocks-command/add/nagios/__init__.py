@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2009/05/06 18:50:09  jhayes
+# Clean up implementation using new dump command.
+#
 # Revision 1.2  2009/04/13 23:19:10  jhayes
 # Code cleaning.
 #
@@ -109,6 +112,9 @@ class Command(rocks.commands.Command):
     for line in lines:
       object = {}
       s = line
+      parse = re.match(r'^rocks add nagios \w+(.*)', s)
+      if parse:
+        s = parse.group(1)
       parse = re.match(r'\s*(\w+)=(\'[^\']*\'|"[^"]*"|[^\'"\s]+)', s)
       while parse:
         object[parse.group(1)] = parse.group(2).strip('\'"')
@@ -131,12 +137,12 @@ class Command(rocks.commands.Command):
     f.close()
     return self.parse_attributes(lines)
 
-  def parse_list_nagios_output(self, args):
+  def parse_dump_nagios_output(self, args):
     """
-    Converts the output of the "rocks list nagios" command to a list of
+    Converts the output of the "rocks dump nagios" command to a list of
     dictionaries.
     """
-    lines = self.command('list.nagios', args).split("\n")
+    lines = self.command('dump.nagios', args).split("\n")
     if len(lines) == 1 and lines[0] == '':
       return []
     return self.parse_attributes(lines)

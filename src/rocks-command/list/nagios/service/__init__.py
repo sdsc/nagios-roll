@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.5  2009/05/06 18:50:09  jhayes
+# Clean up implementation using new dump command.
+#
 # Revision 1.4  2009/04/15 16:50:26  jhayes
 # Allow specification of per-service monitoring timeperiod.  Remove copying of
 # sample configuration to target.
@@ -83,30 +86,19 @@
 # added
 #
 
-import re
 import rocks.commands
 
-class Command(rocks.commands.list.nagios.Command):
+servicesPath = '/opt/nagios/etc/rocks/services.cfg'
+
+class Command(rocks.commands.Command):
   """
   Show nagios services.
   """
 
   def run(self, params, args):
-    objects = self.parse_nagios_file('/opt/nagios/etc/rocks/services.cfg')
-    services = []
-    commands = {}
-    for object in objects:
-      if 'command_name' in object:
-        found = re.search(r'^(.*/)?([^/]+)$', object['command_line'])
-        if found:
-          commands[object['command_name']] = found.group(2)
-    for object in objects:
-      if 'service_description' in object:
-        services.append(
-          'name="%s" hosts="%s" command="%s" contacts="%s" frequency="%s" retry="%s" timeperiod="%s"' %
-          (object['service_description'], object['hostgroup_name'],
-           commands[object['check_command']], object['contact_groups'],
-           object['check_interval'], object['retry_interval'],
-           object['check_period'])
-        )
-    self.addText("\n".join(services))
+    lines = self.command('dump.nagios', [servicesPath]).split("\n")
+    result = []
+    for line in lines:
+      if line.startswith('rocks add nagios service '):
+        result.append(line[len('rocks add nagios service '):])
+    self.addText("\n".join(result))

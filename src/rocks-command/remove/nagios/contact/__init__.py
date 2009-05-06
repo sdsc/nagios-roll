@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.10  2009/05/06 18:50:10  jhayes
+# Clean up implementation using new dump command.
+#
 # Revision 1.9  2009/04/14 20:50:08  jhayes
 # More code cleaning.
 #
@@ -104,17 +107,14 @@ class Command(rocks.commands.Command):
     if len(args) != 1:
       self.abort('email required')
 
-    lines = self.command('list.nagios', ['file=' + contactsPath]).split("\n")
-    if len(lines) == 1 and lines[0] == '':
-      lines = []
+    lines = self.command('dump.nagios', [contactsPath]).split("\n")
 
     tempname = tempfile.mktemp('.txt')
     f = open(tempname, 'w')
     for line in lines:
-      if line.find('email=') < 0:
-        continue
-      if not re.search('email=[\'"]?' + args[0] + r'[\'"]?(\s|$)', line):
-        f.write(line + "\n")
+      if line.startswith('rocks add nagios contact ') and \
+         not re.search('email=[\'"]?' + args[0] + r'[\'"]?(\s|$)', line):
+        f.write(line[len('rocks add nagios contact '):] + "\n")
     f.close()
 
     if os.path.exists(contactsPath):

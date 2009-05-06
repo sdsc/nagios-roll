@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2009/05/06 18:50:09  jhayes
+# Clean up implementation using new dump command.
+#
 # Revision 1.2  2009/04/15 18:26:29  jhayes
 # Add shorthand for specifying timeperiods.
 #
@@ -163,26 +166,22 @@ class Command(rocks.commands.add.nagios.Command):
             'friday', 'saturday')
 
     # Get list of existing timeperiods
-    objects = self.parse_list_nagios_output(['file=' + timeperiodsPath])
+    objects = self.parse_dump_nagios_output([timeperiodsPath])
     # Allow batch input from file
     if 'file' in params:
       extension = self.parse_file(params['file'])
     else:
       extension = [params]
-    # Allow Nagios names as alternative to param names--makes implementation of
-    # remove cleaner
     for object in extension:
-      if 'name' in object:
-        object['timeperiod_name'] = object['name']
-      elif not 'timeperiod_name' in object:
+      if not 'name' in object:
         self.abort('name required')
     objects.extend(extension)
 
     # Dictionaries ensure that user's values override any previous definition
     dayperiodsByName = {}
     for object in objects:
-      if 'timeperiod_name' in object:
-        dayperiodsByName[object['timeperiod_name']] = object
+      if 'name' in object:
+        dayperiodsByName[object['name']] = object
 
     f = open(timeperiodsPath, 'w')
     f.write(timeperiodsHeader)

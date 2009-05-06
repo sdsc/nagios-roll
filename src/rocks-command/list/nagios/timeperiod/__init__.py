@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2009/05/06 18:50:10  jhayes
+# Clean up implementation using new dump command.
+#
 # Revision 1.2  2009/04/15 18:26:29  jhayes
 # Add shorthand for specifying timeperiods.
 #
@@ -88,21 +91,17 @@
 
 import rocks.commands
 
-class Command(rocks.commands.list.nagios.Command):
+timeperiodsPath = '/opt/nagios/etc/rocks/timeperiods.cfg'
+
+class Command(rocks.commands.Command):
   """
   Show nagios timeperiods.
   """
 
   def run(self, params, args):
-    days = ('sunday', 'monday', 'tuesday', 'wednesday', 'thursday',
-            'friday', 'saturday')
-    objects = self.parse_nagios_file('/opt/nagios/etc/rocks/timeperiods.cfg')
-    timeperiods = []
-    for object in objects:
-      if 'timeperiod_name' in object:
-        s = 'name="%s"' % object['timeperiod_name']
-        for day in days:
-          if day in object:
-            s += ' %s="%s"' % (day, object[day])
-        timeperiods.append(s)
-    self.addText("\n".join(timeperiods))
+    lines = self.command('dump.nagios', [timeperiodsPath]).split("\n")
+    result = []
+    for line in lines:
+      if line.startswith('rocks add nagios timeperiod '):
+        result.append(line[len('rocks add nagios timeperiod '):])
+    self.addText("\n".join(result))

@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.5  2009/05/06 18:50:09  jhayes
+# Clean up implementation using new dump command.
+#
 # Revision 1.4  2009/04/13 23:19:10  jhayes
 # Code cleaning.
 #
@@ -67,62 +70,3 @@
 # added
 #
 #
-
-import os
-import re
-import rocks.commands
-
-class Command(rocks.commands.Command):
-  """
-  A class that defines common behavior for Nagios list commands.
-  """
-
-  def parse_nagios_file(self, path):
-    """
-    Returns a list of dictionaries that corresponds to the Nagios object
-    definitions contained in the given file.
-    """
-    if not os.path.exists(path):
-      return []
-    f = open(path, 'r')
-    result = self.parse_nagios_definitions(f.readlines())
-    f.close()
-    return result
-
-  def parse_nagios_definitions(self, lines):
-    """
-    Returns a list of dictionaries that corresponds to the Nagios object
-    definitions contained in the given list of definition lines.
-    """
-    result = []
-    object = {}
-    for line in lines:
-      parse = re.match(r'^\s*define\s+(\S+)\s*{(.*)$', line)
-      if parse:
-        object = {'type': parse.group(1)}
-        line = parse.group(2)
-      parse = re.match(r'^\s*(\w+)\s*([^;}]+)(.*)$', line)
-      if parse:
-        object[parse.group(1)] = parse.group(2).strip()
-        line = parse.group(3)
-      parse = re.match(r'^\s*}', line)
-      if parse:
-        result.append(object)
-    return result
-
-  def run(self, params, args):
-    """
-    List objects defined in a Nagios file--mostly for debugging.
-    """
-    if not 'file' in params:
-      self.abort('"file" parameter required')
-    objects = self.parse_nagios_file(params['file'])
-    result = []
-    for object in objects:
-      if 'type' in params and params['type'] != object['type']:
-        continue
-      text = ''
-      for attribute in object:
-        text += ' %s="%s"' % (attribute, object[attribute])
-      result.append(text)
-    self.addText("\n".join(result))

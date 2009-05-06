@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.5  2009/05/06 18:50:09  jhayes
+# Clean up implementation using new dump command.
+#
 # Revision 1.4  2009/04/13 19:10:10  jhayes
 # Concentrate nagios config file parsing in parent nagios list command class.
 #
@@ -82,19 +85,17 @@
 
 import rocks.commands
 
-class Command(rocks.commands.list.nagios.Command):
+hostsPath = '/opt/nagios/etc/rocks/hosts.cfg'
+
+class Command(rocks.commands.Command):
   """
   Show nagios hosts.
   """
 
   def run(self, params, args):
-    objects = self.parse_nagios_file('/opt/nagios/etc/rocks/hosts.cfg')
-    hosts = []
-    for object in objects:
-      if 'host_name' in object:
-        hosts.append(
-          'name="%s" ip="%s" contacts="%s" groups="%s"' %
-          (object['host_name'], object['address'], object['contact_groups'],
-           object['hostgroups'])
-        )
-    self.addText("\n".join(hosts))
+    lines = self.command('dump.nagios', [hostsPath]).split("\n")
+    result = []
+    for line in lines:
+      if line.startswith('rocks add nagios host '):
+        result.append(line[len('rocks add nagios host '):])
+    self.addText("\n".join(result))

@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.17  2009/05/06 18:50:09  jhayes
+# Clean up implementation using new dump command.
+#
 # Revision 1.16  2009/04/15 18:26:29  jhayes
 # Add shorthand for specifying timeperiods.
 #
@@ -178,32 +181,28 @@ class Command(rocks.commands.add.nagios.Command):
   def run(self, params, args):
 
     # Get list of existing contacts
-    objects = self.parse_list_nagios_output(['file=' + contactsPath])
+    objects = self.parse_dump_nagios_output([contactsPath])
     # Allow batch input from file
     if 'file' in params:
       extension = self.parse_file(params['file'])
     else:
       extension = [params]
-    # Allow Nagios names as alternative to param names--makes implementation of
-    # remove cleaner
     for object in extension:
       if not 'email' in object:
         self.abort('email required')
-      if 'groups' in object:
-        object['contactgroups'] = object['groups']
-      elif not 'contactgroups' in object:
-        object['contactgroups'] = object['email'] + ' group'
+      if not 'groups' in object:
+        object['groups'] = object['email'] + ' group'
     objects.extend(extension)
 
     # Dictionaries ensure that user's values override any previous definition
     contactGroupsByEmail = {}
     membersByGroup = {}
     for object in objects:
-      if not ('email' in object and 'contactgroups' in object):
+      if not ('email' in object and 'groups' in object):
         continue
       email = object['email']
-      contactGroupsByEmail[email] = object['contactgroups']
-      for group in object['contactgroups'].split(','):
+      contactGroupsByEmail[email] = object['groups']
+      for group in object['groups'].split(','):
         if not group in membersByGroup:
           membersByGroup[group] = email
         else:

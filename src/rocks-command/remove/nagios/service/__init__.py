@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.7  2009/05/06 18:50:10  jhayes
+# Clean up implementation using new dump command.
+#
 # Revision 1.6  2009/04/15 16:18:03  jhayes
 # Fix bug in service remove.
 #
@@ -109,20 +112,16 @@ class Command(rocks.commands.Command):
     if len(args) != 1:
       self.abort('service name required')
 
-    lines = self.command('list.nagios', ['file=' + servicesPath]).split("\n")
+    lines = self.command('dump.nagios', [servicesPath]).split("\n")
     if len(lines) == 1 and lines[0] == '':
       lines = []
 
     tempname = tempfile.mktemp('.txt')
     f = open(tempname, 'w')
     for line in lines:
-      # "rocks add nagios service" allows us to intersperse command + service,
-      # so we don't have to merge them here
-      if line.find('service_description=')<0 and line.find('command_line=')<0:
-        continue
-      if not re.search('service_description=[\'"]?' + args[0] + r'[\'"]?(\s|$)',
-                       line):
-        f.write(line + "\n")
+      if line.startswith('rocks add nagios service ') and \
+         not re.search('name=[\'"]?' + args[0] + r'[\'"]?(\s|$)', line):
+        f.write(line[len('rocks add nagios service '):] + "\n")
     f.close()
 
     if os.path.exists(servicesPath):

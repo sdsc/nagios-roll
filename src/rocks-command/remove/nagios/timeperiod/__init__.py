@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/05/06 18:50:10  jhayes
+# Clean up implementation using new dump command.
+#
 # Revision 1.1  2009/04/15 01:39:41  jhayes
 # Add separate commands for manipulating timeperiod definitions.
 #
@@ -107,17 +110,16 @@ class Command(rocks.commands.Command):
     if len(args) != 1:
       self.abort('name required')
 
-    lines = self.command('list.nagios', ['file=' + timeperiodsPath]).split("\n")
+    lines = self.command('dump.nagios', [timeperiodsPath]).split("\n")
     if len(lines) == 1 and lines[0] == '':
       lines = []
 
     tempname = tempfile.mktemp('.txt')
     f = open(tempname, 'w')
     for line in lines:
-      if line.find('timeperiod_name=') < 0:
-        continue
-      if not re.search('timeperiod_name=[\'"]?'+args[0]+r'[\'"]?(\s|$)', line):
-        f.write(line + "\n")
+      if line.startswith('rocks add nagios timeperiod') and \
+         not re.search('name=[\'"]?'+args[0]+r'[\'"]?(\s|$)', line):
+        f.write(line[len('rocks add naigos timeperiod '):] + "\n")
     f.close()
 
     if os.path.exists(timeperiodsPath):

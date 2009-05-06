@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2009/05/06 18:50:10  jhayes
+# Clean up implementation using new dump command.
+#
 # Revision 1.2  2009/04/13 23:19:10  jhayes
 # Code cleaning.
 #
@@ -121,4 +124,3 @@ class Command(rocks.commands.Command):
     self.command('add.nagios.host', ['file=' + tempname])
 
     os.remove(tempname)
-    return

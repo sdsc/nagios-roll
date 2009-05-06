@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.8  2009/05/06 18:50:10  jhayes
+# Clean up implementation using new dump command.
+#
 # Revision 1.7  2009/04/14 20:50:08  jhayes
 # More code cleaning.
 #
@@ -107,17 +110,16 @@ class Command(rocks.commands.Command):
     if len(args) != 1:
       self.abort('host name required')
 
-    lines = self.command('list.nagios', ['file=' + hostsPath]).split("\n")
+    lines = self.command('dump.nagios', [hostsPath]).split("\n")
     if len(lines) == 1 and lines[0] == '':
       lines = []
 
     tempname = tempfile.mktemp('.txt')
     f = open(tempname, 'w')
     for line in lines:
-      if line.find('host_name=') < 0:
-        continue
-      if not re.search('host_name=[\'"]?' + args[0] + r'[\'"]?(\s|$)', line):
-        f.write(line + "\n")
+      if line.startswith('rocks add nagios host ') and \
+         not re.search('name=[\'"]?' + args[0] + r'[\'"]?(\s|$)', line):
+        f.write(line[len('rocks add nagios host '):] + "\n")
     f.close()
 
     if os.path.exists(hostsPath):

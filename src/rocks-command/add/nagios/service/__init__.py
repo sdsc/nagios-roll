@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.10  2009/05/06 18:50:09  jhayes
+# Clean up implementation using new dump command.
+#
 # Revision 1.9  2009/04/15 18:26:29  jhayes
 # Add shorthand for specifying timeperiods.
 #
@@ -191,55 +194,27 @@ class Command(rocks.commands.add.nagios.Command):
   def run(self, params, args):
 
     # Get list of existing services
-    objects = self.parse_list_nagios_output(['file=' + servicesPath])
-    # Pull out existing command definitions
-    commandLinesByCommandName = {}
-    for object in objects:
-      if 'command_name' in object and 'command_line' in object:
-        commandLinesByCommandName[object['command_name']]=object['command_line']
+    objects = self.parse_dump_nagios_output([servicesPath])
     # Allow batch input from file
     if 'file' in params:
       extension = self.parse_file(params['file'])
     else:
       extension = [params]
-    # Allow Nagios names as alternative to param names--makes implementation of
-    # remove cleaner
     for object in extension:
-      # Allow interspersed command+service defs: again, makes remove cleaner
-      if 'command_name' in object and 'command_line' in object:
-        commandLinesByCommandName[object['command_name']]=object['command_line']
-        continue
-      if 'name' in object:
-        object['service_description'] = object['name']
-      elif not 'service_description' in object:
+      if not 'name' in object:
         self.abort('name required')
-      if 'hosts' in object:
-        object['hostgroup_name'] = object['hosts']
-      elif not 'hostgroup_name' in object:
+      if not 'hosts' in object:
         self.abort('hosts required')
-      if 'command' in object:
-        commandName = object['service_description'] + '-command'
-        object['check_command'] = commandName
-        commandLinesByCommandName[commandName] = \
-          '/opt/nagios/libexec/' + object['command']
-      elif not 'check_command' in object:
+      if not 'command' in object:
         self.abort('command required')
-      if 'contacts' in object:
-        object['contact_groups'] = object['contacts']
-      elif not 'contact_groups' in object:
+      if not 'contacts' in object:
         self.abort('contacts required')
-      if 'frequency' in object:
-        object['check_interval'] = object['frequency']
-      elif not 'check_interval' in object:
-        object['check_interval'] = 5
-      if 'retry' in object:
-        object['retry_interval'] = object['retry']
-      elif not 'retry_interval' in object:
-        object['retry_interval'] = 1
-      if 'timeperiod' in object:
-        object['check_period'] = object['timeperiod']
-      elif not 'check_period' in object:
-        object['check_period'] = 'always'
+      if not 'frequency' in object:
+        object['frequency'] = 5
+      if not 'retry' in object:
+        object['retry'] = 1
+      if not 'timeperiod' in object:
+        object['timeperiod'] = 'always'
     objects.extend(extension)
 
     # Dictionaries ensure that user's values override any previous definition
@@ -250,18 +225,18 @@ class Command(rocks.commands.add.nagios.Command):
     hostGroupsByName = {}
     retryIntervalsByName = {}
     for object in objects:
-      if not ('service_description' in object and 'check_command' in object and
-              'check_interval' in object and 'contact_groups' in object and
-              'hostgroup_name' in object and 'retry_interval' in object and
-              'check_period' in object):
+      if not ('name' in object and 'hosts' in object and
+              'command' in object and 'contacts' in object and
+              'frequency' in object and 'retry' in object and
+              'timeperiod' in object):
         continue
-      name = object['service_description']
-      checkCommandsByName[name] = object['check_command']
-      checkIntervalsByName[name] = object['check_interval']
-      checkPeriodsByName[name] = object['check_period']
-      contactGroupsByName[name] = object['contact_groups']
-      hostGroupsByName[name] = object['hostgroup_name']
-      retryIntervalsByName[name] = object['retry_interval']
+      name = object['name']
+      checkCommandsByName[name] = object['command']
+      checkIntervalsByName[name] = object['frequency']
+      checkPeriodsByName[name] = object['timeperiod']
+      contactGroupsByName[name] = object['contacts']
+      hostGroupsByName[name] = object['hosts']
+      retryIntervalsByName[name] = object['retry']
 
     self.command(
       'add.nagios.timeperiod',
@@ -272,10 +247,11 @@ class Command(rocks.commands.add.nagios.Command):
     f.write(serviceHeader)
     for name in checkCommandsByName:
       f.write("\n")
-      commandName = checkCommandsByName[name]
-      f.write(
-        commandFormat % (commandName, commandLinesByCommandName[commandName])
-      )
+      commandName = name + '-command'
+      command = checkCommandsByName[name]
+      if not command.startswith('/'):
+        command = '/opt/nagios/libexec/' + command
+      f.write(commandFormat % (commandName, command))
       f.write("\n")
       f.write(
         serviceFormat %
