@@ -13,6 +13,9 @@
 
   <changelog>
   $Log$
+  Revision 1.15  2009/06/09 21:45:38  jhayes
+  Correction to installation of cgi.cfg.
+
   Revision 1.14  2009/04/23 20:10:31  jhayes
   Portability tweaks.  Remove libmcrypt, since we're not using it.
 
@@ -83,12 +86,10 @@
     ./configure ==with-command-group=nagcmd
     make all
     make install
+    make install-config
 
     # JJH: Must inline here, since Makefile unavailable during installation
   -->
-  <!-- make install-config -->
-  <file name="/opt/nagios/etc/cgi.cfg"
-        expr="/bin/cat /opt/nagios/etc/sample-config/cgi.cfg"/>
   <!-- make install-init -->
   <file name="/etc/rc.d/init.d/nagios"
         expr="/bin/cat /opt/nagios/etc/daemon-init" perms="0755"/>

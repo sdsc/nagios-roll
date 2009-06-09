@@ -55,6 +55,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.8  2009/06/09 21:45:38  jhayes
+# Correction to installation of cgi.cfg.
+#
 # Revision 1.7  2009/04/28 18:23:47  jhayes
 # Remove disused include.
 #
@@ -101,6 +104,7 @@ install::
 	  cd $(NAME)-$(VERSION); \
 	  make prefix=$(ROOT)/$(PKGROOT) install; \
 	  install -m755 daemon-init $(ROOT)/$(PKGROOT)/etc; \
+	  install -m755 sample-config/cgi.cfg $(ROOT)/$(PKGROOT)/etc; \
 	  install -m755 sample-config/httpd.conf $(ROOT)/$(PKGROOT)/etc \
 	)
 
