@@ -54,6 +54,10 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.11  2009/07/17 20:29:54  jhayes
+# Support specification of passive services.  Install Nagios plug-ins on client
+# nodes so that they can be used for passive checks.
+#
 # Revision 1.10  2009/05/06 18:50:09  jhayes
 # Clean up implementation using new dump command.
 #
@@ -134,6 +138,13 @@ define service {
   notifications_enabled        1
   register                     0
 }
+
+define service {
+  name                         passive-service-defaults
+  use                          service-defaults
+  active_checks_enabled        0
+  register                     0
+}
 """
 
 commandFormat = """\
@@ -145,7 +156,7 @@ define command {
 
 serviceFormat = """\
 define service {
-  use                 service-defaults
+  use                 %s
   hostgroup_name      %s
   service_description %s
   check_command       %s
@@ -243,6 +254,7 @@ class Command(rocks.commands.add.nagios.Command):
       ['name=always', 'sunday=*', 'monday=*', 'tuesday=*', 'wednesday=*',
        'thursday=*', 'friday=*', 'saturday=*']
     )
+    self.command('add.nagios.timeperiod', ['name=never'])
     f = open(servicesPath, 'w')
     f.write(serviceHeader)
     for name in checkCommandsByName:
@@ -253,11 +265,15 @@ class Command(rocks.commands.add.nagios.Command):
         command = '/opt/nagios/libexec/' + command
       f.write(commandFormat % (commandName, command))
       f.write("\n")
+      if checkPeriodsByName[name] == 'never':
+        serviceTemplate = 'passive-service-defaults'
+      else:
+        serviceTemplate = 'service-defaults'
       f.write(
         serviceFormat %
-        (hostGroupsByName[name], name, commandName, checkIntervalsByName[name],
-         retryIntervalsByName[name], checkPeriodsByName[name],
-         contactGroupsByName[name])
+        (serviceTemplate, hostGroupsByName[name], name, commandName,
+         checkIntervalsByName[name], retryIntervalsByName[name],
+         checkPeriodsByName[name], contactGroupsByName[name])
       )
     f.close()
 

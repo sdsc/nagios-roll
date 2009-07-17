@@ -13,6 +13,10 @@
 
   <changelog>
   $Log$
+  Revision 1.7  2009/07/17 20:29:54  jhayes
+  Support specification of passive services.  Install Nagios plug-ins on client
+  nodes so that they can be used for passive checks.
+
   Revision 1.6  2009/04/24 23:49:33  anoop
   Enable sunos build for nsca. Added libmcrypt back to enable optional
   encryption. Removed send-nsca, so that we build from the same codebase
@@ -35,6 +39,7 @@
   </changelog>
 
   <package os="linux">nsca</package>
+  <package os="linux">nagios-plugins</package>
   <package os="sunos">ROCKSnsca</package>
   <package os="sunos">ROCKSlibmcrypt</package>
 
