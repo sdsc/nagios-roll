@@ -13,6 +13,9 @@
 
   <changelog>
   $Log$
+  Revision 1.7  2009/07/22 17:00:25  jhayes
+  Allow passive Nagios checks on server.
+
   Revision 1.6  2009/04/23 20:10:31  jhayes
   Portability tweaks.  Remove libmcrypt, since we're not using it.
 
@@ -36,6 +39,10 @@
   </edge>
 
   <edge from="client">
+    <to>nsca-client</to>
+  </edge>
+
+  <edge from="server">
     <to>nsca-client</to>
   </edge>
 
