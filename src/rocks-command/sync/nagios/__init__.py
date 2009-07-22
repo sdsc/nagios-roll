@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.4  2009/07/22 18:17:28  jhayes
+# Bug fix: missing newline at end of add nagios host command.
+#
 # Revision 1.3  2009/05/06 18:50:10  jhayes
 # Clean up implementation using new dump command.
 #
@@ -117,7 +120,7 @@ class Command(rocks.commands.Command):
     f = open(tempname, 'w')
     for name, appliance, ip in self.db.fetchall():
       f.write(
-        'name="%s-appliance" ip=%s contacts="%s" groups="%s-group,allhosts"' %
+        'name="%s-appliance" ip=%s contacts="%s" groups="%s-group,allhosts"\n' %
         (name, ip, params['contacts'], appliance)
       )
     f.close()
