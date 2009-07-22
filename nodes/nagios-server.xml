@@ -13,6 +13,9 @@
 
   <changelog>
   $Log$
+  Revision 1.16  2009/07/22 21:31:06  jhayes
+  Add log_file setting to nagios configuration so that CGI scripts can find it.
+
   Revision 1.15  2009/06/09 21:45:38  jhayes
   Correction to installation of cgi.cfg.
 
@@ -138,6 +141,7 @@ nagiosadmin:<var name="Kickstart_PrivateRootPassword"/>
 
 cfg_dir=/opt/nagios/etc/rocks
 illegal_macro_output_chars=`~$^&amp;"|'&lt;&gt;
+log_file=/opt/nagios/var/nagios.log
   </file>
 
   /bin/mkdir -p /opt/nagios/etc/rocks
