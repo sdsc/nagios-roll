@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.12  2009/07/23 00:13:00  jhayes
+# Make a couple of changes to get email notification working.
+#
 # Revision 1.11  2009/07/17 20:29:54  jhayes
 # Support specification of passive services.  Install Nagios plug-ins on client
 # nodes so that they can be used for passive checks.
@@ -122,7 +125,7 @@ serviceHeader = """\
 define service {
   name                         service-defaults
   is_volatile                  0
-  max_check_attempts           4
+  max_check_attempts           1
   active_checks_enabled        1
   passive_checks_enabled       1
   obsess_over_service          1
