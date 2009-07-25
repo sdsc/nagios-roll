@@ -54,6 +54,10 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.5  2009/07/25 03:19:36  jhayes
+# Add convenience method for generating and transmitting results of passive
+# NSCA checks.
+#
 # Revision 1.4  2009/07/22 18:17:28  jhayes
 # Bug fix: missing newline at end of add nagios host command.
 #
@@ -120,7 +124,7 @@ class Command(rocks.commands.Command):
     f = open(tempname, 'w')
     for name, appliance, ip in self.db.fetchall():
       f.write(
-        'name="%s-appliance" ip=%s contacts="%s" groups="%s-group,allhosts"\n' %
+        'name="%s" ip=%s contacts="%s" groups="%s-group,allhosts"\n' %
         (name, ip, params['contacts'], appliance)
       )
     f.close()

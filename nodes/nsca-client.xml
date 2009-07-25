@@ -13,6 +13,10 @@
 
   <changelog>
   $Log$
+  Revision 1.8  2009/07/25 03:19:35  jhayes
+  Add convenience method for generating and transmitting results of passive
+  NSCA checks.
+
   Revision 1.7  2009/07/17 20:29:54  jhayes
   Support specification of passive services.  Install Nagios plug-ins on client
   nodes so that they can be used for passive checks.
@@ -59,6 +63,27 @@ chown -R nagios:nagios /opt/nagios/etc
 #password=
 encryption_method=1
 </file> <!-- NOTE: send_nsca pukes if we indent this closing tag! -->
+
+<file name="/opt/nagios/bin/nsca_check" perms="0755">
+#!/bin/bash -x
+service=$1
+shift
+case $* in
+  /*)
+    output=`$*`
+  ;;
+  *)
+    output=`/opt/nagios/libexec/$*`
+  ;;
+esac
+exitcode=$?
+hostname='<var name="Kickstart_PrivateHostname"/>'
+server=$hostname
+if test -n '<var name="NSCA_ServerName"/>'; then
+  server='<var name="NSCA_ServerName"/>'
+fi
+printf "%s\t%s\t%s\t%s\n" "$hostname" "$service" "$exitcode" "$output" | /opt/nagios/bin/send_nsca -H $server -c /opt/nagios/etc/send_nsca.cfg
+</file>
 
 </post>
 
