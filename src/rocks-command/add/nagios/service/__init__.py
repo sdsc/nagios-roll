@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.13  2009/07/30 21:21:07  jhayes
+# Modify hosts' cron files to run passive Nagios services.
+#
 # Revision 1.12  2009/07/23 00:13:00  jhayes
 # Make a couple of changes to get email notification working.
 #
@@ -170,6 +173,7 @@ define service {
 }
 """
 
+hostsPath = '/opt/nagios/etc/rocks/hosts.cfg'
 servicesPath = '/opt/nagios/etc/rocks/services.cfg'
 
 class Command(rocks.commands.add.nagios.Command):
@@ -209,6 +213,7 @@ class Command(rocks.commands.add.nagios.Command):
 
     # Get list of existing services
     objects = self.parse_dump_nagios_output([servicesPath])
+    existingServiceCount = len(objects)
     # Allow batch input from file
     if 'file' in params:
       extension = self.parse_file(params['file'])
@@ -236,8 +241,10 @@ class Command(rocks.commands.add.nagios.Command):
     checkIntervalsByName = {}
     checkPeriodsByName = {}
     contactGroupsByName = {}
+    passiveServicesToLaunchByHostGroup = {}
     hostGroupsByName = {}
     retryIntervalsByName = {}
+    i = 1
     for object in objects:
       if not ('name' in object and 'hosts' in object and
               'command' in object and 'contacts' in object and
@@ -245,30 +252,38 @@ class Command(rocks.commands.add.nagios.Command):
               'timeperiod' in object):
         continue
       name = object['name']
+      if not object['command'].startswith('/'):
+        object['command'] = '/opt/nagios/libexec/' + object['command']
       checkCommandsByName[name] = object['command']
       checkIntervalsByName[name] = object['frequency']
       checkPeriodsByName[name] = object['timeperiod']
       contactGroupsByName[name] = object['contacts']
       hostGroupsByName[name] = object['hosts']
       retryIntervalsByName[name] = object['retry']
+      if checkPeriodsByName[name] == 'passive' and i > existingServiceCount:
+        # New passive service; save for later launch
+        if not hostGroupsByName[name] in passiveServicesToLaunchByHostGroup:
+          passiveServicesToLaunchByHostGroup[hostGroupsByName[name]] = []
+        passiveServicesToLaunchByHostGroup[hostGroupsByName[name]].append(name)
+      i += 1
 
+    # Make sure the default timeperiods are defined (redefinition is harmless)
     self.command(
       'add.nagios.timeperiod',
       ['name=always', 'sunday=*', 'monday=*', 'tuesday=*', 'wednesday=*',
        'thursday=*', 'friday=*', 'saturday=*']
     )
-    self.command('add.nagios.timeperiod', ['name=never'])
+    self.command('add.nagios.timeperiod', ['name=passive'])
+
+    # Write the services file
     f = open(servicesPath, 'w')
     f.write(serviceHeader)
     for name in checkCommandsByName:
       f.write("\n")
       commandName = name + '-command'
-      command = checkCommandsByName[name]
-      if not command.startswith('/'):
-        command = '/opt/nagios/libexec/' + command
-      f.write(commandFormat % (commandName, command))
+      f.write(commandFormat % (commandName, checkCommandsByName[name]))
       f.write("\n")
-      if checkPeriodsByName[name] == 'never':
+      if checkPeriodsByName[name] == 'passive':
         serviceTemplate = 'passive-service-defaults'
       else:
         serviceTemplate = 'service-defaults'
@@ -281,3 +296,35 @@ class Command(rocks.commands.add.nagios.Command):
     f.close()
 
     os.system('service nagios restart > /dev/null 2>&1')
+
+    # Rewrite the cron files on each host running a new passive service
+    if len(passiveServicesToLaunchByHostGroup) > 0:
+
+      # Get the list of IPs in each host group
+      objects = self.parse_dump_nagios_output([hostsPath])
+      ipsByHostGroup = {}
+      for object in objects:
+        if not ('groups' in object and 'ip' in object):
+          continue
+        for group in object['groups'].split(','):
+          if not group in ipsByHostGroup:
+            ipsByHostGroup[group] = []
+          ipsByHostGroup[group].append(object['ip'])
+
+      tempfile = '/tmp/cron' + str(os.getpid())
+      for group in passiveServicesToLaunchByHostGroup:
+        # The command run to update the cron file is a bit complex.  We filter
+        # the existing crontab to remove any existing definitions, in case the
+        # user is updating an existing passive service.  The result is saved in
+        # a temp file along with the new service definitions, which is then
+        # passed to /usr/bin/crontab.
+        command = "crontab -l 2>/dev/null | sed "
+        for name in passiveServicesToLaunchByHostGroup[group]:
+          command += " -e /NAGIOSX%sX/d" % name
+        command += " > %s" % tempfile
+        for name in passiveServicesToLaunchByHostGroup[group]:
+          command += " && echo '*/%s * * * * echo NAGIOSX%sX >/dev/null && %s' >> %s" % (checkIntervalsByName[name], name, checkCommandsByName[name], tempfile)
+        command += " && crontab %s" % tempfile
+        ipsByHostGroup[group].append(command)
+        self.command("run.host", ipsByHostGroup[group])
+        ipsByHostGroup[group].pop()
