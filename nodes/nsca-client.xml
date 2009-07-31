@@ -13,6 +13,12 @@
 
   <changelog>
   $Log$
+  Revision 1.9  2009/07/31 17:33:19  jhayes
+  Added nsca_schedule script to ease manipulating cron entry for passive checks.
+  Change "rocks add nagios service" command so that specifying a frequency of 0
+  terminates the service.  Implement "rocks remove nagios service" for passive
+  checks.
+
   Revision 1.8  2009/07/25 03:19:35  jhayes
   Add convenience method for generating and transmitting results of passive
   NSCA checks.
@@ -64,8 +70,31 @@ chown -R nagios:nagios /opt/nagios/etc
 encryption_method=1
 </file> <!-- NOTE: send_nsca pukes if we indent this closing tag! -->
 
+<file name="/opt/nagios/bin/nsca_schedule" perms="0755">
+#!/bin/bash
+# A script for starting/stopping an NSCA passive service check.
+# usage: nsca_schedule &lt;service_name&gt; &lt;period&gt; &lt;command&gt;
+# Specify a period of 0 to stop running a passive service check.
+service=$1
+period=$2
+shift; shift
+command=$*
+tmpfile=/tmp/crontab$$
+# Remove any existing schedule for the service.
+/usr/bin/crontab -l 2&gt;/dev/null | sed -e "/NAGIOSX${service}X/d" &gt; ${tmpfile}
+if test "${period}" != "0"; then
+  /bin/echo "*/${period} * * * * /bin/echo NAGIOSX${service}X &gt;/dev/null &amp;&amp; " \
+    "/opt/nagios/bin/nsca_check ${service} ${command}" &gt;&gt; ${tmpfile}
+fi
+/usr/bin/crontab ${tmpfile}
+/bin/rm -f ${tmpfile}
+</file>
+
 <file name="/opt/nagios/bin/nsca_check" perms="0755">
-#!/bin/bash -x
+#!/bin/bash
+# A convenience script that runs a Nagios service check and sends the output
+# through send_nsca.
+# usage: nsca_check &lt;service_name&gt; &lt;command&gt;
 service=$1
 shift
 case $* in
@@ -82,7 +111,9 @@ server=$hostname
 if test -n '<var name="NSCA_ServerName"/>'; then
   server='<var name="NSCA_ServerName"/>'
 fi
-printf "%s\t%s\t%s\t%s\n" "$hostname" "$service" "$exitcode" "$output" | /opt/nagios/bin/send_nsca -H $server -c /opt/nagios/etc/send_nsca.cfg
+/usr/bin/printf "%s\t%s\t%s\t%s\n" \
+                "$hostname" "$service" "$exitcode" "$output" | \
+  /opt/nagios/bin/send_nsca -H $server -c /opt/nagios/etc/send_nsca.cfg
 </file>
 
 </post>

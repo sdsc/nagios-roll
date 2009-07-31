@@ -54,6 +54,12 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.14  2009/07/31 17:33:19  jhayes
+# Added nsca_schedule script to ease manipulating cron entry for passive checks.
+# Change "rocks add nagios service" command so that specifying a frequency of 0
+# terminates the service.  Implement "rocks remove nagios service" for passive
+# checks.
+#
 # Revision 1.13  2009/07/30 21:21:07  jhayes
 # Modify hosts' cron files to run passive Nagios services.
 #
@@ -279,6 +285,8 @@ class Command(rocks.commands.add.nagios.Command):
     f = open(servicesPath, 'w')
     f.write(serviceHeader)
     for name in checkCommandsByName:
+      if checkIntervalsByName[name] == '0':
+        continue
       f.write("\n")
       commandName = name + '-command'
       f.write(commandFormat % (commandName, checkCommandsByName[name]))
@@ -311,20 +319,13 @@ class Command(rocks.commands.add.nagios.Command):
             ipsByHostGroup[group] = []
           ipsByHostGroup[group].append(object['ip'])
 
-      tempfile = '/tmp/cron' + str(os.getpid())
       for group in passiveServicesToLaunchByHostGroup:
-        # The command run to update the cron file is a bit complex.  We filter
-        # the existing crontab to remove any existing definitions, in case the
-        # user is updating an existing passive service.  The result is saved in
-        # a temp file along with the new service definitions, which is then
-        # passed to /usr/bin/crontab.
-        command = "crontab -l 2>/dev/null | sed "
+        command = ""
         for name in passiveServicesToLaunchByHostGroup[group]:
-          command += " -e /NAGIOSX%sX/d" % name
-        command += " > %s" % tempfile
-        for name in passiveServicesToLaunchByHostGroup[group]:
-          command += " && echo '*/%s * * * * echo NAGIOSX%sX >/dev/null && %s' >> %s" % (checkIntervalsByName[name], name, checkCommandsByName[name], tempfile)
-        command += " && crontab %s" % tempfile
+          if command != "":
+            command += "; "
+          command += "/opt/nagios/bin/nsca_schedule %s %s %s" % \
+            (name, checkIntervalsByName[name], checkCommandsByName[name])
         ipsByHostGroup[group].append(command)
         self.command("run.host", ipsByHostGroup[group])
         ipsByHostGroup[group].pop()
