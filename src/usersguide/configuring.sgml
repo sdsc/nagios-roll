@@ -134,16 +134,16 @@ appliance type, as well as an "allhosts" group.  Here is an example of its use:
 # rocks list nagios host
 # rocks sync nagios contacts=administrators
 # rocks list nagios host
-name="compute-0-0-appliance" ip="10.1.255.254" contacts="administrators"
+name="compute-0-0" ip="10.1.255.254" contacts="administrators"
 groups="Compute-group,allhosts"
-name="compute-0-1-appliance" ip="10.1.255.253" contacts="administrators"
+name="compute-0-1" ip="10.1.255.253" contacts="administrators"
 groups="Compute-group,allhosts"
-name="compute-0-2-appliance" ip="10.1.255.252" contacts="administrators"
+name="compute-0-2" ip="10.1.255.252" contacts="administrators"
 groups="Compute-group,allhosts"
-name="compute-0-3-appliance" ip="10.1.255.251" contacts="administrators"
+name="compute-0-3" ip="10.1.255.251" contacts="administrators"
 groups="Compute-group,allhosts"
 &lt;etc.&gt;
-name="blue-appliance" ip="10.1.1.1" contacts="administrators" groups="Frontend-group,allhosts"
+name="blue" ip="10.1.1.1" contacts="administrators" groups="Frontend-group,allhosts"
 </screen>
 </para>
 </section>
@@ -196,23 +196,63 @@ list of the macros that Nagios supports.
 Here is an example of using several <command>rocks</command> commands to add,
 remove, and list Nagios services:
 <screen>
-# rocks add nagios service name='Load Average' hosts=allhosts \
+# rocks add nagios service name='Load_Average' hosts=allhosts \
   command='check_load -w 3,3,3 -c 5,5,5' contacts=administrators
 # rocks list nagios service
-name="Load Average" hosts="allhosts" command="check_load -w 3,3,3 -c 5,5,5" 
+name="Load_Average" hosts="allhosts" command="check_load -w 3,3,3 -c 5,5,5" 
 contacts="administrators" frequency="5" retry="1" timeperiod="always"
-# rocks add nagios service name='Free Disk' hosts=allhosts command='check_disk -W 10% -C 1%' \
+# rocks add nagios service name='Free_Disk' hosts=allhosts command='check_disk -W 10% -C 1%' \
   contacts=administrators frequency=60
 # rocks list nagios service
-name="Load Average" hosts="allhosts" command="check_load -w 3,3,3 -c 5,5,5"
+name="Load_Average" hosts="allhosts" command="check_load -w 3,3,3 -c 5,5,5"
 contacts="administrators" frequency="5" retry="1" timeperiod="always"
-name="Free Disk" hosts="allhosts" command="check_disk -W 10% -C 1%" contacts="administrators"
+name="Free_Disk" hosts="allhosts" command="check_disk -W 10% -C 1%" contacts="administrators"
 frequency="60" retry="1" timeperiod="always"
-# rocks remove nagios service 'Load Average'
+# rocks remove nagios service 'Load_Average'
 # rocks list nagios service
-name="Free Disk" hosts="allhosts" command="check_disk -W 10% -C 1%" contacts="administrators"
+name="Free_Disk" hosts="allhosts" command="check_disk -W 10% -C 1%" contacts="administrators"
 frequency="60" retry="1" timeperiod="always"
 </screen>
+</para>
+</section>
+
+<section id="passive-configuration" xreflabel="Passive Configuration">
+<title>Configuring Passive Services</title>
+<para>
+Under default operation, a Nagios daemon performs all host and service checks
+directly.  In a cluster environment, this centralized approach scales poorly as
+the number of hosts grows.  For example, if you have 256 compute nodes and you
+ask Nagios to perform periodic checks of the available disk space on each node,
+the Nagios daemon running on the frontend will invoke ssh 256 times each time
+it performs the check.
+</para><para>
+The NSCA add-on for Nagios, included in the Rocks Nagios roll, addresses this
+problem by allowing Nagios checks to be distributed among the hosts to be
+tested.  Using this approach, each individual host schedules and performs its
+own Nagios check locally.  Results from each check are forwarded to the
+frontend and are incorporated into the Nagios result history, just as if the
+Nagios daemon had run it.
+</para><para>
+You can schedule a distributed service check using the <command>rocks add
+nagios service</command> command, specifying "passive" as the value for the
+<command>timeperiod</command> parameter.  ("Passive" is Nagios' term for tests
+performed outside its direct control.)  For example:
+<screen>
+# rocks add nagios service name='Load_Average' hosts=allhosts frequency=10 \
+  command='check_load -w 3,3,3 -c 5,5,5' contacts=administrators timeperiod=passive
+</screen>
+In response to this command, Rocks will schedule a cron job on each of the
+hosts in the allhosts group to run every 10 minutes.  It will run the specified
+check_load test and send the results to the Nagios daemon running on the
+frontend.
+</para><para>
+It's important to note that the hosts included in a distributed service check
+are fixed when the <command>rocks add nagios service</command> command runs.
+If, after running the command shown above, you later add additional hosts to
+the allhosts group, the Load_Average check will not be scheduled on the new
+members.  You can update the configuration so that a distributed service check
+runs on new host group members by re-running the <command>rocks add nagios
+service</command> command.
 </para>
 </section>
 
