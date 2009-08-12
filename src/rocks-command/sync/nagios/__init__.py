@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.6  2009/08/12 19:53:32  jhayes
+# Extend 'rocks sync nagios' to propagate passive tests to newly-defined hosts.
+#
 # Revision 1.5  2009/07/25 03:19:36  jhayes
 # Add convenience method for generating and transmitting results of passive
 # NSCA checks.
@@ -97,8 +100,11 @@
 #
 
 import os
+import re
 import tempfile
 import rocks.commands
+
+servicesPath = '/opt/nagios/etc/rocks/services.cfg'
 
 class Command(rocks.commands.Command):
   """
@@ -121,6 +127,7 @@ class Command(rocks.commands.Command):
     )
 
     tempname = tempfile.mktemp('.txt')
+
     f = open(tempname, 'w')
     for name, appliance, ip in self.db.fetchall():
       f.write(
@@ -129,5 +136,18 @@ class Command(rocks.commands.Command):
       )
     f.close()
     self.command('add.nagios.host', ['file=' + tempname])
+
+    # Redefine existing passive services (will launch distributed tests on
+    # newly-defined hosts where appropriate)
+    lines = self.command('dump.nagios', [servicesPath]).split("\n")
+    if len(lines) == 1 and lines[0] == '':
+      lines = []
+    f = open(tempname, 'w')
+    for line in lines:
+      if line.startswith('rocks add nagios service ') and \
+         re.search(r'timeperiod=[\'"]?passive[\'"]?(\s|$)', line):
+        f.write(line[len('rocks add nagios service '):] + "\n")
+    f.close()
+    self.command('add.nagios.service', ['file=' + tempname])
 
     os.remove(tempname)
