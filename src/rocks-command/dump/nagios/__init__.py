@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.2  2009/08/12 19:50:46  jhayes
+# Use full path.
+#
 # Revision 1.1  2009/05/06 17:44:04  jhayes
 # Add dump command.
 #
@@ -152,7 +155,7 @@ class Command(rocks.commands.Command):
           commands[object['command_name']] = object['command_line']
       elif attributeMaps.has_key(type):
         map = attributeMaps[type]
-        text = 'rocks add nagios ' + type
+        text = '/opt/rocks/bin/rocks add nagios ' + type
         for attribute in map:
           if not object.has_key(attribute):
             continue
