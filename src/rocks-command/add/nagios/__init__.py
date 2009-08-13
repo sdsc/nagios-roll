@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.4  2009/08/13 03:22:36  jhayes
+# Code improvements.
+#
 # Revision 1.3  2009/05/06 18:50:09  jhayes
 # Clean up implementation using new dump command.
 #
@@ -112,7 +115,7 @@ class Command(rocks.commands.Command):
     for line in lines:
       object = {}
       s = line
-      parse = re.match(r'^rocks add nagios \w+(.*)', s)
+      parse = re.search(r'\s*add\s*nagios\s*\w+(.*)', s)
       if parse:
         s = parse.group(1)
       parse = re.match(r'\s*(\w+)=(\'[^\']*\'|"[^"]*"|[^\'"\s]+)', s)

@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.10  2009/08/13 03:22:36  jhayes
+# Code improvements.
+#
 # Revision 1.9  2009/05/06 18:50:09  jhayes
 # Clean up implementation using new dump command.
 #
@@ -83,6 +86,7 @@
 # added
 #
 
+import re
 import rocks.commands
 
 contactsPath = '/opt/nagios/etc/rocks/contacts.cfg'
@@ -96,6 +100,7 @@ class Command(rocks.commands.Command):
     lines = self.command('dump.nagios', [contactsPath]).split("\n")
     result = []
     for line in lines:
-      if line.startswith('rocks add nagios contact '):
-        result.append(line[len('rocks add nagios contact '):])
+      matchInfo = re.search(r'\s*add\s*nagios\s*contact\s*(.*)$', line)
+      if matchInfo:
+        result.append(matchInfo.group(1))
     self.addText("\n".join(result))

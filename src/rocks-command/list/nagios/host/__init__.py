@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.6  2009/08/13 03:22:36  jhayes
+# Code improvements.
+#
 # Revision 1.5  2009/05/06 18:50:09  jhayes
 # Clean up implementation using new dump command.
 #
@@ -83,6 +86,7 @@
 # added
 #
 
+import re
 import rocks.commands
 
 hostsPath = '/opt/nagios/etc/rocks/hosts.cfg'
@@ -96,6 +100,7 @@ class Command(rocks.commands.Command):
     lines = self.command('dump.nagios', [hostsPath]).split("\n")
     result = []
     for line in lines:
-      if line.startswith('rocks add nagios host '):
-        result.append(line[len('rocks add nagios host '):])
+      matchInfo = re.search(r'\s*add\s*nagios\s*host\s*(.*)$', line)
+      if matchInfo:
+        result.append(matchInfo.group(1))
     self.addText("\n".join(result))

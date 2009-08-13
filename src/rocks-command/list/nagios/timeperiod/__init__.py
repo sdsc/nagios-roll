@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.4  2009/08/13 03:22:36  jhayes
+# Code improvements.
+#
 # Revision 1.3  2009/05/06 18:50:10  jhayes
 # Clean up implementation using new dump command.
 #
@@ -89,6 +92,7 @@
 # added
 #
 
+import re
 import rocks.commands
 
 timeperiodsPath = '/opt/nagios/etc/rocks/timeperiods.cfg'
@@ -102,6 +106,7 @@ class Command(rocks.commands.Command):
     lines = self.command('dump.nagios', [timeperiodsPath]).split("\n")
     result = []
     for line in lines:
-      if line.startswith('rocks add nagios timeperiod '):
-        result.append(line[len('rocks add nagios timeperiod '):])
+      matchInfo = re.search(r'\s*add\s*nagios\s*timeperiod\s*(.*)$', line)
+      if matchInfo:
+        result.append(matchInfo.group(1))
     self.addText("\n".join(result))

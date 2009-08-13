@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2009/08/13 03:22:37  jhayes
+# Code improvements.
+#
 # Revision 1.2  2009/05/06 18:50:10  jhayes
 # Clean up implementation using new dump command.
 #
@@ -117,9 +120,10 @@ class Command(rocks.commands.Command):
     tempname = tempfile.mktemp('.txt')
     f = open(tempname, 'w')
     for line in lines:
-      if line.startswith('rocks add nagios timeperiod') and \
+      matchInfo = re.search(r'\s*add\s*nagios\s*timeperiod\s*(.*)$', line)
+      if matchInfo and \
          not re.search('name=[\'"]?'+args[0]+r'[\'"]?(\s|$)', line):
-        f.write(line[len('rocks add naigos timeperiod '):] + "\n")
+        f.write(matchInfo.group(1) + "\n")
     f.close()
 
     if os.path.exists(timeperiodsPath):

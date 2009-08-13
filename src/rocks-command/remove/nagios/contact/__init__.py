@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.11  2009/08/13 03:22:36  jhayes
+# Code improvements.
+#
 # Revision 1.10  2009/05/06 18:50:10  jhayes
 # Clean up implementation using new dump command.
 #
@@ -112,9 +115,10 @@ class Command(rocks.commands.Command):
     tempname = tempfile.mktemp('.txt')
     f = open(tempname, 'w')
     for line in lines:
-      if line.startswith('rocks add nagios contact ') and \
+      matchInfo = re.search(r'\s*add\s*nagios\s*contact\s*(.*)$', line)
+      if matchInfo and \
          not re.search('email=[\'"]?' + args[0] + r'[\'"]?(\s|$)', line):
-        f.write(line[len('rocks add nagios contact '):] + "\n")
+        f.write(matchInfo.group(1) + "\n")
     f.close()
 
     if os.path.exists(contactsPath):

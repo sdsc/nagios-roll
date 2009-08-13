@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.9  2009/08/13 03:22:36  jhayes
+# Code improvements.
+#
 # Revision 1.8  2009/05/06 18:50:10  jhayes
 # Clean up implementation using new dump command.
 #
@@ -117,9 +120,10 @@ class Command(rocks.commands.Command):
     tempname = tempfile.mktemp('.txt')
     f = open(tempname, 'w')
     for line in lines:
-      if line.startswith('rocks add nagios host ') and \
+      matchInfo = re.search(r'\s*add\s*nagios\s*host\s*(.*)$', line)
+      if matchInfo and \
          not re.search('name=[\'"]?' + args[0] + r'[\'"]?(\s|$)', line):
-        f.write(line[len('rocks add nagios host '):] + "\n")
+        f.write(matchInfo.group(1) + "\n")
     f.close()
 
     if os.path.exists(hostsPath):

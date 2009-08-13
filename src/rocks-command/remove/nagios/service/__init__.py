@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.9  2009/08/13 03:22:36  jhayes
+# Code improvements.
+#
 # Revision 1.8  2009/07/31 17:33:19  jhayes
 # Added nsca_schedule script to ease manipulating cron entry for passive checks.
 # Change "rocks add nagios service" command so that specifying a frequency of 0
@@ -125,12 +128,13 @@ class Command(rocks.commands.Command):
     tempname = tempfile.mktemp('.txt')
     f = open(tempname, 'w')
     for line in lines:
-      if not line.startswith('rocks add nagios service '):
+      matchInfo = re.search(r'\s*add\s*nagios\s*service\s*(.*)$', line)
+      if not matchInfo:
         continue
       if not re.search(r'name=[\'"]?' + args[0] + r'[\'"]?(\s|$)', line):
-        f.write(line[len('rocks add nagios service '):] + "\n")
+        f.write(matchInfo.group(1) + "\n")
       elif re.search(r'timeperiod=[\'"]?passive[\'"]?(\s|$)', line):
-        f.write(line[len('rocks add nagios service '):] + " frequency=0\n")
+        f.write(matchInfo.group(1) + " frequency=0\n")
     f.close()
 
     if os.path.exists(servicesPath):
