@@ -54,6 +54,10 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.7  2009/09/03 21:24:27  jhayes
+# Bug fix: 'rocks sync nagios' wasn't starting passive services on newly-added
+# hosts.
+#
 # Revision 1.6  2009/08/12 19:53:32  jhayes
 # Extend 'rocks sync nagios' to propagate passive tests to newly-defined hosts.
 #
@@ -144,9 +148,10 @@ class Command(rocks.commands.Command):
       lines = []
     f = open(tempname, 'w')
     for line in lines:
-      if line.startswith('rocks add nagios service ') and \
+      matchInfo = re.search(r'\s*add\s*nagios\s*service\s*(.*)$', line)
+      if matchInfo and \
          re.search(r'timeperiod=[\'"]?passive[\'"]?(\s|$)', line):
-        f.write(line[len('rocks add nagios service '):] + "\n")
+        f.write(matchInfo.group(1) + "\n")
     f.close()
     self.command('add.nagios.service', ['file=' + tempname])
 
