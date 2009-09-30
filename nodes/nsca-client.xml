@@ -13,6 +13,10 @@
 
   <changelog>
   $Log$
+  Revision 1.11  2009/09/30 23:15:20  jhayes
+  Extend timeout for NSCA reporting from 10 to 120 seconds.  Randomize cron
+  starting minute to reduce reporting contention.
+
   Revision 1.10  2009/08/12 20:02:54  jhayes
   Bug fix: using wrong rocks var to pick up host name.
 
@@ -86,7 +90,13 @@ tmpfile=/tmp/crontab$$
 # Remove any existing schedule for the service.
 /usr/bin/crontab -l 2&gt;/dev/null | sed -e "/NAGIOSX${service}X/d" &gt; ${tmpfile}
 if test "${period}" != "0"; then
-  /bin/echo "*/${period} * * * * /bin/echo NAGIOSX${service}X &gt;/dev/null &amp;&amp; " \
+  # Supress cron messages
+  if test "`cat ${tmpfile}`" = ""; then
+    /bin/echo "MAILTO=''" &gt; ${tmpfile}
+  fi
+  # Randomize initial test minute to reduce inter-host contention
+  first=`/usr/bin/python -c "import random; print random.randint(1, ${period}) - 1"`
+  /bin/echo "${first}-59/${period} * * * * /bin/echo NAGIOSX${service}X &gt;/dev/null &amp;&amp; " \
     "/opt/nagios/bin/nsca_check ${service} ${command}" &gt;&gt; ${tmpfile}
 fi
 /usr/bin/crontab ${tmpfile}
@@ -116,7 +126,7 @@ if test -n '<var name="NSCA_ServerName"/>'; then
 fi
 /usr/bin/printf "%s\t%s\t%s\t%s\n" \
                 "$hostname" "$service" "$exitcode" "$output" | \
-  /opt/nagios/bin/send_nsca -H $server -c /opt/nagios/etc/send_nsca.cfg
+  /opt/nagios/bin/send_nsca -to 120 -H $server -c /opt/nagios/etc/send_nsca.cfg
 </file>
 
 </post>
