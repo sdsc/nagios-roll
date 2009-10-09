@@ -55,6 +55,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.9  2009/10/09 15:51:45  jhayes
+# Move creation of nagios user into Makefile.
+#
 # Revision 1.8  2009/06/09 21:45:38  jhayes
 # Correction to installation of cgi.cfg.
 #
@@ -88,6 +91,10 @@ REDHAT.ROOT = $(PWD)/../../
 -include $(ROCKSROOT)/etc/Rules.mk
 
 build:
+	grep '^nagios:' /etc/passwd; \
+	if test $$? -ne 0; then \
+          useradd -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios
+	fi
 	tar zxvf $(NAME)-$(VERSION).tar.gz
 	( \
 	  cd $(NAME)-$(VERSION); \
