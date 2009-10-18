@@ -4,6 +4,7 @@
 
   <description>
   Nagios system monitor
+  http://www.nagios.org
   </description>
 
   <copyright>
@@ -13,42 +14,8 @@
 
   <changelog>
   $Log$
-  Revision 1.16  2009/07/22 21:31:06  jhayes
-  Add log_file setting to nagios configuration so that CGI scripts can find it.
-
-  Revision 1.15  2009/06/09 21:45:38  jhayes
-  Correction to installation of cgi.cfg.
-
-  Revision 1.14  2009/04/23 20:10:31  jhayes
-  Portability tweaks.  Remove libmcrypt, since we're not using it.
-
-  Revision 1.13  2009/04/15 17:47:18  jhayes
-  Add line to config file to avoid nagios warning message.
-
-  Revision 1.12  2009/04/13 23:19:09  jhayes
-  Code cleaning.
-
-  Revision 1.11  2009/03/30 23:14:49  jhayes
-  Debugging.
-
-  Revision 1.10  2009/03/30 21:16:58  jhayes
-  Debugging.
-
-  Revision 1.9  2009/03/30 19:29:42  jhayes
-  Split nagios service manipluation into separate commands.  Remove all add
-  arguments in favor of named params.  Lotsa code improvements.
-
-  Revision 1.8  2009/03/28 00:40:39  jhayes
-  More debugging.
-
-  Revision 1.7  2009/03/27 22:58:28  jhayes
-  Debugging.
-
-  Revision 1.6  2009/03/26 21:26:49  jhayes
-  Begin working on using rocks command to manipulate nagios config.
-
-  Revision 1.5  2009/03/25 18:39:47  jhayes
-  Prep work for adding object configuration.  A bug fix or two.
+  Revision 1.17  2009/10/18 16:31:31  jhayes
+  Add URLs.
 
   </changelog>
 

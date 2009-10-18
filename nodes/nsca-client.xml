@@ -4,6 +4,7 @@
 
   <description>
   NSCA Nagios plug-in for Nagios client
+  http://www.nagios.org
   </description>
 
   <copyright>
@@ -13,45 +14,8 @@
 
   <changelog>
   $Log$
-  Revision 1.11  2009/09/30 23:15:20  jhayes
-  Extend timeout for NSCA reporting from 10 to 120 seconds.  Randomize cron
-  starting minute to reduce reporting contention.
-
-  Revision 1.10  2009/08/12 20:02:54  jhayes
-  Bug fix: using wrong rocks var to pick up host name.
-
-  Revision 1.9  2009/07/31 17:33:19  jhayes
-  Added nsca_schedule script to ease manipulating cron entry for passive checks.
-  Change "rocks add nagios service" command so that specifying a frequency of 0
-  terminates the service.  Implement "rocks remove nagios service" for passive
-  checks.
-
-  Revision 1.8  2009/07/25 03:19:35  jhayes
-  Add convenience method for generating and transmitting results of passive
-  NSCA checks.
-
-  Revision 1.7  2009/07/17 20:29:54  jhayes
-  Support specification of passive services.  Install Nagios plug-ins on client
-  nodes so that they can be used for passive checks.
-
-  Revision 1.6  2009/04/24 23:49:33  anoop
-  Enable sunos build for nsca. Added libmcrypt back to enable optional
-  encryption. Removed send-nsca, so that we build from the same codebase
-
-  Revision 1.5  2009/04/23 20:39:03  jhayes
-  Work around nsca weirdness.
-
-  Revision 1.4  2009/04/23 20:10:31  jhayes
-  Portability tweaks.  Remove libmcrypt, since we're not using it.
-
-  Revision 1.3  2009/04/23 17:48:10  jhayes
-  Build send_nsca on target for portability.
-
-  Revision 1.2  2009/04/21 20:50:52  jhayes
-  Add NSCA configuration files.
-
-  Revision 1.1  2009/04/21 17:59:01  jhayes
-  Initial additions for NSCA plug-in.
+  Revision 1.12  2009/10/18 16:31:31  jhayes
+  Add URLs.
 
   </changelog>
 
