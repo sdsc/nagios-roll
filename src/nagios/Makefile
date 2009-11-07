@@ -54,36 +54,6 @@
 #
 # @Copyright@
 #
-# $Log$
-# Revision 1.9  2009/10/09 15:51:45  jhayes
-# Move creation of nagios user into Makefile.
-#
-# Revision 1.8  2009/06/09 21:45:38  jhayes
-# Correction to installation of cgi.cfg.
-#
-# Revision 1.7  2009/04/28 18:23:47  jhayes
-# Remove disused include.
-#
-# Revision 1.6  2009/04/15 16:50:26  jhayes
-# Allow specification of per-service monitoring timeperiod.  Remove copying of
-# sample configuration to target.
-#
-# Revision 1.5  2009/03/27 22:58:28  jhayes
-# Debugging.
-#
-# Revision 1.4  2009/03/26 21:26:50  jhayes
-# Begin working on using rocks command to manipulate nagios config.
-#
-# Revision 1.3  2009/03/13 19:07:55  jhayes
-# Clean up node XML and Makefile.
-#
-# Revision 1.2  2009/03/12 18:44:35  jhayes
-# Initial version working on triton.
-#
-# Revision 1.1  2009/02/05 18:36:05  bruno
-# added
-#
-#
 
 PKGROOT = /opt/nagios
 REDHAT.ROOT = $(PWD)/../../
@@ -93,7 +63,7 @@ REDHAT.ROOT = $(PWD)/../../
 build:
 	grep '^nagios:' /etc/passwd; \
 	if test $$? -ne 0; then \
-          useradd -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios
+	  useradd -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios; \
 	fi
 	tar zxvf $(NAME)-$(VERSION).tar.gz
 	( \

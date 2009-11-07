@@ -54,18 +54,11 @@
 # 
 # @Copyright@
 #
-# $Log$
-# Revision 1.2  2009/04/15 21:18:25  jhayes
-# Update image.
-#
-# Revision 1.1  2009/02/05 18:36:05  bruno
-# added
-#
-#
 
+PKGROOT = /var/www/html/roll-documentation/$(ROLL)/$(VERSION)
 REDHAT.ROOT = $(PWD)/../../
+
 -include $(ROCKSROOT)/etc/Rules.mk
-include Rules.mk
 
 default: $(NAME).spec ../$(NAME)-$(VERSION).tar.gz
 
@@ -92,4 +85,3 @@ install:: build
 clean::
 	rm -f *.html
 	rm -f index.pdf
-

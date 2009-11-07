@@ -2,106 +2,100 @@
 
 <kickstart>
 
-  <description>
-  Nagios system monitor
-  http://www.nagios.org
-  </description>
+<description>
+Nagios system monitor
+http://www.nagios.org
+</description>
 
-  <copyright>
-  Copyright (c) 2000 - 2008 The Regents of the University of California.
-  All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
-  </copyright>
+<copyright>
+Copyright (c) 2000 - 2009 The Regents of the University of California.
+All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
+</copyright>
 
-  <changelog>
-  $Log$
-  Revision 1.17  2009/10/18 16:31:31  jhayes
-  Add URLs.
+<changelog>
+</changelog>
 
-  </changelog>
+<package>nagios</package>
+<package>nagios-plugins</package>
+<package>rocks-command-nagios</package>
 
-  <package>nagios</package>
-  <package>nagios-plugins</package>
-  <package>rocks-command-nagios</package>
+<post>
 
-  <post>
+<!--
+  # JJH: see http://nagios.sourceforge.net/docs/3_0/quickstart-fedora.html
+-->
 
-  <!--
-    # JJH: see http://nagios.sourceforge.net/docs/3_0/quickstart-fedora.html
-  -->
+<!--
+  # JJH: replaced <= gbruno
+  # Create a new nagios user account and give it a password.
+  /usr/sbin/useradd -m nagios
+-->
+if test -f /usr/sbin/useradd.real; then
+  USERADD=/usr/sbin/useradd.real
+else
+  USERADD=/usr/sbin/useradd
+fi
+$USERADD -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios -G apache
 
-  <!--
-    # JJH: replaced <= gbruno
-    # Create a new nagios user account and give it a password.
-    /usr/sbin/useradd -m nagios
-  -->
-  if test -f /usr/sbin/useradd.real; then
-    USERADD=/usr/sbin/useradd.real
-  else
-    USERADD=/usr/sbin/useradd
-  fi
-  $USERADD -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios -G apache
+<!--
+  # JJH: Unneeded: use apache group directly instead
+  # Create a new nagcmd group for allowing external commands to be submitted
+  # through the web interface. Add both the nagios user and the apache user
+  # to the group.
+  /usr/sbin/groupadd nagcmd
+  /usr/sbin/usermod -a -G nagcmd apache
+  /usr/sbin/usermod -a -G nagcmd nagios
 
-  <!--
-    # JJH: Unneeded: use apache group directly instead
-    # Create a new nagcmd group for allowing external commands to be submitted
-    # through the web interface. Add both the nagios user and the apache user
-    # to the group.
-    /usr/sbin/groupadd nagcmd
-    /usr/sbin/usermod -a -G nagcmd apache
-    /usr/sbin/usermod -a -G nagcmd nagios
+  # JJH: Done by roll build; ==with-command-group defaults to nagios
+  # Run the Nagios configure script, passing the name of the group you
+  # created earlier like so:
+  ./configure ==with-command-group=nagcmd
+  make all
+  make install
+  make install-config
 
-    # JJH: Done by roll build; ==with-command-group defaults to nagios
-    # Run the Nagios configure script, passing the name of the group you
-    # created earlier like so:
-    ./configure ==with-command-group=nagcmd
-    make all
-    make install
-    make install-config
+  # JJH: Must inline here, since Makefile unavailable during installation
+-->
+<!-- make install-init -->
+<file name="/etc/rc.d/init.d/nagios"
+      expr="/bin/cat /opt/nagios/etc/daemon-init" perms="0755"/>
+<!-- make install-commandmode -->
+/bin/mkdir /opt/nagios/var/rw
+/bin/chmod g+s /opt/nagios/var/rw
+<!-- make install-webconf -->
+<file name="/etc/httpd/conf.d/nagios.conf"
+      expr="/bin/cat /opt/nagios/etc/httpd.conf" perms="0644"/>
 
-    # JJH: Must inline here, since Makefile unavailable during installation
-  -->
-  <!-- make install-init -->
-  <file name="/etc/rc.d/init.d/nagios"
-        expr="/bin/cat /opt/nagios/etc/daemon-init" perms="0755"/>
-  <!-- make install-commandmode -->
-  /bin/mkdir /opt/nagios/var/rw
-  chmod g+s /opt/nagios/var/rw
-  <!-- make install-webconf -->
-  <file name="/etc/httpd/conf.d/nagios.conf"
-        expr="/bin/cat /opt/nagios/etc/httpd.conf" perms="0644"/>
+<!--
+  # JJH: not needed
+  # Replace nagios@localhost w/the email specified at installation
+  vi /opt/nagios/etc/objects/contacts.cfg
 
-  <!--
-    # JJH: not needed
-    # Replace nagios@localhost w/the email specified at installation
-    vi /opt/nagios/etc/objects/contacts.cfg
-
-    # JJH: replaced <= gbruno; I used nagiosadmin (default) instead of nagios
-    # Create a nagiosadmin account for logging into the Nagios web interface.
-    # Remember the password you assign to this account - you'll need it later.
-    htpasswd -c /usr/local/nagios/etc/htpasswd.users nagiosadmin
-  -->
-  <file name="/opt/nagios/etc/htpasswd.users" perms="0644">
+  # JJH: replaced <= gbruno; I used nagiosadmin (default) instead of nagios
+  # Create a nagiosadmin account for logging into the Nagios web interface.
+  # Remember the password you assign to this account - you'll need it later.
+  htpasswd -c /usr/local/nagios/etc/htpasswd.users nagiosadmin
+-->
+<file name="/opt/nagios/etc/htpasswd.users" perms="0644">
 nagiosadmin:<var name="Kickstart_PrivateRootPassword"/>
-  </file>
+</file>
 
-  <!--
-    # JJH: not needed
-    # Restart Apache to make the new settings take effect.
-    service httpd restart
+<!--
+  # JJH: not needed
+  # Restart Apache to make the new settings take effect.
+  service httpd restart
 
-    # JJH: Handled by Makefile; opts default to nagios
-    # Compile and install the plugins.
-    ./configure ==with-nagios-user=nagios ==with-nagios-group=nagios
-    make
-    make install
+  # JJH: Handled by Makefile; opts default to nagios
+  # Compile and install the plugins.
+  ./configure ==with-nagios-user=nagios ==with-nagios-group=nagios
+  make
+  make install
+-->
 
-    </file>
-  -->
-
-  <!--
-    # JJH: add configuration
-  -->
-  <file name="/opt/nagios/etc/nagios.cfg" perms="0644">
+<!--
+  # JJH: add configuration
+-->
+<file name="/opt/nagios/etc/nagios.cfg" perms="0644">
 ##
 ## ROCKS
 ##
@@ -109,42 +103,42 @@ nagiosadmin:<var name="Kickstart_PrivateRootPassword"/>
 cfg_dir=/opt/nagios/etc/rocks
 illegal_macro_output_chars=`~$^&amp;"|'&lt;&gt;
 log_file=/opt/nagios/var/nagios.log
-  </file>
+</file>
 
-  /bin/mkdir -p /opt/nagios/etc/rocks
-  /opt/rocks/bin/rocks add nagios contact \
-    email='<var name="Info_ClusterContact"/>' \
-    groups='administrators'
-  /opt/rocks/bin/rocks add nagios host \
-    name='<var name="Kickstart_PrivateHostname"/>' \
-    ip='<var name="Kickstart_PrivateAddress"/>' \
-    contacts='administrators' \
-    groups='allhosts'
-  /opt/rocks/bin/rocks add nagios service \
-    name='PING' hosts='allhosts' \
-    command='check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 5' \
-    contacts='administrators'
+/bin/mkdir -p /opt/nagios/etc/rocks
+/opt/rocks/bin/rocks add nagios contact \
+  email='<var name="Info_ClusterContact"/>' \
+  groups='administrators'
+/opt/rocks/bin/rocks add nagios host \
+  name='<var name="Kickstart_PrivateHostname"/>' \
+  ip='<var name="Kickstart_PrivateAddress"/>' \
+  contacts='administrators' \
+  groups='allhosts'
+/opt/rocks/bin/rocks add nagios service \
+  name='PING' hosts='allhosts' \
+  command='check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 5' \
+  contacts='administrators'
 
-  <!--
-    # JJH: Not needed
-    chkconfig ==add nagios
+<!--
+  # JJH: Not needed
+  chkconfig ==add nagios
 
-    # JJH: create ssh key so nagios won't prompt for passphrase
-  -->
-  /bin/mkdir -p /opt/nagios/.ssh
-  /usr/bin/ssh-keygen -q -f /opt/nagios/.ssh/id_rsa -N ''
+  # JJH: create ssh key so nagios won't prompt for passphrase
+-->
+/bin/mkdir -p /opt/nagios/.ssh
+/usr/bin/ssh-keygen -q -f /opt/nagios/.ssh/id_rsa -N ''
 
-  /bin/chown -R nagios.apache /opt/nagios
-  /sbin/chkconfig nagios on
+/bin/chown -R nagios.apache /opt/nagios
+/sbin/chkconfig nagios on
 
-  <!--
-    # JJH: not needed
-    # Verify the sample Nagios configuration files.
-    /opt/nagios/bin/nagios -v /opt/nagios/etc/nagios.cfg
-    # If there are no errors, start Nagios.
-    service nagios start
-  -->
+<!--
+  # JJH: not needed
+  # Verify the sample Nagios configuration files.
+  /opt/nagios/bin/nagios -v /opt/nagios/etc/nagios.cfg
+  # If there are no errors, start Nagios.
+  service nagios start
+-->
 
-  </post>
+</post>
 
 </kickstart>

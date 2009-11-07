@@ -2,36 +2,32 @@
 
 <kickstart>
 
-  <description>
-  NSCA Nagios plug-in for Nagios client
-  http://www.nagios.org
-  </description>
+<description>
+NSCA Nagios plug-in for Nagios client
+http://www.nagios.org
+</description>
 
-  <copyright>
-  Copyright (c) 2000 - 2008 The Regents of the University of California.
-  All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
-  </copyright>
+<copyright>
+Copyright (c) 2000 - 2009 The Regents of the University of California.
+All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
+</copyright>
 
-  <changelog>
-  $Log$
-  Revision 1.12  2009/10/18 16:31:31  jhayes
-  Add URLs.
+<changelog>
+</changelog>
 
-  </changelog>
+<package os="linux">nsca</package>
+<package os="linux">nagios-plugins</package>
+<package os="sunos">ROCKSnsca</package>
+<package os="sunos">ROCKSlibmcrypt</package>
 
-  <package os="linux">nsca</package>
-  <package os="linux">nagios-plugins</package>
-  <package os="sunos">ROCKSnsca</package>
-  <package os="sunos">ROCKSlibmcrypt</package>
-
-  <post>
+<post>
 
 /usr/sbin/groupadd -g 413 nagios
 /usr/sbin/useradd  -u 413 -g nagios -c "Nagios Monitoring" -d /opt/nagios nagios
 
 <!-- adapted from nsca-2.7.2/sample_config/send_nsca.cfg -->
-mkdir -p /opt/nagios/etc
-chown -R nagios:nagios /opt/nagios/etc
+/bin/mkdir -p /opt/nagios/etc
+/bin/chown -R nagios:nagios /opt/nagios/etc
 <file name="/opt/nagios/etc/send_nsca.cfg" owner="nagios:nagios" perms="0644">
 ##
 ## ROCKS

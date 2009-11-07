@@ -54,17 +54,6 @@
 # 
 # @Copyright@
 #
-# $Log$
-# Revision 1.3  2009/11/03 22:28:09  jhayes
-# Update.
-#
-# Revision 1.2  2009/04/20 18:52:12  jhayes
-# Tweaks.
-#
-# Revision 1.1  2009/02/05 18:36:05  bruno
-# added
-#
-#
 
 -include $(ROLLSROOT)/etc/Rolls.mk
 
@@ -72,4 +61,3 @@ default: roll
 
 clean::
 	rm -f _arch bootstrap.py
-

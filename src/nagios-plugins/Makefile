@@ -54,36 +54,26 @@
 # 
 # @Copyright@
 #
-# $Log$
-# Revision 1.1  2009/02/05 18:36:05  bruno
-# added
-#
-#
 
-PKGROOT		= /opt/nagios
-REDHAT.ROOT     = $(PWD)/../../
+PKGROOT     = /opt/nagios
+REDHAT.ROOT = $(PWD)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
-include Rules.mk
-
 
 build:
 	tar zxvf $(NAME)-$(VERSION).tar.gz
-	(								\
-		cd $(NAME)-$(VERSION);					\
-		./configure --prefix=$(PKGROOT); 			\
-		make all;						\
+	( \
+	  cd $(NAME)-$(VERSION); \
+	  ./configure --prefix=$(PKGROOT); \
+	  make all \
 	)
-
 
 install::
 	mkdir -p $(ROOT)/$(PKGROOT)
-	(								\
-		cd $(NAME)-$(VERSION);					\
-		make prefix=$(ROOT)/$(PKGROOT) install;			\
+	( \
+	  cd $(NAME)-$(VERSION); \
+	  make prefix=$(ROOT)/$(PKGROOT) install; \
 	)
-
 
 clean::
 	rm -rf $(NAME)-$(VERSION)
-

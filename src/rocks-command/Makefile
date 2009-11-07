@@ -54,16 +54,11 @@
 # 
 # @Copyright@
 #
-# $Log$
-# Revision 1.1  2009/02/05 18:36:05  bruno
-# added
-#
-#
 
-
+PKGROOT = /opt/rocks
 REDHAT.ROOT     = $(PWD)/../..
+
 -include $(ROCKSROOT)/etc/Rules.mk
-include Rules.mk
 
 build:
 
@@ -72,3 +67,4 @@ install::
 	find -name "*.py" | cpio -pduv $(ROOT)/$(PY.ROCKS)/rocks/commands
 	find $(ROOT)/$(PY.ROCKS) -type d -exec chmod a+rx {} \;
 
+clean::

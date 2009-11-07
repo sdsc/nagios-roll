@@ -54,59 +54,27 @@
 #
 # @Copyright@
 #
-# $Log$
-# Revision 1.3  2009/04/24 23:49:33  anoop
-# Enable sunos build for nsca. Added libmcrypt back to enable optional
-# encryption. Removed send-nsca, so that we build from the same codebase
-#
-# Revision 1.2  2009/04/21 20:50:52  jhayes
-# Add NSCA configuration files.
-#
-# Revision 1.1  2009/04/21 17:59:01  jhayes
-# Initial additions for NSCA plug-in.
-#
-# Revision 1.6  2009/04/15 16:50:26  jhayes
-# Allow specification of per-service monitoring timeperiod.  Remove copying of
-# sample configuration to target.
-#
-# Revision 1.5  2009/03/27 22:58:28  jhayes
-# Debugging.
-#
-# Revision 1.4  2009/03/26 21:26:50  jhayes
-# Begin working on using rocks command to manipulate nagios config.
-#
-# Revision 1.3  2009/03/13 19:07:55  jhayes
-# Clean up node XML and Makefile.
-#
-# Revision 1.2  2009/03/12 18:44:35  jhayes
-# Initial version working on triton.
-#
-# Revision 1.1  2009/02/05 18:36:05  bruno
-# added
-#
-#
 
 PKGROOT = /opt/nagios
 REDHAT.ROOT = $(CURDIR)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
-include Rules.mk
 
 build:
 	gunzip -c $(NAME)-$(VERSION).tar.gz | $(TAR) -xf -
 	( \
-	  cd $(NAME)-$(VERSION);		\
-	  ./configure --prefix=$(PKGROOT);	\
-	  $(MAKE)				\
+	  cd $(NAME)-$(VERSION); \
+	  ./configure --prefix=$(PKGROOT); \
+	  $(MAKE) \
 	)
 
 install::
 	mkdir -p $(ROOT)/$(PKGROOT)
 	mkdir -p $(ROOT)/$(PKGROOT)/bin
-	(								\
-		cd $(NAME)-$(VERSION);					\
-		$(INSTALL) -m0755 src/nsca $(ROOT)/$(PKGROOT)/bin/nsca;	\
-		$(INSTALL) -m0755 src/send_nsca	$(ROOT)/$(PKGROOT)/bin/send_nsca;\
+	( \
+	  cd $(NAME)-$(VERSION); \
+	  $(INSTALL) -m0755 src/nsca $(ROOT)/$(PKGROOT)/bin/nsca; \
+	  $(INSTALL) -m0755 src/send_nsca $(ROOT)/$(PKGROOT)/bin/send_nsca; \
 	)
 
 clean::

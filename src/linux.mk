@@ -53,11 +53,6 @@
 # 
 # @Copyright@
 #
-# $Log$
-# Revision 1.1  2009/02/05 18:36:05  bruno
-# added
-#
-#
 
 SRCDIRS = `find . -type d -maxdepth 1 \
 	-not -name CVS \
