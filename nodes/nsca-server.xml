@@ -26,7 +26,7 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 ##
 pid_file=/opt/nagios/var/nsca.pid
 server_port=5667
-server_address=<var name="Kickstart_PrivateAddress"/>
+server_address=&Kickstart_PrivateAddress;
 nsca_user=nagios
 nsca_group=apache
 debug=1
@@ -59,13 +59,13 @@ service nsca
         server_args     = -c /opt/nagios/etc/nsca.cfg --inetd
        	log_on_failure  += USERID
         disable         = no
-        only_from       = <var name="Kickstart_PrivateAddress"/>/<var name="Kickstart_PrivateNetmaskCIDR"/>
+        only_from       = &Kickstart_PrivateAddress;/&Kickstart_PrivateNetmaskCIDR;
 }
 </file>
 
 /bin/chown -R nagios.apache /opt/nagios
 
-/opt/rocks/bin/rocks add var NSCA ServerName <var name="Kickstart_PrivateHostname"/>
+/opt/rocks/bin/rocks set attr NSCA_ServerName &Kickstart_PrivateHostname;
 
 </post>
 

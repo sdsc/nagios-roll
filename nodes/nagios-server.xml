@@ -77,7 +77,7 @@ $USERADD -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios -G apache
   htpasswd -c /usr/local/nagios/etc/htpasswd.users nagiosadmin
 -->
 <file name="/opt/nagios/etc/htpasswd.users" perms="0644">
-nagiosadmin:<var name="Kickstart_PrivateRootPassword"/>
+nagiosadmin:&Kickstart_PrivateRootPassword;
 </file>
 
 <!--
@@ -107,11 +107,11 @@ log_file=/opt/nagios/var/nagios.log
 
 /bin/mkdir -p /opt/nagios/etc/rocks
 /opt/rocks/bin/rocks add nagios contact \
-  email='<var name="Info_ClusterContact"/>' \
+  email='&Info_ClusterContact;' \
   groups='administrators'
 /opt/rocks/bin/rocks add nagios host \
-  name='<var name="Kickstart_PrivateHostname"/>' \
-  ip='<var name="Kickstart_PrivateAddress"/>' \
+  name='&Kickstart_PrivateHostname;' \
+  ip='&Kickstart_PrivateAddress; \
   contacts='administrators' \
   groups='allhosts'
 /opt/rocks/bin/rocks add nagios service \

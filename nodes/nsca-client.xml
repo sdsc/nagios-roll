@@ -79,10 +79,10 @@ case $* in
   ;;
 esac
 exitcode=$?
-hostname='<var name="Node_Hostname"/>'
+hostname='&hostname;'
 server=$hostname
-if test -n '<var name="NSCA_ServerName"/>'; then
-  server='<var name="NSCA_ServerName"/>'
+if test -n '&NSCA_ServerName;'; then
+  server='&NSCA_ServerName;'
 fi
 /usr/bin/printf "%s\t%s\t%s\t%s\n" \
                 "$hostname" "$service" "$exitcode" "$output" | \
