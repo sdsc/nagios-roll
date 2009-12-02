@@ -7,6 +7,9 @@ Appendix for Copyright and License notices
 @Copyright@
 
 $Log$
+Revision 1.2  2009/12/02 19:07:29  jhayes
+Fix nagios copyright page.
+
 Revision 1.1  2009/02/05 18:36:05  bruno
 added
 
@@ -33,17 +36,18 @@ added
 
 
 <section>
-	<title>License</title>
+	<title>Copyright</title>
 
-<para>
+<para><screen>
+Nagios is Copyright (c) 2002-2006 Ethan Galstad (egalstad@nagios.org)
 Nagios and the Nagios logo are registered trademarks of Ethan Galstad.
-</para>
+</screen></para>
 
 </section>
 
 
 <section>
-	<title>Copyright</title>
+	<title>License</title>
 
 <para><screen>
 <![CDATA[
