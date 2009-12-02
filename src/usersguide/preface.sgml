@@ -4,7 +4,9 @@
 
 <para>
 
-The Nagios Roll provides Nagios monitoring and reporting for a cluster.
+The Nagios Roll provides Nagios monitoring and reporting for a cluster.  It
+installs both the Nagios software and the NSCA plug-in into /opt/nagios on
+both server and client hosts.
 
 </para>
 
