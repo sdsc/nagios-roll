@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.15  2010/03/23 21:55:11  jhayes
+# Use ssh instead of rocks run host, since we're using an IP address.
+#
 # Revision 1.14  2009/07/31 17:33:19  jhayes
 # Added nsca_schedule script to ease manipulating cron entry for passive checks.
 # Change "rocks add nagios service" command so that specifying a frequency of 0
@@ -326,6 +329,6 @@ class Command(rocks.commands.add.nagios.Command):
             command += "; "
           command += "/opt/nagios/bin/nsca_schedule %s %s %s" % \
             (name, checkIntervalsByName[name], checkCommandsByName[name])
-        ipsByHostGroup[group].append(command)
-        self.command("run.host", ipsByHostGroup[group])
-        ipsByHostGroup[group].pop()
+        for ip in ipsByHostGroup[group]:
+          sshCommand = "ssh %s '%s'" % (ip, command)
+          commands.getoutput(sshCommand)
