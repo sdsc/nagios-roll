@@ -112,7 +112,7 @@ log_file=/opt/nagios/var/nagios.log
   groups='administrators'
 /opt/rocks/bin/rocks add nagios host \
   name='&Kickstart_PrivateHostname;' \
-  ip='&Kickstart_PrivateAddress; \
+  ip='&Kickstart_PrivateAddress;' \
   contacts='administrators' \
   groups='allhosts'
 /opt/rocks/bin/rocks add nagios service \
