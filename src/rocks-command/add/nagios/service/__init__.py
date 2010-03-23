@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.16  2010/03/23 21:58:36  jhayes
+# Forgot import.
+#
 # Revision 1.15  2010/03/23 21:55:11  jhayes
 # Use ssh instead of rocks run host, since we're using an IP address.
 #
@@ -126,6 +129,7 @@
 # added
 #
 
+import commands
 import os
 import rocks.commands
 
