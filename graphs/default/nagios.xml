@@ -18,17 +18,29 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 <edge from="server">
   <to>nagios-server</to>
 </edge>
+<order head="server">
+  <tail>nagios-server</tail>
+</order>
 
 <edge from="nagios-server">
   <to>nsca-server</to>
 </edge>
+<order head="nagios-server">
+  <tail>nsca-server</tail>
+</order>
 
 <edge from="client">
   <to>nsca-client</to>
 </edge>
+<order head="client">
+  <tail>nsca-client</tail>
+</order>
 
 <edge from="server">
   <to>nsca-client</to>
 </edge>
+<order head="server">
+  <tail>nsca-client</tail>
+</order>
 
 </graph>
