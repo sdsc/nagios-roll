@@ -43,4 +43,11 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
   <tail>nsca-client</tail>
 </order>
 
+<edge from="server">
+  <to>nagios-doc</to>
+</edge>
+<order head="server">
+  <tail>nagios-doc</tail>
+</order>
+
 </graph>

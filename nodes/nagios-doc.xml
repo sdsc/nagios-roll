@@ -1,0 +1,23 @@
+<?xml version="1.0" standalone="no"?>
+
+<kickstart>
+
+<description>
+Nagios system monitor roll doc
+http://www.nagios.org
+</description>
+
+<copyright>
+Copyright (c) 2000 - 2009 The Regents of the University of California.
+All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
+</copyright>
+
+<changelog>
+</changelog>
+
+<package>roll-nagios-usersguide</package>
+
+<post>
+</post>
+
+</kickstart>
