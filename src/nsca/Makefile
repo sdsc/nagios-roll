@@ -64,7 +64,7 @@ build:
 	gunzip -c $(NAME)-$(VERSION).tar.gz | $(TAR) -xf -
 	( \
 	  cd $(NAME)-$(VERSION); \
-	  ./configure --prefix=$(PKGROOT); \
+	  CC=gcc ./configure --prefix=$(PKGROOT); \
 	  $(MAKE) \
 	)
 
