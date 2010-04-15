@@ -57,17 +57,7 @@
 
 -include $(ROLLSROOT)/etc/Rolls.mk
 
-default:
-	mkdir nodesbak
-	cp nodes/*.xml nodesbak/
-	if test -z "`rocks list attr | grep Info_Cluster`"; then \
-	  perl -pi -e 's#&hostname;#<var name="Node_Hostname"/>#g' nodes/*.xml;\
-	  perl -pi -e 's#&(\w+_\w+);#<var name="$$1"/>#g' nodes/*.xml; \
-	  perl -pi -e 's#rocks\s+set\s+attr(\s+\w+)_(\w+)#rocks add var$$1 $$2#g' nodes/*.xml; \
-	fi
-	$(MAKE) roll
-	mv nodesbak/* nodes/
-	rmdir nodesbak
+default: roll
 
 clean::
-	rm -f _arch
+	rm -f _arch bootstrap.py
