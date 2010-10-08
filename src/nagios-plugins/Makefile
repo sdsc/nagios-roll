@@ -56,23 +56,23 @@
 #
 
 PKGROOT     = /opt/nagios
-REDHAT.ROOT = $(PWD)/../../
+REDHAT.ROOT = $(CURDIR)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
 build:
-	tar zxvf $(NAME)-$(VERSION).tar.gz
+	gunzip -c $(NAME)-$(VERSION).tar.gz | $(TAR) -xf -
 	( \
 	  cd $(NAME)-$(VERSION); \
 	  ./configure --prefix=$(PKGROOT); \
-	  make all \
+	  $(MAKE) all \
 	)
 
 install::
 	mkdir -p $(ROOT)/$(PKGROOT)
 	( \
 	  cd $(NAME)-$(VERSION); \
-	  make prefix=$(ROOT)/$(PKGROOT) install; \
+	  $(MAKE) prefix=$(ROOT)/$(PKGROOT) install; \
 	)
 
 clean::

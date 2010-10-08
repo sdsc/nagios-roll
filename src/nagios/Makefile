@@ -56,22 +56,18 @@
 #
 
 PKGROOT = /opt/nagios
-REDHAT.ROOT = $(PWD)/../../
+REDHAT.ROOT = $(CURDIR)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
 build:
-	grep '^nagios:' /etc/passwd; \
-	if test $$? -ne 0; then \
-	  useradd -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios; \
-	fi
-	tar zxvf $(NAME)-$(VERSION).tar.gz
+	gunzip -c $(NAME)-$(VERSION).tar.gz | $(TAR) -xf -
 	( \
-	  cd $(NAME)-$(VERSION); \
-	  ./configure --prefix=$(PKGROOT) \
-	    --with-nagios-user=nagios \
-	    --with-nagios-group=apache; \
-	  make all \
+	  cd $(NAME)-$(VERSION);	\
+	  ./configure --prefix=$(PKGROOT)\
+	    --with-nagios-user=nagios	\
+	    --with-nagios-group=apache;	\
+	  $(MAKE) all;			\
 	)
 
 install::
@@ -79,10 +75,10 @@ install::
 	mkdir -p $(ROOT)/$(PKGROOT)/etc
 	( \
 	  cd $(NAME)-$(VERSION); \
-	  make prefix=$(ROOT)/$(PKGROOT) install; \
-	  install -m755 daemon-init $(ROOT)/$(PKGROOT)/etc; \
-	  install -m755 sample-config/cgi.cfg $(ROOT)/$(PKGROOT)/etc; \
-	  install -m755 sample-config/httpd.conf $(ROOT)/$(PKGROOT)/etc \
+	  $(MAKE) prefix=$(ROOT)/$(PKGROOT) install; \
+	  $(INSTALL) -m755 daemon-init $(ROOT)/$(PKGROOT)/etc; \
+	  $(INSTALL) -m755 sample-config/cgi.cfg $(ROOT)/$(PKGROOT)/etc; \
+	  $(INSTALL) -m755 sample-config/httpd.conf $(ROOT)/$(PKGROOT)/etc \
 	)
 
 clean::

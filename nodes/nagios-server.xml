@@ -24,18 +24,7 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 <!--
   # JJH: see http://nagios.sourceforge.net/docs/3_0/quickstart-fedora.html
 -->
-
-<!--
-  # JJH: replaced <= gbruno
-  # Create a new nagios user account and give it a password.
-  /usr/sbin/useradd -m nagios
--->
-if test -f /usr/sbin/useradd.real; then
-  USERADD=/usr/sbin/useradd.real
-else
-  USERADD=/usr/sbin/useradd
-fi
-$USERADD -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios -G apache
+/usr/sbin/useradd -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios -G apache
 
 <!--
   # JJH: Unneeded: use apache group directly instead
@@ -56,15 +45,16 @@ $USERADD -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios -G apache
 
   # JJH: Must inline here, since Makefile unavailable during installation
 -->
-<!-- make install-init -->
-<file name="/etc/rc.d/init.d/nagios"
-      expr="/bin/cat /opt/nagios/etc/daemon-init" perms="0755"/>
+
+cp /opt/nagios/etc/daemon-init /etc/rc.d/init.d/nagios
+chmod 0755 /etc/rc.d/init.d/nagios
+
 <!-- make install-commandmode -->
-/bin/mkdir /opt/nagios/var/rw
-/bin/chmod g+s /opt/nagios/var/rw
+mkdir -p /opt/nagios/var/rw
+chmod g+s /opt/nagios/var/rw
 <!-- make install-webconf -->
-<file name="/etc/httpd/conf.d/nagios.conf"
-      expr="/bin/cat /opt/nagios/etc/httpd.conf" perms="0644"/>
+cp /opt/nagios/etc/httpd.conf /etc/httpd/conf.d/nagios.conf
+chmod 0644 /etc/httpd/conf.d/nagios.conf
 
 <!--
   # JJH: not needed
