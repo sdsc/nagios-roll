@@ -60,6 +60,7 @@ service nsca
        	log_on_failure  += USERID
         disable         = no
         only_from       = &Kickstart_PrivateAddress;/&Kickstart_PrivateNetmaskCIDR;
+        cps             = 400 10
 }
 </file>
 
