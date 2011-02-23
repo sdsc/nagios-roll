@@ -29,18 +29,15 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
   <tail>nsca-server</tail>
 </order>
 
-<edge from="client">
+<edge from="base">
   <to>nsca-client</to>
+  <to>nagios-roll-test</to>
 </edge>
-<order head="client">
+<order head="base">
   <tail>nsca-client</tail>
 </order>
-
-<edge from="server">
-  <to>nsca-client</to>
-</edge>
-<order head="server">
-  <tail>nsca-client</tail>
+<order head="base">
+  <tail>nagios-roll-test</tail>
 </order>
 
 <edge from="server">
