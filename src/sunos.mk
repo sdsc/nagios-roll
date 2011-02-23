@@ -6,7 +6,7 @@
 # 		         www.rocksclusters.org
 # 		        version 4.3 (Mars Hill)
 # 
-# Copyright (c) 2000 - 2007 The Regents of the University of California.
+# Copyright (c) 2000 - 2011 The Regents of the University of California.
 # All rights reserved.	
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -54,6 +54,9 @@
 # @Copyright@
 #
 # $Log$
+# Revision 1.3  2011/02/23 20:24:33  jhayes
+# Update copyrights.
+#
 # Revision 1.2  2009/04/24 23:49:33  anoop
 # Enable sunos build for nsca. Added libmcrypt back to enable optional
 # encryption. Removed send-nsca, so that we build from the same codebase

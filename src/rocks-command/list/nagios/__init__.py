@@ -6,7 +6,7 @@
 #              www.rocksclusters.org
 #             version 4.3 (Mars Hill)
 # 
-# Copyright (c) 2000 - 2007 The Regents of the University of California.
+# Copyright (c) 2000 - 2011 The Regents of the University of California.
 # All rights reserved.  
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -52,21 +52,4 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 # @Copyright@
-#
-# $Log$
-# Revision 1.5  2009/05/06 18:50:09  jhayes
-# Clean up implementation using new dump command.
-#
-# Revision 1.4  2009/04/13 23:19:10  jhayes
-# Code cleaning.
-#
-# Revision 1.3  2009/04/13 19:10:10  jhayes
-# Concentrate nagios config file parsing in parent nagios list command class.
-#
-# Revision 1.2  2009/03/17 06:46:59  jhayes
-# Follow conventions from other commands.
-#
-# Revision 1.1  2009/02/05 18:36:05  bruno
-# added
-#
-#
+

@@ -6,7 +6,7 @@
 # 		         www.rocksclusters.org
 # 		        version 4.3 (Mars Hill)
 # 
-# Copyright (c) 2000 - 2007 The Regents of the University of California.
+# Copyright (c) 2000 - 2011 The Regents of the University of California.
 # All rights reserved.	
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -52,82 +52,6 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 # @Copyright@
-#
-# $Log$
-# Revision 1.16  2010/03/23 21:58:36  jhayes
-# Forgot import.
-#
-# Revision 1.15  2010/03/23 21:55:11  jhayes
-# Use ssh instead of rocks run host, since we're using an IP address.
-#
-# Revision 1.14  2009/07/31 17:33:19  jhayes
-# Added nsca_schedule script to ease manipulating cron entry for passive checks.
-# Change "rocks add nagios service" command so that specifying a frequency of 0
-# terminates the service.  Implement "rocks remove nagios service" for passive
-# checks.
-#
-# Revision 1.13  2009/07/30 21:21:07  jhayes
-# Modify hosts' cron files to run passive Nagios services.
-#
-# Revision 1.12  2009/07/23 00:13:00  jhayes
-# Make a couple of changes to get email notification working.
-#
-# Revision 1.11  2009/07/17 20:29:54  jhayes
-# Support specification of passive services.  Install Nagios plug-ins on client
-# nodes so that they can be used for passive checks.
-#
-# Revision 1.10  2009/05/06 18:50:09  jhayes
-# Clean up implementation using new dump command.
-#
-# Revision 1.9  2009/04/15 18:26:29  jhayes
-# Add shorthand for specifying timeperiods.
-#
-# Revision 1.8  2009/04/15 16:50:26  jhayes
-# Allow specification of per-service monitoring timeperiod.  Remove copying of
-# sample configuration to target.
-#
-# Revision 1.7  2009/04/15 16:18:03  jhayes
-# Fix bug in service remove.
-#
-# Revision 1.6  2009/04/14 20:50:07  jhayes
-# More code cleaning.
-#
-# Revision 1.5  2009/04/13 23:19:10  jhayes
-# Code cleaning.
-#
-# Revision 1.4  2009/04/10 21:36:37  jhayes
-# Allow definition of service frequency and retry period.
-#
-# Revision 1.3  2009/04/01 19:12:50  jhayes
-# Add warning header to configuration files.
-#
-# Revision 1.2  2009/03/31 21:52:31  jhayes
-# Restart nagios after adding/removing objects.
-#
-# Revision 1.1  2009/03/31 13:37:36  jhayes
-# Add service commands.
-#
-# Revision 1.3  2009/03/28 00:40:39  jhayes
-# More debugging.
-#
-# Revision 1.2  2009/03/27 22:58:29  jhayes
-# Debugging.
-#
-# Revision 1.1  2009/03/27 18:54:51  jhayes
-# Add nagios host commands.
-#
-# Revision 1.4  2009/03/27 17:48:42  jhayes
-# Tidier implementation.
-#
-# Revision 1.3  2009/03/26 21:26:50  jhayes
-# Begin working on using rocks command to manipulate nagios config.
-#
-# Revision 1.2  2009/03/17 06:46:59  jhayes
-# Follow conventions from other commands.
-#
-# Revision 1.1  2009/02/05 18:36:05  bruno
-# added
-#
 
 import commands
 import os

@@ -6,7 +6,7 @@
 # 		         www.rocksclusters.org
 # 		        version 4.3 (Mars Hill)
 # 
-# Copyright (c) 2000 - 2007 The Regents of the University of California.
+# Copyright (c) 2000 - 2011 The Regents of the University of California.
 # All rights reserved.	
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -52,45 +52,6 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 # @Copyright@
-#
-# $Log$
-# Revision 1.9  2009/08/13 03:22:36  jhayes
-# Code improvements.
-#
-# Revision 1.8  2009/05/06 18:50:10  jhayes
-# Clean up implementation using new dump command.
-#
-# Revision 1.7  2009/04/14 20:50:08  jhayes
-# More code cleaning.
-#
-# Revision 1.6  2009/04/02 17:14:44  jhayes
-# Remove redundant restarts.
-#
-# Revision 1.5  2009/04/01 19:09:02  jhayes
-# Allow batch add in prep for sync command.
-#
-# Revision 1.4  2009/03/31 21:52:31  jhayes
-# Restart nagios after adding/removing objects.
-#
-# Revision 1.3  2009/03/30 21:16:58  jhayes
-# Debugging.
-#
-# Revision 1.2  2009/03/30 19:29:43  jhayes
-# Split nagios service manipluation into separate commands.  Remove all add
-# arguments in favor of named params.  Lotsa code improvements.
-#
-# Revision 1.1  2009/03/27 18:54:52  jhayes
-# Add nagios host commands.
-#
-# Revision 1.3  2009/03/26 21:26:50  jhayes
-# Begin working on using rocks command to manipulate nagios config.
-#
-# Revision 1.2  2009/03/17 06:47:00  jhayes
-# Follow conventions from other commands.
-#
-# Revision 1.1  2009/02/05 18:36:05  bruno
-# added
-#
 
 import os
 import re

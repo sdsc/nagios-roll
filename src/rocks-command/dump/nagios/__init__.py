@@ -6,7 +6,7 @@
 #              www.rocksclusters.org
 #             version 4.3 (Mars Hill)
 # 
-# Copyright (c) 2000 - 2007 The Regents of the University of California.
+# Copyright (c) 2000 - 2011 The Regents of the University of California.
 # All rights reserved.  
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -52,14 +52,6 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 # @Copyright@
-#
-# $Log$
-# Revision 1.2  2009/08/12 19:50:46  jhayes
-# Use full path.
-#
-# Revision 1.1  2009/05/06 17:44:04  jhayes
-# Add dump command.
-#
 #
 
 import os
