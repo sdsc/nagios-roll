@@ -53,6 +53,7 @@
 # 
 # @Copyright@
 
+import commands
 import os
 import re
 import tempfile
@@ -83,7 +84,8 @@ class Command(rocks.commands.Command):
     tempname = tempfile.mktemp('.txt')
 
     f = open(tempname, 'w')
-    for name, appliance, ip in self.db.fetchall():
+    queryTable = self.db.fetchall()
+    for name, appliance, ip in queryTable:
       f.write(
         'name="%s" ip=%s contacts="%s" groups="%s-group,allhosts"\n' %
         (name, ip, params['contacts'], appliance)
@@ -91,18 +93,11 @@ class Command(rocks.commands.Command):
     f.close()
     self.command('add.nagios.host', ['file=' + tempname])
 
-    # Redefine existing passive services (will launch distributed tests on
-    # newly-defined hosts where appropriate)
-    lines = self.command('dump.nagios', [servicesPath]).split("\n")
-    if len(lines) == 1 and lines[0] == '':
-      lines = []
-    f = open(tempname, 'w')
-    for line in lines:
-      matchInfo = re.search(r'\s*add\s*nagios\s*service\s*(.*)$', line)
-      if matchInfo and \
-         re.search(r'timeperiod=[\'"]?passive[\'"]?(\s|$)', line):
-        f.write(matchInfo.group(1) + "\n")
-    f.close()
-    self.command('add.nagios.service', ['file=' + tempname])
+    # Reset the NSCA commands for each host
+    for name, appliance, ip in queryTable:
+      command = ('rocks report host nagios %s | ' +
+                 'rocks report script | ' +
+                 'ssh %s') % (name, name)
+      commands.getoutput(command)
 
     os.remove(tempname)
