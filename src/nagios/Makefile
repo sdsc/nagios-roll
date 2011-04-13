@@ -61,6 +61,10 @@ REDHAT.ROOT = $(CURDIR)/../../
 -include $(ROCKSROOT)/etc/Rules.mk
 
 build:
+	grep '^nagios:' /etc/passwd; \
+	if test $$? -ne 0; then \
+	  useradd -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios; \
+	fi
 	gunzip -c $(NAME)-$(VERSION).tar.gz | $(TAR) -xf -
 	( \
 	  cd $(NAME)-$(VERSION);	\
