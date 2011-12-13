@@ -56,6 +56,7 @@
 #
 
 PKGROOT = /opt/nagios
+SOURCE = nagios-$(VERSION)
 REDHAT.ROOT = $(CURDIR)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
@@ -65,9 +66,9 @@ build:
 	if test $$? -ne 0; then \
 	  useradd -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios; \
 	fi
-	gunzip -c $(NAME)-$(VERSION).tar.gz | $(TAR) -xf -
+	gunzip -c $(SOURCE).tar.gz | $(TAR) -xf -
 	( \
-	  cd $(NAME)-$(VERSION);	\
+	  cd $(SOURCE);	\
 	  ./configure --prefix=$(PKGROOT)\
 	    --with-nagios-user=nagios	\
 	    --with-nagios-group=apache;	\
@@ -75,10 +76,10 @@ build:
 	)
 
 install::
-	mkdir -p $(ROOT)/$(PKGROOT)
-	mkdir -p $(ROOT)/$(PKGROOT)/etc
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)/etc
 	( \
-	  cd $(NAME)-$(VERSION); \
+	  cd $(SOURCE); \
 	  $(MAKE) prefix=$(ROOT)/$(PKGROOT) install; \
 	  $(INSTALL) -m755 daemon-init $(ROOT)/$(PKGROOT)/etc; \
 	  $(INSTALL) -m755 sample-config/cgi.cfg $(ROOT)/$(PKGROOT)/etc; \
@@ -86,4 +87,4 @@ install::
 	)
 
 clean::
-	rm -rf $(NAME)-$(VERSION)
+	rm -rf $(SOURCE)

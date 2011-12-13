@@ -64,7 +64,7 @@ service nsca
 }
 </file>
 
-/bin/chown -R nagios.apache /opt/nagios
+/bin/chown -R nagios:apache /opt/nagios
 
 /opt/rocks/bin/rocks set attr NSCA_ServerName &Kickstart_PrivateHostname;
 

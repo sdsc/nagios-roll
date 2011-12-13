@@ -55,25 +55,26 @@
 # @Copyright@
 #
 
-PKGROOT     = /opt/nagios
+PKGROOT = /opt/nagios
+SOURCE = nagios-plugins-$(VERSION)
 REDHAT.ROOT = $(CURDIR)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
 build:
-	gunzip -c $(NAME)-$(VERSION).tar.gz | $(TAR) -xf -
+	gunzip -c $(SOURCE).tar.gz | $(TAR) -xf -
 	( \
-	  cd $(NAME)-$(VERSION); \
+	  cd $(SOURCE); \
 	  ./configure --prefix=$(PKGROOT); \
 	  $(MAKE) all \
 	)
 
 install::
-	mkdir -p $(ROOT)/$(PKGROOT)
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	( \
-	  cd $(NAME)-$(VERSION); \
+	  cd $(SOURCE); \
 	  $(MAKE) prefix=$(ROOT)/$(PKGROOT) install; \
 	)
 
 clean::
-	rm -rf $(NAME)-$(VERSION)
+	rm -rf $(SOURCE)

@@ -56,23 +56,24 @@
 #
 
 PKGROOT = /opt/rocks
+SOURCE = libmcrypt-$(VERSION)
 REDHAT.ROOT = $(CURDIR)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
 build:
-	gunzip -c $(NAME)-$(VERSION).tar.gz | $(TAR) -xf -
+	gunzip -c $(SOURCE).tar.gz | $(TAR) -xf -
 	( \
-	  cd $(NAME)-$(VERSION); \
+	  cd $(SOURCE); \
 	  ./configure --prefix=$(PKGROOT); \
 	  $(MAKE); \
 	)
 
 install::
 	( \
-	  cd $(NAME)-$(VERSION); \
+	  cd $(SOURCE); \
 	  $(MAKE) install DESTDIR=$(ROOT); \
 	)
 
 clean::
-	rm -rf $(NAME)-$(VERSION)
+	rm -rf $(SOURCE)

@@ -56,14 +56,14 @@
 #
 
 PKGROOT = /opt/rocks
-REDHAT.ROOT     = $(PWD)/../..
+REDHAT.ROOT = $(CURDIR)/../..
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
 build:
 
 install::
-	mkdir -p $(ROOT)/$(PY.ROCKS)/rocks/commands
+	mkdir -p -m 755 $(ROOT)/$(PY.ROCKS)/rocks/commands
 	find -name "*.py" | cpio -pduv $(ROOT)/$(PY.ROCKS)/rocks/commands
 	find $(ROOT)/$(PY.ROCKS) -type d -exec chmod a+rx {} \;
 

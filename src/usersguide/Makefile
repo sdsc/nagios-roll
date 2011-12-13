@@ -56,7 +56,7 @@
 #
 
 PKGROOT = /var/www/html/roll-documentation/$(ROLL)/$(VERSION)
-REDHAT.ROOT = $(PWD)/../../
+REDHAT.ROOT = $(CURDIR)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
@@ -64,11 +64,11 @@ default: $(NAME).spec ../$(NAME)-$(VERSION).tar.gz
 
 html: predoc
 	cp images/select-nagios.png images/roll-select-rolls.png
-	jw --backend html --dsl $(PWD)/rocks.dsl#html index.sgml
+	jw --backend html --dsl $(CURDIR)/rocks.dsl#html index.sgml
 
 pdf: predoc
 	cp images/select-nagios.png images/roll-select-rolls.png
-	jw --backend pdf --dsl $(PWD)/rocks.dsl#print index.sgml
+	jw --backend pdf --dsl $(CURDIR)/rocks.dsl#print index.sgml
 
 build: html pdf
 

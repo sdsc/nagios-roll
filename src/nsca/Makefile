@@ -56,26 +56,27 @@
 #
 
 PKGROOT = /opt/nagios
+SOURCE = ncsa-$(VERSION)
 REDHAT.ROOT = $(CURDIR)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
 
 build:
-	gunzip -c $(NAME)-$(VERSION).tar.gz | $(TAR) -xf -
+	gunzip -c $(SOURCE).tar.gz | $(TAR) -xf -
 	( \
-	  cd $(NAME)-$(VERSION); \
+	  cd $(SOURCE); \
 	  CC=gcc ./configure --prefix=$(PKGROOT); \
 	  $(MAKE) \
 	)
 
 install::
-	mkdir -p $(ROOT)/$(PKGROOT)
-	mkdir -p $(ROOT)/$(PKGROOT)/bin
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)/bin
 	( \
-	  cd $(NAME)-$(VERSION); \
+	  cd $(SOURCE); \
 	  $(INSTALL) -m0755 src/nsca $(ROOT)/$(PKGROOT)/bin/nsca; \
 	  $(INSTALL) -m0755 src/send_nsca $(ROOT)/$(PKGROOT)/bin/send_nsca; \
 	)
 
 clean::
-	rm -rf $(NAME)-$(VERSION)
+	rm -rf $(SOURCE)
