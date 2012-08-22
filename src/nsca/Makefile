@@ -56,7 +56,7 @@
 #
 
 PKGROOT = /opt/nagios
-SOURCE = ncsa-$(VERSION)
+SOURCE = nsca-$(VERSION)
 REDHAT.ROOT = $(CURDIR)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk

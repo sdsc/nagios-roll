@@ -1,3 +1,3 @@
 NAME    = nsca
-VERSION = 2.7.2
+VERSION = 2.9.1
 RELEASE = 1
