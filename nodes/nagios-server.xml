@@ -17,6 +17,7 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 
 <package>nagios</package>
 <package>nagios-plugins</package>
+<package>nagios-roll-test</package>
 <package>rocks-command-nagios</package>
 
 <post>

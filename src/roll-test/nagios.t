@@ -1,25 +1,4 @@
-<?xml version="1.0" standalone="no"?>
-
-<kickstart>
-
-<description>
-nagios roll installation test.
-</description>
-
-<copyright>
-Copyright (c) 2000 - 2011 The Regents of the University of California.
-All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
-</copyright>
-
-<changelog>
-</changelog>
-
-<post>
-
-/bin/mkdir -m 0755 /root/rolltests
-
-<file name="/root/rolltests/nagios.t" perms="0755">
-<![CDATA[#!/usr/bin/perl -w
+#!/usr/bin/perl -w
 # nagios roll installation test.  Usage:
 # nagios.t [nodetype]
 #   where nodetype is one of "Compute", "Dbnode", "Frontend" or "Login"
@@ -94,9 +73,3 @@ SKIP: {
   $output = `rocks list attr | grep NSCA_ServerName`;
   like($output, qr/NSCA_ServerName/, 'nsca attr set');
 }
-]]>
-</file>
-
-</post>
-
-</kickstart> 

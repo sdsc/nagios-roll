@@ -19,6 +19,7 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 <package os="linux">nagios-plugins</package>
 <package os="sunos">ROCKSnsca</package>
 <package os="sunos">ROCKSlibmcrypt</package>
+<package>nagios-roll-test</package>
 
 <post>
 
