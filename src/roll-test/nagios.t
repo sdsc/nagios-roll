@@ -39,7 +39,6 @@ SKIP: {
   ok(-f '/opt/nagios/etc/nagios.cfg', 'nagios configuration created');
   $output = `rocks dump nagios 2>&1`;
   like($output, qr/administrators/, 'nagios default contact defined');
-  like($output, qr/PING/, 'ping service defined');
   ok(-f '/opt/nagios/.ssh/id_rsa', 'nagios ssh key created');
   $output = `/bin/ls -ld /opt/nagios 2>&1`;
   like($output, qr/nagios\s*apache/, '/opt/nagios ownership set');
