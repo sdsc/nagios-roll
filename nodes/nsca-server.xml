@@ -19,27 +19,6 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 
 <post>
 
-<!-- adapted from nsca-2.7.2/sample_config/nsca.cfg -->
-<file name="/opt/nagios/etc/nsca.cfg" perms="0644">
-##
-## ROCKS
-##
-pid_file=/opt/nagios/var/nsca.pid
-server_port=5667
-server_address=&Kickstart_PrivateAddress;
-nsca_user=nagios
-nsca_group=apache
-debug=0
-command_file=/opt/nagios/var/rw/nagios.cmd
-alternate_dump_file=/opt/nagios/var/rw/nsca.dump
-aggregate_writes=0
-append_to_file=0
-max_packet_age=30
-# We're restricting to local network; password would be overkill
-#password=
-decryption_method=1
-</file> <!-- NOTE: nsca pukes if we indent this closing tag! -->
-
 <file name="/etc/services" mode="append">
 nsca            5667/tcp                        # NSCA Nagios add-on
 </file>
@@ -67,6 +46,7 @@ service nsca
 /bin/chown -R nagios:apache /opt/nagios
 
 /opt/rocks/bin/rocks set attr NSCA_ServerName &Kickstart_PrivateHostname;
+/opt/rocks/bin/rocks set attr NSCA_ServerAddr &Kickstart_PrivateAddress;
 
 </post>
 

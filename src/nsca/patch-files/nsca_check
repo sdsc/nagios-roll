@@ -1,0 +1,23 @@
+#!/bin/bash
+# A convenience script that runs a Nagios service check and sends the output
+# through send_nsca.
+# usage: nsca_check <service_name> <command>
+service=$1
+shift
+case $* in
+  /*)
+    output=`$*`
+  ;;
+  *)
+    output=`/opt/nagios/libexec/$*`
+  ;;
+esac
+exitcode=$?
+hostname=`hostname`
+server=`/opt/rocks/bin/rocks list attr | grep NSCA_ServerName | awk ' {print $2}'`
+if test -z "$server"; then
+  server=$hostname
+fi
+/usr/bin/printf "%s\t%s\t%s\t%s\n" \
+                "$hostname" "$service" "$exitcode" "$output" | \
+  /opt/nagios/bin/send_nsca -to 120 -H $server -c /opt/nagios/etc/send_nsca.cfg

@@ -1,0 +1,23 @@
+#!/bin/bash
+# A script for starting/stopping an NSCA passive service check.
+# usage: nsca_schedule <service_name> <period> <command>
+# Specify a period of 0 to stop running a passive service check.
+service=$1
+period=$2
+shift; shift
+command=$*
+tmpfile=/tmp/crontab$$
+# Remove any existing schedule for the service.
+/usr/bin/crontab -l 2>/dev/null | sed -e "/NAGIOSX${service}X/d" > ${tmpfile}
+if test "${period}" != "0"; then
+  # Supress cron messages
+  if test "`cat ${tmpfile}`" = ""; then
+    /bin/echo "MAILTO=''" > ${tmpfile}
+  fi
+  # Randomize initial test minute to reduce inter-host contention
+  first=`/usr/bin/python -c "import random; print random.randint(1, ${period}) - 1"`
+  /bin/echo "${first}-59/${period} * * * * /bin/echo NAGIOSX${service}X >/dev/null && " \
+    "/opt/nagios/bin/nsca_check ${service} ${command}" >> ${tmpfile}
+fi
+/usr/bin/crontab ${tmpfile}
+/bin/rm -f ${tmpfile}

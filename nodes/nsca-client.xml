@@ -22,74 +22,10 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 <package>nagios-roll-test</package>
 
 <post>
-
 /usr/sbin/groupadd -g 413 nagios
 /usr/sbin/useradd  -u 413 -g nagios -c "Nagios Monitoring" -d /opt/nagios nagios
-
-<!-- adapted from nsca-2.7.2/sample_config/send_nsca.cfg -->
-/bin/mkdir -p /opt/nagios/etc
-/bin/chown -R nagios:nagios /opt/nagios/etc
-<file name="/opt/nagios/etc/send_nsca.cfg" owner="nagios:nagios" perms="0644">
-##
-## ROCKS
-##
-# We're restricting to local network; password would be overkill
-#password=
-encryption_method=1
-</file> <!-- NOTE: send_nsca pukes if we indent this closing tag! -->
-
-<file name="/opt/nagios/bin/nsca_schedule" perms="0755">
-#!/bin/bash
-# A script for starting/stopping an NSCA passive service check.
-# usage: nsca_schedule &lt;service_name&gt; &lt;period&gt; &lt;command&gt;
-# Specify a period of 0 to stop running a passive service check.
-service=$1
-period=$2
-shift; shift
-command=$*
-tmpfile=/tmp/crontab$$
-# Remove any existing schedule for the service.
-/usr/bin/crontab -l 2&gt;/dev/null | sed -e "/NAGIOSX${service}X/d" &gt; ${tmpfile}
-if test "${period}" != "0"; then
-  # Supress cron messages
-  if test "`cat ${tmpfile}`" = ""; then
-    /bin/echo "MAILTO=''" &gt; ${tmpfile}
-  fi
-  # Randomize initial test minute to reduce inter-host contention
-  first=`/usr/bin/python -c "import random; print random.randint(1, ${period}) - 1"`
-  /bin/echo "${first}-59/${period} * * * * /bin/echo NAGIOSX${service}X &gt;/dev/null &amp;&amp; " \
-    "/opt/nagios/bin/nsca_check ${service} ${command}" &gt;&gt; ${tmpfile}
-fi
-/usr/bin/crontab ${tmpfile}
-/bin/rm -f ${tmpfile}
-</file>
-
-<file name="/opt/nagios/bin/nsca_check" perms="0755">
-#!/bin/bash
-# A convenience script that runs a Nagios service check and sends the output
-# through send_nsca.
-# usage: nsca_check &lt;service_name&gt; &lt;command&gt;
-service=$1
-shift
-case $* in
-  /*)
-    output=`$*`
-  ;;
-  *)
-    output=`/opt/nagios/libexec/$*`
-  ;;
-esac
-exitcode=$?
-hostname='&hostname;'
-server=$hostname
-if test -n '&NSCA_ServerName;'; then
-  server='&NSCA_ServerName;'
-fi
-/usr/bin/printf "%s\t%s\t%s\t%s\n" \
-                "$hostname" "$service" "$exitcode" "$output" | \
-  /opt/nagios/bin/send_nsca -to 120 -H $server -c /opt/nagios/etc/send_nsca.cfg
-</file>
-
+/bin/chown -R nagios:nagios /opt/nagios/*
+/usr/bin/perl -pi -e 's/NSCA_SERVER_ADDR/&Kickstart_PrivateAddress;/' /opt/nagios/etc/*
 </post>
 
 <eval mode="xml">

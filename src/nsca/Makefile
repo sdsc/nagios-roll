@@ -72,11 +72,13 @@ build:
 install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)/bin
-	( \
-	  cd $(SOURCE); \
-	  $(INSTALL) -m0755 src/nsca $(ROOT)/$(PKGROOT)/bin/nsca; \
-	  $(INSTALL) -m0755 src/send_nsca $(ROOT)/$(PKGROOT)/bin/send_nsca; \
-	)
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)/etc
+	$(INSTALL) -m0755 $(SOURCE)/src/nsca $(ROOT)/$(PKGROOT)/bin/nsca
+	$(INSTALL) -m0755 $(SOURCE)/src/send_nsca $(ROOT)/$(PKGROOT)/bin/send_nsca
+	$(INSTALL) -m0644 patch-files/nsca.cfg $(ROOT)/$(PKGROOT)/etc/
+	$(INSTALL) -m0755 patch-files/nsca_check $(ROOT)/$(PKGROOT)/bin/
+	$(INSTALL) -m0755 patch-files/nsca_schedule $(ROOT)/$(PKGROOT)/bin/
+	$(INSTALL) -m0644 patch-files/send_nsca.cfg $(ROOT)/$(PKGROOT)/etc/
 
 clean::
 	rm -rf $(SOURCE)
