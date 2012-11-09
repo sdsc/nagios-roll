@@ -22,10 +22,11 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 <package>nagios-roll-test</package>
 
 <post>
-/usr/sbin/groupadd -g 413 nagios
-/usr/sbin/useradd  -u 413 -g nagios -c "Nagios Monitoring" -d /opt/nagios nagios
-/bin/chown -R nagios:nagios /opt/nagios/*
-/usr/bin/perl -pi -e 's/NSCA_SERVER_ADDR/&Kickstart_PrivateAddress;/' /opt/nagios/etc/*
+groupadd -g 413 nagios
+useradd  -u 413 -g nagios -c "Nagios Monitoring" -d /opt/nagios nagios
+chown -R nagios:nagios /opt/nagios/*
+perl -pi -e 's/NSCA_SERVER_ADDR/&Kickstart_PrivateAddress;/' /opt/nagios/etc/*
+perl -pi -e 's/NSCA_SERVER_NETMASKBITS/&Kickstart_PrivateNetmaskCIDR;/' /opt/nagios/etc/*
 </post>
 
 <eval mode="xml">

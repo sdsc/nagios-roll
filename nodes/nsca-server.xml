@@ -19,31 +19,10 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 
 <post>
 
-<file name="/etc/services" mode="append">
-nsca            5667/tcp                        # NSCA Nagios add-on
-</file>
+chown -R nagios:apache /opt/nagios
 
-<!-- adapted from nsca-2.7.2/sample_config/nsca.xinetd.d -->
-<file name="/etc/xinetd.d/nsca" perms="0644">
-# default: on
-# description: NSCA (Nagios Service Check Acceptor)
-service nsca
-{
-       	flags           = REUSE
-        socket_type     = stream        
-       	wait            = no
-        user            = nagios
-        group		= apache
-       	server          = /opt/nagios/bin/nsca
-        server_args     = -c /opt/nagios/etc/nsca.cfg --inetd
-       	log_on_failure  += USERID
-        disable         = no
-        only_from       = &Kickstart_PrivateAddress;/&Kickstart_PrivateNetmaskCIDR;
-        cps             = 400 10
-}
-</file>
-
-/bin/chown -R nagios:apache /opt/nagios
+cat /opt/nagios/etc/nsca.services >> /etc/services
+cp /opt/nagios/etc/nsca.xinetd.d /etc/xinetd.d/nsca
 
 /opt/rocks/bin/rocks set attr NSCA_ServerName &Kickstart_PrivateHostname;
 /opt/rocks/bin/rocks set attr NSCA_ServerAddr &Kickstart_PrivateAddress;

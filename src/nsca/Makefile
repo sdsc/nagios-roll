@@ -76,6 +76,8 @@ install::
 	$(INSTALL) -m0755 $(SOURCE)/src/nsca $(ROOT)/$(PKGROOT)/bin/nsca
 	$(INSTALL) -m0755 $(SOURCE)/src/send_nsca $(ROOT)/$(PKGROOT)/bin/send_nsca
 	$(INSTALL) -m0644 patch-files/nsca.cfg $(ROOT)/$(PKGROOT)/etc/
+	$(INSTALL) -m0644 patch-files/nsca.services $(ROOT)/$(PKGROOT)/etc/
+	$(INSTALL) -m0644 patch-files/nsca.xinetd.d $(ROOT)/$(PKGROOT)/etc/
 	$(INSTALL) -m0755 patch-files/nsca_check $(ROOT)/$(PKGROOT)/bin/
 	$(INSTALL) -m0755 patch-files/nsca_schedule $(ROOT)/$(PKGROOT)/bin/
 	$(INSTALL) -m0644 patch-files/send_nsca.cfg $(ROOT)/$(PKGROOT)/etc/

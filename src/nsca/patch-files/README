@@ -1,0 +1,8 @@
+NSCA Configuration Files
+
+nsca.cfg       nsca server configuration
+nsca_check     nsca client convenience script
+nsca_schedule  nsca client convenience script
+nsca.services  append to /etc/services on nsca server
+nsca.xinetd.d  copy to /etc/xinetd.d/nsca on server
+send_nsca.cfg  send_nsca client configuration
