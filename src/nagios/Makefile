@@ -77,7 +77,8 @@ build:
 
 install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
-	mkdir -p -m 755 $(ROOT)/$(PKGROOT)/etc
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)/etc/rocks
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)/.ssh
 	( \
 	  cd $(SOURCE); \
 	  $(MAKE) prefix=$(ROOT)/$(PKGROOT) install; \
@@ -85,6 +86,8 @@ install::
 	  $(INSTALL) -m755 sample-config/cgi.cfg $(ROOT)/$(PKGROOT)/etc; \
 	  $(INSTALL) -m755 sample-config/httpd.conf $(ROOT)/$(PKGROOT)/etc \
 	)
+	$(INSTALL) -m644 patch-files/nagios.cfg $(ROOT)/$(PKGROOT)/etc
+	/usr/bin/ssh-keygen -q -f $(ROOT)/$(PKGROOT)/.ssh/id_rsa -N ''
 
 clean::
 	rm -rf $(SOURCE)
