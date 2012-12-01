@@ -1,3 +1,3 @@
 NAME    = nagios
-VERSION = 3.4.1
-RELEASE = 1
+VERSION = 3.4.3
+RELEASE = 0
