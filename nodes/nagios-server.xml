@@ -22,7 +22,8 @@ All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 
 <post>
 
-useradd -M -u413 -c "Nagios Monitoring" -d /opt/nagios nagios -G apache
+groupadd -g 413 nagios
+useradd -M -u413 -c "Nagios Monitoring" -d /opt/nagios -G apache,nagios nagios
 
 cp /opt/nagios/etc/daemon-init /etc/rc.d/init.d/nagios
 chmod 0755 /etc/rc.d/init.d/nagios
@@ -37,7 +38,7 @@ chmod 0644 /etc/httpd/conf.d/nagios.conf
 nagiosadmin:&Kickstart_PrivateRootPassword;
 </file>
 
-/bin/chown -R nagios.apache /opt/nagios
+/bin/chown -R nagios:apache /opt/nagios
 /sbin/chkconfig nagios on
 
 /opt/rocks/bin/rocks add nagios contact \
