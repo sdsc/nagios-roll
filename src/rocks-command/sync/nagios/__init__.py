@@ -77,8 +77,9 @@ class Command(rocks.commands.Command):
 
     self.db.execute(
       """select n.name, m.name, i.ip
-         from nodes n, memberships m, networks i
-         where n.membership=m.id and i.node=n.id and i.device="eth0" """
+         from nodes n, memberships m, networks i, subnets s
+         where n.membership=m.id and i.node=n.id and i.subnet=s.id and
+               s.name="private" """
     )
 
     tempname = tempfile.mktemp('.txt')
