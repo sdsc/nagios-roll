@@ -54,7 +54,7 @@ $output = `id nagios 2>&1`;
 ok($? == 0, 'nagios login defined');
 like($output, qr/uid=413/, 'nagios uid');
 $output = `/bin/ls -ld /opt/nagios/etc 2>&1`;
-like($output, qr/nagios\s*nagios/, '/opt/nagios/etc created');
+like($output, qr/nagios\s*apache/, '/opt/nagios/etc created');
 ok(-f '/opt/nagios/etc/send_nsca.cfg', 'nsca config installed');
 ok(-f '/opt/nagios/bin/nsca_schedule', 'nsca_schedule installed');
 ok(-f '/opt/nagios/bin/nsca_check', 'nsca_check installed');
