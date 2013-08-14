@@ -14,7 +14,7 @@ case $* in
 esac
 exitcode=$?
 hostname=`hostname`
-server=`/opt/rocks/bin/rocks list attr | grep NSCA_ServerName | awk ' {print $2}'`
+server=`grep server_address /opt/nagios/etc/nsca.cfg |sed 's/.*=//'`
 if test -z "$server"; then
   server=$hostname
 fi
