@@ -156,4 +156,4 @@ class Command(rocks.commands.Command):
             object[attribute] = commands[object[attribute]]
           text += " %s='%s'" % (map[attribute], object[attribute])
         result.append(text)
-    self.addText("\n".join(result))
+    self.addText("\n".join(sorted(result)))

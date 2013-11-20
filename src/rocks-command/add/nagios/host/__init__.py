@@ -185,7 +185,7 @@ class Command(rocks.commands.add.nagios.Command):
     )
     f = open(hostsPath, 'w')
     f.write(hostHeader)
-    for name in addressesByName:
+    for name in sorted(addressesByName.keys()):
       f.write("\n")
       f.write(
         hostFormat %
