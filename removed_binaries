@@ -1,0 +1,10 @@
+3248339  382e58cdb48b2f32fcae62c242a75ea5b226f681  src/nagios/nagios-3.2.2.tar.gz
+2735504  db1d13c9141f8e27862b1e2aacbb17e01f2ca33e  src/nagios/nagios-3.0.6.tar.gz
+2279556  6de085046636b3cd41811a64176cf69c0f79bb96  src/nagios-plugins/nagios-plugins-1.4.13.tar.gz
+2095419  e2e8db608a90749848675deb35d082f4cf88a5a9  src/nagios-plugins/nagios-plugins-1.4.15.tar.gz
+2087089  0fde83d8fd6fd90da639e232f9f4344740270217  src/nagios-plugins/nagios-plugins-1.4.16.tar.gz
+1790104  f678e08f0288f140557d7a22c16ad1f883f6d697  src/nagios/nagios-3.4.3.tar.gz
+1788305  47b958f2402d397792213556d6b0ff47ca1b6cab  src/nagios/nagios-3.4.1.tar.gz
+1335178  398adfbec4b8aac72f3575717f491e490d188dbc  src/libmcrypt/libmcrypt-2.5.8.tar.gz
+114107   9551bb1a9d2008529955a0deca63c7de37796d7d  src/nsca/nsca-2.9.1.tar.gz
+104953   724997e35972c79a0fbecd85a2acd3c35242d531  src/nsca/nsca-2.7.2.tar.gz
