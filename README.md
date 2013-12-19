@@ -6,9 +6,9 @@ This roll bundles the Nagios cluster monitoring package.
 
 For more information about the various packages included in the nagios roll please visit their official web pages:
 
-- <a href="http://www.nagios.org" target="_blank"></a> is a powerful monitoring
-system that enables organizations to identify and resolve IT infrastructure
-problems before they affect critical business processes.
+- <a href="http://www.nagios.org" target="_blank">Nagios</a> is a powerful
+monitoring system that enables organizations to identify and resolve IT
+infrastructure problems before they affect critical business processes.
 - <a
 href="http://exchange.nagios.org/directory/Addons/Passive-Checks/NSCA--2D-Nagios
 -Service-Check-Acceptor/details" target="_blank">NSCA</a>, the Nagios Service
