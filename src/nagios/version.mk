@@ -1,5 +1,5 @@
 NAME    = nagios
-VERSION = 3.4.3
+VERSION = 4.0.2
 RELEASE = 0
 PKGROOT = /opt/nagios
 
