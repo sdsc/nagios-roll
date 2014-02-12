@@ -74,8 +74,8 @@ install::
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)/bin
 	mkdir -p -m 755 $(ROOT)/$(PKGROOT)/etc
-	$(INSTALL) -m0755 $(SOURCE)/src/nsca $(ROOT)/$(PKGROOT)/bin/nsca
-	$(INSTALL) -m0755 $(SOURCE)/src/send_nsca $(ROOT)/$(PKGROOT)/bin/send_nsca
+	$(INSTALL) -m0755 $(SOURCE_DIR)/src/nsca $(ROOT)/$(PKGROOT)/bin/nsca
+	$(INSTALL) -m0755 $(SOURCE_DIR)/src/send_nsca $(ROOT)/$(PKGROOT)/bin/send_nsca
 	$(INSTALL) -m0644 patch-files/nsca.cfg $(ROOT)/$(PKGROOT)/etc/
 	$(INSTALL) -m0644 patch-files/nsca.services $(ROOT)/$(PKGROOT)/etc/
 	$(INSTALL) -m0644 patch-files/nsca.xinetd.d $(ROOT)/$(PKGROOT)/etc/
