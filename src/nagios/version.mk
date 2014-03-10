@@ -2,6 +2,7 @@ NAME    = nagios
 VERSION = 4.0.2
 RELEASE = 0
 PKGROOT = /opt/nagios
+RPM.EXTRAS         = AutoReq:No
 
 SRC_SUBDIR         = nagios
 

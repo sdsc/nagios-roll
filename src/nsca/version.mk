@@ -2,6 +2,7 @@ NAME               = nsca
 VERSION            = 2.9.1
 RELEASE            = 1
 PKGROOT            = /opt/nagios
+RPM.EXTRAS         = AutoReq:No
 
 SRC_SUBDIR         = nsca
 

@@ -2,6 +2,7 @@ NAME               = libmcrypt
 VERSION            = 2.5.8
 RELEASE            = 1
 PKGROOT            = /opt/rocks
+RPM.EXTRAS         = AutoReq:No
 
 SRC_SUBDIR         = libmcrypt
 
