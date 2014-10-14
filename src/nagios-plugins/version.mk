@@ -1,6 +1,6 @@
 NAME               = nagios-plugins
-VERSION            = 1.4.16
-RELEASE            = 1
+VERSION            = 2.0.3
+RELEASE            = 0
 PKGROOT            = /opt/nagios
 RPM.EXTRAS         = AutoReq:No
 

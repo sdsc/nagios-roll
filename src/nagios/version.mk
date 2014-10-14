@@ -1,5 +1,5 @@
 NAME    = nagios
-VERSION = 4.0.2
+VERSION = 4.0.8
 RELEASE = 0
 PKGROOT = /opt/nagios
 RPM.EXTRAS         = AutoReq:No
