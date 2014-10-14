@@ -1,16 +1,16 @@
-NAME    = nagios
-VERSION = 4.0.8
-RELEASE = 0
-PKGROOT = /opt/nagios
-RPM.EXTRAS         = AutoReq:No
+NAME           = nagios
+VERSION        = 4.0.8
+RELEASE        = 0
+PKGROOT        = /opt/nagios
 
-SRC_SUBDIR         = nagios
+SRC_SUBDIR     = nagios
 
-SOURCE_NAME        = $(NAME)
-SOURCE_VERSION     = $(VERSION)
-SOURCE_SUFFIX      = tar.gz
-SOURCE_PKG         = $(SOURCE_NAME)-$(SOURCE_VERSION).$(SOURCE_SUFFIX)
-SOURCE_DIR         = $(SOURCE_PKG:%.$(SOURCE_SUFFIX)=%)
+SOURCE_NAME    = $(NAME)
+SOURCE_SUFFIX  = tar.gz
+SOURCE_VERSION = $(VERSION)
+SOURCE_PKG     = $(SOURCE_NAME)-$(SOURCE_VERSION).$(SOURCE_SUFFIX)
+SOURCE_DIR     = $(SOURCE_PKG:%.$(SOURCE_SUFFIX)=%)
 
-TAR_GZ_PKGS           = $(SOURCE_PKG)
+TAR_GZ_PKGS    = $(SOURCE_PKG)
 
+RPM.EXTRAS     = AutoReq:No
