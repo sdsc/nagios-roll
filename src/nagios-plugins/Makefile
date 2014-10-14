@@ -66,15 +66,15 @@ build: $(SRC_DIRS)
 	( \
 	  cd $(SOURCE_DIR); \
 	  ./configure --prefix=$(PKGROOT); \
-	  $(MAKE) all; \
+	  $(MAKE) all \
 	)
 	@echo "::: Package $(NAME) build complete :::"
 	
 install::
-	mkdir -p $(ROOT)/$(PKGROOT)
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
 	( \
 	  cd $(SOURCE_DIR); \
-	  $(MAKE) prefix=$(ROOT)/$(PKGROOT) install; \
+	  $(MAKE) prefix=$(ROOT)/$(PKGROOT) install \
 	)
 	@echo "::: Package $(NAME) install complete :::"
 
