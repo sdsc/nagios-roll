@@ -1,11 +1,11 @@
-NAME           = nagios-plugins
+NAME           = sdsc-nagios-plugins
 VERSION        = 2.0.3
-RELEASE        = 0
+RELEASE        = 1
 PKGROOT        = /opt/nagios
 
 SRC_SUBDIR     = nagios-plugins
 
-SOURCE_NAME    = $(NAME)
+SOURCE_NAME    = nagios-plugins
 SOURCE_SUFFIX  = tar.gz
 SOURCE_VERSION = $(VERSION)
 SOURCE_PKG     = $(SOURCE_NAME)-$(SOURCE_VERSION).$(SOURCE_SUFFIX)

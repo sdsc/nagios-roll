@@ -60,7 +60,23 @@ REDHAT.ROOT = $(CURDIR)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
 include Rules.mk
-include pull.mk
+include $(SDSCDEVEL)/Pull.mk
+include $(SDSCDEVEL)/Rules.mk
+
+LICENSE_FILES = $(SOURCE_DIR)/{LEGAL,nsca.spec}
+
+$(NAME).spec: DESCRIPTION LICENSE
+
+DESCRIPTION:
+	( \
+	  $(DESCRIBE_PKG) \
+	) > $@
+
+LICENSE: $(SRC_DIRS)
+	if ! grep -q "License: GPL" $(SOURCE_DIR)/nsca.spec; then \
+	  exit 2; \
+	fi
+	echo GPL > $@
 
 build: $(SRC_DIRS)
 	( \
@@ -82,8 +98,9 @@ install::
 	$(INSTALL) -m0755 patch-files/nsca_check $(ROOT)/$(PKGROOT)/bin/
 	$(INSTALL) -m0755 patch-files/nsca_schedule $(ROOT)/$(PKGROOT)/bin/
 	$(INSTALL) -m0644 patch-files/send_nsca.cfg $(ROOT)/$(PKGROOT)/etc/
+	$(INSTALL_LICENSE_FILES)
 	@echo "::: Package $(NAME) install complete :::"
 
 clean::
-	rm -rf $(SOURCE_DIR)
+	rm -rf $(SOURCE_DIR) DESCRIPTION LICENSE
 

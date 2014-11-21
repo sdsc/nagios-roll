@@ -1,11 +1,11 @@
-NAME           = libmcrypt
+NAME           = sdsc-libmcrypt
 VERSION        = 2.5.8
-RELEASE        = 1
+RELEASE        = 2
 PKGROOT        = /opt/rocks
 
 SRC_SUBDIR     = libmcrypt
 
-SOURCE_NAME    = $(NAME)
+SOURCE_NAME    = libmcrypt
 SOURCE_SUFFIX  = tar.gz
 SOURCE_VERSION = $(VERSION)
 SOURCE_PKG     = $(SOURCE_NAME)-$(SOURCE_VERSION).$(SOURCE_SUFFIX)

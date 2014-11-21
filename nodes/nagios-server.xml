@@ -12,10 +12,10 @@ Copyright (c) 2000 - 2014 The Regents of the University of California.
 All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 </copyright>
 
-<package>nagios</package>
-<package>nagios-plugins</package>
-<package>nagios-roll-test</package>
-<package>rocks-command-nagios</package>
+<package>sdsc-nagios</package>
+<package>sdsc-nagios-plugins</package>
+<package>sdsc-nagios-roll-test</package>
+<package>sdsc-rocks-command-nagios</package>
 
 <post>
 

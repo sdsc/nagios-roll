@@ -58,7 +58,6 @@
 # $Log$
 #
 
-PKGROOT = /opt/rocks
 REDHAT.ROOT = $(CURDIR)/../..
 
 -include $(ROCKSROOT)/etc/Rules.mk

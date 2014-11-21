@@ -60,7 +60,23 @@ REDHAT.ROOT = $(CURDIR)/../../
 
 -include $(ROCKSROOT)/etc/Rules.mk
 include Rules.mk
-include pull.mk
+include $(SDSCDEVEL)/Pull.mk
+include $(SDSCDEVEL)/Rules.mk
+
+LICENSE_FILES = $(SOURCE_DIR)/{LICENSE,README}
+
+$(NAME).spec: DESCRIPTION LICENSE
+
+DESCRIPTION:
+	( \
+	  $(DESCRIBE_PKG) \
+	) > $@
+
+LICENSE: $(SRC_DIRS)
+	if ! grep -q "GNU GENERAL PUBLIC LICENSE" $(SOURCE_DIR)/LICENSE; then \
+	  exit 2; \
+	fi
+	echo GPL > $@
 
 build: $(SRC_DIRS)
 	grep '^nagios:' /etc/passwd; \
@@ -88,9 +104,10 @@ install::
 	  $(INSTALL) -m755 sample-config/httpd.conf $(ROOT)/$(PKGROOT)/etc; \
 	)
 	$(INSTALL) -m644 patch-files/nagios.cfg $(ROOT)/$(PKGROOT)/etc
+	$(INSTALL_LICENSE_FILES)
 	/usr/bin/ssh-keygen -q -f $(ROOT)/$(PKGROOT)/.ssh/id_rsa -N ''
 	@echo "::: Package $(NAME) install complete :::"
 
 clean::
-	rm -rf $(SOURCE_DIR)
+	rm -rf $(SOURCE_DIR) DESCRIPTION LICENSE
 

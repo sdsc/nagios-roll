@@ -1,6 +1,8 @@
-NAME    = roll-$(ROLL)-usersguide
-RELEASE = 0
-RPM.EXTRAS         = AutoReq:No
+NAME       = sdsc-roll-$(ROLL)-usersguide
+VERSION    = 1
+RELEASE    = 1
+
+RPM.EXTRAS = AutoReq:No
 
 SUMMARY_COMPATIBLE   = $(VERSION)
 SUMMARY_MAINTAINER   = Rocks Group

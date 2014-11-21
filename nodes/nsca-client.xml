@@ -12,11 +12,9 @@ Copyright (c) 2000 - 2014 The Regents of the University of California.
 All rights reserved. Rocks(r) v5.1 www.rocksclusters.org
 </copyright>
 
-<package os="linux">nsca</package>
-<package os="linux">nagios-plugins</package>
-<package os="sunos">ROCKSnsca</package>
-<package os="sunos">ROCKSlibmcrypt</package>
-<package>nagios-roll-test</package>
+<package>sdsc-nsca</package>
+<package>sdsc-nagios-plugins</package>
+<package>sdsc-nagios-roll-test</package>
 
 <post>
 groupadd -g 413 nagios
