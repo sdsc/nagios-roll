@@ -13,7 +13,7 @@ case $* in
   ;;
 esac
 exitcode=$?
-hostname=`hostname`
+hostname=`hostname | sed 's/\..*//'`
 server=`grep server_address /opt/nagios/etc/nsca.cfg |sed 's/.*=//'`
 if test -z "$server"; then
   server=$hostname
