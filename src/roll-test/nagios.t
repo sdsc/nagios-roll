@@ -13,13 +13,13 @@ my $output;
 # nagios-doc.xml
 SKIP: {
   skip 'not server', 1 if $appliance ne 'Frontend';
-  ok(-d '/var/www/html/roll-documentation/nagios', 'doc installed');
+  ok(-d '/var/www/html/roll-documentation/nagios-roll', 'doc installed');
 }
 
 # nagios-server.xml
 SKIP: {
 
-  skip 'not server', 15 if $appliance ne 'Frontend';
+  skip 'not server', 16 if $appliance ne 'Frontend';
   ok(-d '/opt/nagios', 'nagios installed');
   ok(-f '/opt/nagios/libexec/check_dummy', 'nagios plugins installed');
   $output = `rocks dump nagios 2>&1`;
@@ -27,7 +27,7 @@ SKIP: {
   `grep -q '^nagios:' /etc/passwd 2>&1`;
   ok($? == 0, 'nagios user created');
   $output = `id nagios 2>&1`;
-  like($output, qr/apache/, 'nagios group membership');
+  like($output, qr/apache/, 'nagios in group apache');
   $output = `service nagios status 2>&1`;
   ok($? == 0, 'nagios service defined');
   like($output, qr/running/, 'nagios running');
@@ -40,8 +40,10 @@ SKIP: {
   $output = `rocks dump nagios 2>&1`;
   like($output, qr/administrators/, 'nagios default contact defined');
   ok(-f '/opt/nagios/.ssh/id_rsa', 'nagios ssh key created');
-  $output = `/bin/ls -ld /opt/nagios 2>&1`;
-  like($output, qr/nagios\s*apache/, '/opt/nagios ownership set');
+  chomp($output = `/bin/ls -ld /opt/nagios 2>&1 | awk ' {print \$3}'`);
+  is($output, 'nagios', '/opt/nagios ownership set');
+  chomp($output = `/bin/ls -ld /opt/nagios 2>&1 | awk ' {print \$4}'`);
+  is($output, 'apache', '/opt/nagios group set');
 
 }
 
