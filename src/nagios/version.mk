@@ -1,6 +1,6 @@
 NAME           = sdsc-nagios
 VERSION        = 4.0.8
-RELEASE        = 1
+RELEASE        = 2
 PKGROOT        = /opt/nagios
 
 SRC_SUBDIR     = nagios
