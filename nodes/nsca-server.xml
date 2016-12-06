@@ -20,6 +20,8 @@ chown -R nagios:apache /opt/nagios
 
 cat /opt/nagios/etc/nsca.services >> /etc/services
 cp /opt/nagios/etc/nsca.xinetd.d /etc/xinetd.d/nsca
+perl -pi -e 's/NSCA_SERVER_ADDR/&Kickstart_PrivateAddress;/' /etc/xinetd.d/nsca
+perl -pi -e 's/NSCA_SERVER_NETMASKBITS/&Kickstart_PrivateNetmaskCIDR;/' /etc/xinetd.d/nsca
 
 /opt/rocks/bin/rocks set attr NSCA_ServerName &Kickstart_PrivateHostname;
 /opt/rocks/bin/rocks set attr NSCA_ServerAddr &Kickstart_PrivateAddress;
