@@ -1,8 +1,9 @@
 NAME       = sdsc-roll-$(ROLL)-usersguide
 VERSION    = 1
-RELEASE    = 1
+RELEASE    = 2
 
-RPM.EXTRAS = AutoReq:No
+RPM.EXTRAS = AutoReq:No\nAutoProv:No
+RPM.PREFIX = $(PKGROOT)
 
 SUMMARY_COMPATIBLE   = $(VERSION)
 SUMMARY_MAINTAINER   = Rocks Group
